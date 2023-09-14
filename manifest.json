@@ -1,0 +1,122 @@
+{
+  "manifest_version": 3,
+  "name": "Ford All You Need",
+  "description": "Tissue for wiping Junior Content Editors tears",
+  "version": "0.1",
+  "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "48": "images/icon-64.png",
+    "128": "images/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "contextMenus"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://jira.uhub.biz/browse/*"
+      ],
+      "js": [
+        "createWFButton.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://wwwperf.brandeuauthorlb.ford.com/miscadmin"
+      ],
+      "js": [
+        "sharedTools.js",
+        "createWFAEMTools.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://wwwperf.brandeuauthorlb.ford.com/inbox"
+      ],
+      "js": [
+        "/thirdParty/jQuery.js",
+        "sharedTools.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://wwwperf.brandeuauthorlb.ford.com/etc/workflow/packages/ESM/*"
+      ],
+      "all_frames": true,
+      "js": [
+        "sharedTools.js",
+        "fixWFPage.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://wwwperf.brandeuauthorlb.ford.com/content/*"
+      ],
+      "all_frames": true,
+      "js": [
+        "sharedTools.js",
+        "author.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://wwwperf.brandeuauthorlb.ford.com/etc/guxacc/tools/resource-resolver-tool.html"
+      ],
+      "all_frames": true,
+      "js": [
+        "sharedTools.js",
+        "resourceResolver.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://wwwperf.brandeuauthorlb.ford.com/etc/guxfoe/tools/find-replace-links.html"
+      ],
+      "all_frames": true,
+      "js": [
+        "sharedTools.js",
+        "findReplace.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://www.ford.ie/*",
+        "https://www.ford.fi/*",
+        "https://www.ford.cz/*",
+        "https://www.ford.hu/*",
+        "https://www.ford.gr/*",
+        "https://www.ford.ro/*",
+        "https://www.ford.lu/*",
+        "https://www.fr.ford.be/*",
+        "https://www.nl.ford.be/*",
+        "https://www.de.ford.ch/*",
+        "https://www.fr.ford.ch/*",
+        "https://www.it.ford.ch/*",
+        "https://www.ford.co.uk/*",
+        "https://www.ford.de/*",
+        "https://www.ford.es/*",
+        "https://www.ford.fr/*",
+        "https://www.ford.nl/*",
+        "https://www.ford.it/*",
+        "https://www.ford.no/*",
+        "https://www.ford.at/*",
+        "https://www.ford.pt/*",
+        "https://www.ford.pl/*",
+        "https://www.ford.dk/*",
+        "https://*.brandeulb.ford.com/*"
+      ],
+      "js": [
+        "livePerf.js"
+      ]
+    }
+  ]
+}
