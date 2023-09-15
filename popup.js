@@ -344,15 +344,11 @@ function openPropertiesTouchUI(tab) {
       }
 
       if (!ifProd) {
-        ButtonOnClick("#buttonToProd", function () {
-          ToEnvironment("prod");
-        });
+        ButtonOnClick("#buttonToProd", ToEnvironment, "prod");
       }
 
       if (!ifAuthor) {
-        ButtonOnClick("#buttonToAuthor", function () {
-          ToEnvironment("author");
-        });
+        ButtonOnClick("#buttonToAuthor", ToEnvironment, "author");
       } else {
         ButtonOnClick("#buttonToAnotherUI", changeUI, tab, url);
         ButtonOnClick(
@@ -366,12 +362,18 @@ function openPropertiesTouchUI(tab) {
     ifJira = url.match(regexJira);
     if (ifJira) {
       ButtonOnClick("#buttonCreateWF", function () {
-        chrome.tabs.sendMessage(tab.id, "createWF");
+        chrome.tabs.sendMessage(tab.id, { from: "popup", subject: "createWF" });
       });
       //CreateWFButton();
     }
 
-    //ShowAltTexts()
+    ButtonOnClick("#buttonShowAltTexts", function () {
+      chrome.tabs.sendMessage(tab.id, {
+        from: "popup",
+        subject: "showAltTexts",
+      });
+    });
+
     //HighlightHeading()
   });
 })();

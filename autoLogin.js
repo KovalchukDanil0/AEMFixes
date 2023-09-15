@@ -1,0 +1,51 @@
+function blurAll() {
+  var tmp = document.createElement("input");
+  document.body.appendChild(tmp);
+  tmp.focus();
+  document.body.removeChild(tmp);
+}
+
+(function AutoLogIn() {
+  waitForElm("#input28").then((oktaForm) => {
+    var intervaID = setInterval(function () {
+      if (oktaForm.value.isEmpty()) {
+        return;
+      } else {
+        document.activeElement.blur();
+      }
+      clearInterval(intervaID);
+
+      var checkbox = document.querySelector("#input36");
+      checkbox.click();
+
+      var submitButton = document.querySelector(
+        "#form20 > div.o-form-button-bar > input"
+      );
+      submitButton.click();
+    }, 500);
+  });
+
+  waitForElm(
+    "#okta-sign-in > div.auth-content > div > div > div.siw-main-body > form > div.authenticator-verify-list.authenticator-list > div > div:nth-child(2) > div.authenticator-description > div.authenticator-button > a"
+  ).then((pushNotify) => {
+    pushNotify.click();
+  });
+
+  waitForElm("#bySelection > div:nth-child(5)").then((activeDirectoryBtn) => {
+    activeDirectoryBtn.click();
+  });
+
+  waitForElm("#userNameInput").then((logInForm) => {
+    var intervaID = setInterval(function () {
+      if (logInForm.value.isEmpty()) {
+        return;
+      } else {
+        document.activeElement.blur();
+      }
+      clearInterval(intervaID);
+
+      var logInButton = document.querySelector("#submitButton");
+      logInButton.click();
+    }, 500);
+  });
+})();

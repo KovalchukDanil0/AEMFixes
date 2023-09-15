@@ -321,5 +321,18 @@ function RusskiMatAsErrors() {
 }
 
 (function () {
+  var regexFixShortLink =
+    /((?:.+)?wwwperf\.)(brandeulb\.ford\.com(?:\/)?(?:editor\.html|cf#)?\/)(content\/(?:.+)?)/gm;
+  if (window.location.href.match(regexFixShortLink)) {
+    window.open(
+      window.location.href.replace(
+        regexFixShortLink,
+        "$1brandeuauthorlb.ford.com/editor.html/$3"
+      ),
+      "_parent"
+    );
+    return;
+  }
+
   RusskiMatAsErrors();
 })();

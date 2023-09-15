@@ -23,6 +23,14 @@
   "content_scripts": [
     {
       "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "/tools/showAltTexts.js"
+      ]
+    },
+    {
+      "matches": [
         "https://jira.uhub.biz/browse/*"
       ],
       "js": [
@@ -116,6 +124,17 @@
       ],
       "js": [
         "livePerf.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://corpqa.sts.ford.com/*",
+        "https://corp.sts.ford.com/*",
+        "https://wpp.okta.com/app/wpp_uhubjira_1/*"
+      ],
+      "js": [
+        "sharedTools.js",
+        "autoLogin.js"
       ]
     }
   ]

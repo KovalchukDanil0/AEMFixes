@@ -34,6 +34,14 @@ const marketsInBeta = [
 
 const regexJira = /jira\.uhub\.biz\/browse\//gm;
 
+String.prototype.isEmpty = function () {
+  if (this.trim().length === 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 function ifWorkflow(url) {
   return url.match(regexWorkflow);
 }

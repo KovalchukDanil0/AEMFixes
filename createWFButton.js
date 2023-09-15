@@ -167,11 +167,13 @@ function AEMToolsCreateWF() {
   });
 }
 
-chrome.runtime.onMessage.addListener((msgObj) => {
-  if (msgObj == "createWF") {
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.from === "popup" && msg.subject === "createWF") {
     AEMToolsCreateWF();
   }
 });
+
+chrome.runtime.onMessage.addListener((msgObj) => {});
 
 (function WFButton() {
   var WFButton = buttonsContainer().appendChild(createWFButton());
