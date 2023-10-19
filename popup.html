@@ -4,23 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <button style="display: none;" id="buttonCreateWF">Create WF</button>
+    <button id="buttonCreateWF">Create WF</button>
 
-    <button style="display: none;" id="buttonToLive">To Live</button>
-    <button style="display: none;" id="buttonToPerf">To Perf</button>
-    <button style="display: none;" id="buttonToProd">To Prod</button>
-    <button style="display: none;" id="buttonToAuthor">To Author</button>
+    <div class="topContainer">
+      <button id="buttonToLive">To Live</button>
+      <button id="buttonToPerf">To Perf</button>
+      <button id="buttonToProd">To Prod</button>
+      <button id="buttonToTouch">To Touch</button>
+      <button id="buttonToClassic">To Classic</button>
+    </div>
 
-    <button style="display: none;" id="buttonToAnotherUI">To Another UI</button>
-    <button style="display: none;" id="buttonOpenPropertiesTouchUI">
-      Open Properties Touch UI
-    </button>
-
-    <button style="display: none;" id="buttonShowAltTexts">
-      Show Alt Texts
-    </button>
+    <div class="bottomContainer">
+      <button id="buttonOpenPropertiesTouchUI">Open Properties Touch UI</button>
+      <button id="buttonShowAltTexts">Alt Texts</button>
+      <button id="buttonCopyAllLinks">Copy all links</button>
+    </div>
 
     <script src="sharedTools.js"></script>
     <script src="popup.js"></script>

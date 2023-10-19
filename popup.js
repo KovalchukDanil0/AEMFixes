@@ -1,4 +1,3 @@
-var highlightedTabsUrls = [];
 const parser = document.createElement("a");
 
 function isMarketInBeta(market) {
@@ -6,92 +5,104 @@ function isMarketInBeta(market) {
   return false;
 }
 
-function ToEnvironment(env, newTab) {
-  chrome.tabs.query({ highlighted: true }, function (tabs) {
-    for (let index = 0; index < tabs.length; index++) {
-      const tab = tabs[index];
-      var url = tab.url;
+function ToEnvironment(tab, url, env, newTab) {
+  parser.href = url;
+  var urlPart = parser.pathname + parser.search + parser.hash;
 
-      parser.href = url;
-      var urlPart = parser.pathname + parser.search + parser.hash;
+  var isAuthorBeta,
+    ifSameEnv = false;
+  var beta = "";
+  var market, localLanguage;
 
-      var isAuthorBeta = false;
-      var beta = "";
-      var market, localLanguage;
-
-      // Live
-      if (url.match(regexLive)) {
-        if (url.match(/www\.ford\.\w\w\.\w\w/gm)) {
-          market = url.replace(regexLive, "$3");
-          localLanguage = url.replace(regexLive, "$2");
-        } else {
-          market = url.replace(regexLive, "$2");
-          localLanguage = url.replace(regexLive, "$1");
-        }
-
-        if (isMarketInBeta(market)) {
-          beta = "-beta";
-        }
-      }
-      // Perf & Prod
-      else if (url.match(regexPerfProd)) {
-        if (
-          url.match(/www(?:perf|prod)(?:-beta)?-couk\.brandeulb\.ford\.com/gm)
-        ) {
-          market = url.replace(regexPerfProd, "$3");
-          localLanguage = url.replace(regexPerfProd, "$2");
-        } else {
-          market = url.replace(regexPerfProd, "$2");
-          localLanguage = url.replace(regexPerfProd, "$3");
-        }
-
-        if (isMarketInBeta(market)) beta = "-beta";
-      }
-      // Author
-      else if (url.match(regexAuthor)) {
-        market = url.replace(regexAuthor, "$2");
-
-        localLanguage = fixLocalLanguage(
-          url.replace(regexAuthor, "$3"),
-          market,
-          false
-        );
-
-        if (isMarketInBeta(market)) {
-          beta = "-beta";
-
-          isAuthorBeta = true;
-          chrome.tabs.sendMessage(
-            tab.id,
-            { from: "popup", subject: "getAlias" },
-            (urlPart) => {
-              determineEnv(
-                env,
-                tab,
-                market,
-                localLanguage,
-                beta,
-                urlPart,
-                newTab
-              );
-            }
-          );
-        } else {
-          urlPart = urlPart.replace(
-            /(?:.+)?\/content.+\/home(.+)?\.html(?:.+)?/gm,
-            "$1"
-          );
-        }
-      }
-
-      if (!isAuthorBeta) {
-        determineEnv(env, tab, market, localLanguage, beta, urlPart, newTab);
-      }
+  // Live
+  if (url.match(regexLive)) {
+    if (url.match(/www\.ford\.\w\w\.\w\w/gm)) {
+      market = url.replace(regexLive, "$3");
+      localLanguage = url.replace(regexLive, "$2");
+    } else {
+      market = url.replace(regexLive, "$2");
+      localLanguage = url.replace(regexLive, "$1");
     }
-  });
+
+    if (isMarketInBeta(market)) {
+      beta = "-beta";
+    }
+  }
+  // Perf & Prod
+  else if (url.match(regexPerfProd)) {
+    if (url.match(/www(?:perf|prod)(?:-beta)?-couk\.brandeulb\.ford\.com/gm)) {
+      market = url.replace(regexPerfProd, "$3");
+      localLanguage = url.replace(regexPerfProd, "$2");
+    } else {
+      market = url.replace(regexPerfProd, "$2");
+      localLanguage = url.replace(regexPerfProd, "$3");
+    }
+
+    if (isMarketInBeta(market)) beta = "-beta";
+  }
+  // Author
+  else if (url.match(regexAuthor)) {
+    market = url.replace(regexAuthor, "$3");
+
+    localLanguage = fixLocalLanguage(
+      url.replace(regexAuthor, "$4"),
+      market,
+      false
+    );
+    ifSameEnv = true;
+
+    if (isMarketInBeta(market)) {
+      beta = "-beta";
+      isAuthorBeta = true;
+
+      chrome.tabs.sendMessage(
+        tab.id,
+        { from: "popup", subject: "getAlias" },
+        (urlPart) => {
+          determineEnv(
+            env,
+            tab,
+            market,
+            localLanguage,
+            beta,
+            urlPart,
+            newTab,
+            ifSameEnv
+          );
+        }
+      );
+    } else {
+      urlPart = urlPart.replace(
+        /(?:.+)?\/content.+\/home(.+)?\.html(?:.+)?/gm,
+        "$1"
+      );
+    }
+  }
+
+  if (!isAuthorBeta) {
+    determineEnv(
+      env,
+      tab,
+      market,
+      localLanguage,
+      beta,
+      urlPart,
+      newTab,
+      ifSameEnv
+    );
+  }
 }
 
-function determineEnv(env, tab, market, localLanguage, beta, urlPart, newTab) {
+function determineEnv(
+  env,
+  tab,
+  market,
+  localLanguage,
+  beta,
+  urlPart,
+  newTab,
+  ifSameEnv
+) {
   if (market == "") throw new Error("Market is not set!");
 
   //window.close();
@@ -106,8 +117,18 @@ function determineEnv(env, tab, market, localLanguage, beta, urlPart, newTab) {
     case "prod":
       makePerf(env, tab, market, localLanguage, beta, urlPart, newTab);
       break;
-    case "author":
-      makeAuthor(tab, market, localLanguage, beta, urlPart, newTab);
+    case "editor.html":
+    case "cf#":
+      makeAuthor(
+        env,
+        tab,
+        market,
+        localLanguage,
+        beta,
+        urlPart,
+        newTab,
+        ifSameEnv
+      );
       break;
   }
 }
@@ -211,7 +232,16 @@ function makePerf(env, tab, market, localLanguage, beta, urlPart, newTab) {
   );
 }
 
-function makeAuthor(tab, market, localLanguage, beta, urlPart, newTab) {
+function makeAuthor(
+  env,
+  tab,
+  market,
+  localLanguage,
+  beta,
+  urlPart,
+  newTab,
+  ifSameEnv
+) {
   var wrongLink =
     "/content/guxeu" +
     beta +
@@ -224,53 +254,45 @@ function makeAuthor(tab, market, localLanguage, beta, urlPart, newTab) {
     "/home" +
     urlPart;
 
-  var t = {
-    map: {
-      originalPath:
-        "/content/guxeu-beta/uk/en_gb/home/vans-and-pickups/transit",
-    },
-  };
-
-  chrome.storage.local
+  /*chrome.storage.local
     .set({ LinkPart: parser.search + parser.hash })
-    .then(() => {
-      if (beta == "-beta" && urlPart != "") {
-        fetch(
-          "https://wwwperf.brandeuauthorlb.ford.com/bin/guxacc/tools/customslingresresolver?page-path=" +
-            wrongLink,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-            },
-          }
-        )
-          .then((response) => response.json())
-          .then((response) => console.log(JSON.stringify(response)));
-        /*chrome.storage.local.set({ WrongLink: wrongLink }).then(() => {
-          window.open(
-            "https://wwwperf.brandeuauthorlb.ford.com/etc/guxacc/tools/resource-resolver-tool.html",
-            "_blank"
-          );
-        });*/
-      } else {
-        makeRealAuthorLink(tab, wrongLink, newTab);
+    .then(() => { */
+
+  if (beta == "-beta" && urlPart != "" && !ifSameEnv) {
+    fetch(
+      "https://wwwperf.brandeuauthorlb.ford.com/bin/guxacc/tools/customslingresresolver?page-path=" +
+        wrongLink,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
       }
-    });
+    )
+      .then((response) => response.json())
+      .then(
+        (response) =>
+          makeRealAuthorLink(
+            env,
+            tab,
+            response["map"]["originalPath"],
+            newTab,
+            ifSameEnv
+          ),
+        newTab
+      );
+  } else {
+    makeRealAuthorLink(env, tab, wrongLink, newTab, ifSameEnv);
+  }
+
+  /* });*/
 }
 
-function makeRealAuthorLink(tab, wrongLink, newTab) {
-  chrome.storage.local.get(["LinkPart"]).then((linkPart) => {
-    ifOpenNewTab(
-      tab,
-      "https://wwwperf.brandeuauthorlb.ford.com/" +
-        "editor.html" +
-        wrongLink +
-        ".html" +
-        linkPart["LinkPart"],
-      newTab
-    );
-  });
+function makeRealAuthorLink(env, tab, wrongLink, newTab) {
+  var trueLink =
+    "https://wwwperf.brandeuauthorlb.ford.com/" + env + wrongLink + ".html";
+
+  ifOpenNewTab(tab, trueLink, newTab);
 }
 
 function ifOpenNewTab(tab, newUrl, newTab) {
@@ -283,38 +305,50 @@ function ifOpenNewTab(tab, newUrl, newTab) {
   }
 }
 
-function changeUI(tab, link, newTab) {
-  const regexChangeUI =
-    /((?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com)((?:\/)?(?:editor\.html|cf#)?\/)(content(?:.+)?)/gm;
-
-  var authorUI = link.replace(regexChangeUI, "$2");
-  var newUrl;
-
-  console.log(authorUI);
-
-  if (authorUI == "/editor.html/")
-    newUrl = link.replace(regexChangeUI, "$1/cf#/$3");
-  else newUrl = link.replace(regexChangeUI, "$1/editor.html/$3");
-
-  ifOpenNewTab(tab, newUrl, newTab);
-}
-
 function ButtonOnClick(selector, func, ...args) {
   var button = document.querySelector(selector);
-  button.style.display = "block";
-  button.addEventListener("click", function () {
-    func(...args, false);
-  });
+  button.style.display = "inherit";
 
-  button.addEventListener("contextmenu", function () {
-    func(...args, true);
+  button.addEventListener("click", () =>
+    ExecuteOnEachTab(func, false, ...args)
+  );
+  button.addEventListener("auxclick", function (e) {
+    if (e.button == 1) {
+      ExecuteOnEachTab(func, true, ...args);
+    }
   });
+}
+
+function ButtonOnClickOnce(selector, func, ...args) {
+  var button = document.querySelector(selector);
+  button.style.display = "inherit";
+
+  button.addEventListener("click", () => func(...args));
+  button.addEventListener("auxclick", function (e) {
+    if (e.button == 1) {
+      func(...args);
+    }
+  });
+}
+
+function ExecuteOnEachTab(func, newTab, ...args) {
+  chrome.tabs.query(
+    { highlighted: true, currentWindow: true },
+    function (tabs) {
+      for (let index = 0; index < tabs.length; index++) {
+        const tab = tabs[index];
+        var url = tab.url;
+
+        func(tab, url, ...args, newTab);
+      }
+    }
+  );
 }
 
 function openPropertiesTouchUI(tab) {
   var newUrl = tab.url.replace(
     regexAuthor,
-    "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$1"
+    "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$2"
   );
 
   chrome.tabs.create({
@@ -323,10 +357,49 @@ function openPropertiesTouchUI(tab) {
   });
 }
 
+function CopyAllLinks() {
+  var highlightedPageLinks = [];
+
+  chrome.tabs.query(
+    { highlighted: true, currentWindow: true },
+    function (tabs) {
+      for (let index = 0; index < tabs.length; index++) {
+        const tab = tabs[index];
+        var url = tab.url;
+
+        highlightedPageLinks += url + "\n";
+        navigator.clipboard.writeText(highlightedPageLinks);
+      }
+    }
+  );
+
+  highlightedPageLinks = [];
+}
+
 (function ButtonsEvents() {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const tab = tabs[0];
     const url = tab.url;
+
+    ButtonOnClick("#buttonShowAltTexts", function () {
+      chrome.tabs.sendMessage(tab.id, {
+        from: "popup",
+        subject: "showAltTexts",
+      });
+    });
+
+    ButtonOnClickOnce("#buttonCopyAllLinks", CopyAllLinks);
+
+    //HighlightHeading()
+
+    ifJira = url.match(regexJira);
+    if (ifJira) {
+      ButtonOnClick("#buttonCreateWF", function () {
+        chrome.tabs.sendMessage(tab.id, { from: "popup", subject: "createWF" });
+      });
+      //CreateWFButton();
+      return;
+    }
 
     ifLive = url.match(regexLive);
     ifPerf = url.replace(regexPerfProd, "$1") == "perf";
@@ -348,32 +421,17 @@ function openPropertiesTouchUI(tab) {
       }
 
       if (!ifAuthor) {
-        ButtonOnClick("#buttonToAuthor", ToEnvironment, "author");
+        ButtonOnClick("#buttonToClassic", ToEnvironment, "cf#");
+        ButtonOnClick("#buttonToTouch", ToEnvironment, "editor.html");
       } else {
-        ButtonOnClick("#buttonToAnotherUI", changeUI, tab, url);
-        ButtonOnClick(
-          "#buttonOpenPropertiesTouchUI",
-          openPropertiesTouchUI,
-          tab
-        );
+        if (url.replace(regexAuthor, "$1") == "editor.html") {
+          ButtonOnClick("#buttonToClassic", ToEnvironment, "cf#");
+        } else {
+          ButtonOnClick("#buttonToTouch", ToEnvironment, "editor.html");
+        }
+
+        ButtonOnClick("#buttonOpenPropertiesTouchUI", openPropertiesTouchUI);
       }
     }
-
-    ifJira = url.match(regexJira);
-    if (ifJira) {
-      ButtonOnClick("#buttonCreateWF", function () {
-        chrome.tabs.sendMessage(tab.id, { from: "popup", subject: "createWF" });
-      });
-      //CreateWFButton();
-    }
-
-    ButtonOnClick("#buttonShowAltTexts", function () {
-      chrome.tabs.sendMessage(tab.id, {
-        from: "popup",
-        subject: "showAltTexts",
-      });
-    });
-
-    //HighlightHeading()
   });
 })();

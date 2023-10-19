@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Ford All You Need Test",
+  "name": "Ford All You Need",
   "description": "Tissue for wiping Junior Content Editors tears",
-  "version": "0.2",
+  "version": "0.1",
   "icons": {
     "16": "images/icon-16.png",
     "32": "images/icon-32.png",
@@ -12,14 +12,15 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "minimum_chrome_version": "92",
   "permissions": [
     "tabs",
     "storage",
     "contextMenus"
   ],
-  "background": {
-    "service_worker": "background.js"
-  },
   "content_scripts": [
     {
       "matches": [
@@ -44,15 +45,6 @@
       "js": [
         "sharedTools.js",
         "createWFAEMTools.js"
-      ]
-    },
-    {
-      "matches": [
-        "https://wwwperf.brandeuauthorlb.ford.com/inbox"
-      ],
-      "js": [
-        "/thirdParty/jQuery.js",
-        "sharedTools.js"
       ]
     },
     {

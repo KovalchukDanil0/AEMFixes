@@ -13,315 +13,88 @@ function ReplaceByRandElmArray(elm, replaceArray) {
   return string;
 }
 
-function RusskiMatAsErrors() {
+function RandomProgrammerMemes() {
   if (document.title != "404") return;
 
-  var arrayRusskiMat = [
-    "архипиздрит",
-    "басран",
-    "бздение",
-    "бздеть",
-    "бздех",
-    "бзднуть",
-    "бздун",
-    "бздунья",
-    "бздюха",
-    "бикса",
-    "блежник",
-    "блудилище",
-    "бляд",
-    "блябу",
-    "блябуду",
-    "блядун",
-    "блядунья",
-    "блядь",
-    "блядюга",
-    "взьебка",
-    "волосянка",
-    "взьебывать",
-    "взебывать",
-    "выблядок",
-    "выблядыш",
-    "выебать",
-    "выеть",
-    "выпердеть",
-    "высраться",
-    "выссаться",
-    "говенка",
-    "говенный",
-    "говешка",
-    "говназия",
-    "говнецо",
-    "говно",
-    "говноед",
-    "говночист",
-    "говнюк",
-    "говнюха",
-    "говнядина",
-    "говняк",
-    "говняный",
-    "говнять",
-    "гондон",
-    "дермо",
-    "долбоеб",
-    "дрисня",
-    "дрист",
-    "дристать",
-    "дристануть",
-    "дристун",
-    "дристуха",
-    "дрочена",
-    "дрочила",
-    "дрочилка",
-    "дрочить",
-    "дрочка",
-    "ебало",
-    "ебальник",
-    "ебануть",
-    "ебаный",
-    "ебарь",
-    "ебатория",
-    "ебать",
-    "ебаться",
-    "ебец",
-    "ебливый",
-    "ебля",
-    "ебнуть",
-    "ебнуться",
-    "ебня",
-    "ебун",
-    "елда",
-    "елдак",
-    "елдачить",
-    "заговнять",
-    "задристать",
-    "задрока",
-    "заеба",
-    "заебанец",
-    "заебать",
-    "заебаться",
-    "заебываться",
-    "заеть",
-    "залупа",
-    "залупаться",
-    "залупить",
-    "залупиться",
-    "замудохаться",
-    "засерун",
-    "засеря",
-    "засерать",
-    "засирать",
-    "засранец",
-    "засрун",
-    "захуячить",
-    "злоебучий",
-    "изговнять",
-    "изговняться",
-    "кляпыжиться",
-    "курва",
-    "курвенок",
-    "курвин",
-    "курвяжник",
-    "курвяжница",
-    "курвяжный",
-    "манда",
-    "мандавошка",
-    "мандей",
-    "мандеть",
-    "мандища",
-    "мандюк",
-    "минет",
-    "минетчик",
-    "минетчица",
-    "мокрохвостка",
-    "мокрощелка",
-    "мудак",
-    "муде",
-    "мудеть",
-    "мудила",
-    "мудистый",
-    "мудня",
-    "мудоеб",
-    "мудозвон",
-    "муйня",
-    "набздеть",
-    "наговнять",
-    "надристать",
-    "надрочить",
-    "наебать",
-    "наебнуться",
-    "наебывать",
-    "нассать",
-    "нахезать",
-    "нахуйник",
-    "насцать",
-    "обдристаться",
-    "обдристаться",
-    "обосранец",
-    "обосрать",
-    "обосцать",
-    "обосцаться",
-    "обсирать",
-    "опизде",
-    "отпиздячить",
-    "отпороть",
-    "отъеть",
-    "охуевательский",
-    "охуевать",
-    "охуевающий",
-    "охуеть",
-    "охуительный",
-    "охуячивать",
-    "охуячить",
-    "педрик",
-    "пердеж",
-    "пердение",
-    "пердеть",
-    "пердильник",
-    "перднуть",
-    "пердун",
-    "пердунец",
-    "пердунина",
-    "пердунья",
-    "пердуха",
-    "пердь",
-    "передок",
-    "пернуть",
-    "пидор",
-    "пизда",
-    "пиздануть",
-    "пизденка",
-    "пиздеть",
-    "пиздить",
-    "пиздища",
-    "пиздобратия",
-    "пиздоватый",
-    "пиздорванец",
-    "пиздорванка",
-    "пиздострадатель",
-    "пиздун",
-    "пиздюга",
-    "пиздюк",
-    "пиздячить",
-    "писять",
-    "питишка",
-    "плеха",
-    "подговнять",
-    "подъебнуться",
-    "поебать",
-    "поеть",
-    "попысать",
-    "посрать",
-    "поставить",
-    "поцоватый",
-    "презерватив",
-    "проблядь",
-    "проебать",
-    "промандеть",
-    "промудеть",
-    "пропиздеть",
-    "пропиздячить",
-    "пысать",
-    "разъеба",
-    "разъебай",
-    "распиздай",
-    "распиздеться",
-    "распиздяй",
-    "распроеть",
-    "растыка",
-    "сговнять",
-    "секель",
-    "серун",
-    "серька",
-    "сика",
-    "сикать",
-    "сикель",
-    "сирать",
-    "сирывать",
-    "скурвиться",
-    "скуреха",
-    "скурея",
-    "скуряга",
-    "скуряжничать",
-    "спиздить",
-    "срака",
-    "сраный",
-    "сранье",
-    "срать",
-    "срун",
-    "ссака",
-    "ссаки",
-    "ссать",
-    "старпер",
-    "струк",
-    "суходрочка",
-    "сцавинье",
-    "сцака",
-    "сцаки",
-    "сцание",
-    "сцать",
-    "сциха",
-    "сцуль",
-    "сцыха",
-    "сыкун",
-    "титечка",
-    "титечный",
-    "титка",
-    "титочка",
-    "титька",
-    "трипер",
-    "триппер",
-    "уеть",
-    "усраться",
-    "усцаться",
-    "фик",
-    "фуй",
-    "хезать",
-    "хер",
-    "херня",
-    "херовина",
-    "херовый",
-    "хитрожопый",
-    "хлюха",
-    "хуевина",
-    "хуевый",
-    "хуек",
-    "хуепромышленник",
-    "хуерик",
-    "хуесос",
-    "хуище",
-    "хуй",
-    "хуйня",
-    "хуйрик",
-    "хуякать",
-    "хуякнуть",
-    "целка",
-    "шлюха",
-  ];
-  var arrayQuerySel = [
-    "#accelerator-page > div.content > div > div.box-content.cq-dd-image > div > div.billboard.billboard-image-sets-height > div > div.billboard-inner > div.billboard-paragraph > div > div > div",
-    "#global-ux > div.content.clearfix > div:nth-child(1) > div.billboard.section > div > div.billboard-inner > div.billboard-paragraph > div > div.richtext.section > div > div",
-  ];
+  var githubPath =
+    "https://raw.githubusercontent.com/deep5050/programming-memes/main/";
 
-  var index = 0;
-  var textContainer = null;
-  while (textContainer == null) {
-    if (index > arrayQuerySel.length - 1) {
-      break;
-    }
-    textContainer = document.querySelector(arrayQuerySel[index]);
-    index += 1;
-  }
+  const request = new XMLHttpRequest();
 
-  if (textContainer != null) {
-    for (const child of textContainer.children) {
-      child.textContent = ReplaceByRandElmArray(child, arrayRusskiMat);
+  request.open("GET", githubPath + "memes.json");
+  request.send();
+
+  request.onload = () => {
+    if (request.status === 200) {
+      console.log("Success"); // So extract data from json and create table
+
+      var data = JSON.parse(request.response);
+      var count = Object.keys(data).length;
+
+      //Extracting data
+      var memeImage = data[generateRandom(count - 1)].path;
+
+      var arrayQuerySel = [
+        "#accelerator-page > div.content > div > div.box-content.cq-dd-image > div > div.billboard.billboard-image-sets-height > div > div.billboard-inner",
+        "#global-ux > div.content.clearfix > div:nth-child(1) > div.billboard.section > div > div.billboard-inner",
+      ];
+
+      var index = -1;
+      var billboardContainer = null;
+      while (index <= arrayQuerySel.length) {
+        index += 1;
+        billboardContainer = document.querySelector(arrayQuerySel[index]);
+
+        if (billboardContainer != null) break;
+      }
+
+      var billboardImages = [];
+      var billboardText;
+      switch (index) {
+        case 0:
+          billboardImages = document.querySelectorAll(
+            arrayQuerySel[index] + " > div > picture > source"
+          );
+
+          billboardText = document.querySelector(
+            arrayQuerySel[index] + " > div.billboard-paragraph"
+          );
+          billboardText.remove();
+
+          break;
+        case 1:
+          billboardImages = document.querySelectorAll(
+            arrayQuerySel[index] + " > div > div > picture > source"
+          );
+
+          billboardText = document.querySelector(
+            arrayQuerySel[index] + " > div.billboard-paragraph"
+          );
+          billboardText.remove();
+
+          break;
+      }
+
+      billboardImages.forEach((image) => {
+        image.srcset = githubPath + memeImage;
+      });
     }
-  }
+  };
+
+  request.onerror = () => {
+    throw new Error("no more memes error");
+  };
+}
+
+function generateRandom(maxLimit) {
+  let rand = Math.random() * maxLimit;
+  rand = Math.floor(rand);
+
+  return rand;
 }
 
 (function () {
-  var regexFixShortLink =
+  /*var regexFixShortLink =
     /((?:.+)?wwwperf\.)(brandeulb\.ford\.com(?:\/)?(?:editor\.html|cf#)?\/)(content\/(?:.+)?)/gm;
   if (window.location.href.match(regexFixShortLink)) {
     window.open(
@@ -332,7 +105,7 @@ function RusskiMatAsErrors() {
       "_parent"
     );
     return;
-  }
+  }*/
 
-  RusskiMatAsErrors();
+  RandomProgrammerMemes();
 })();

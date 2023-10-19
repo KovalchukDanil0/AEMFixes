@@ -1,22 +1,18 @@
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  const item = msg.item;
-
   // Asynchronously process your "item", but DON'T return the promise
-  asyncOperation().then(() => {
-    if (msg.from === "popup" && msg.subject === "getAlias") {
-      waitRealAuthorPath().then((realUrl) => {
-        var urlPart = realUrl.textContent.replace(
-          /(?:[\s\S]*)?Your real URL will be : \.\.\. \/home(\S+)?(?:[\s\S]*)?/gm,
-          "$1"
-        );
-        response(urlPart);
-      });
-    }
-  });
+  if (msg.from === "popup" && msg.subject === "getAlias") {
+    waitRealAuthorPath().then((realUrl) => {
+      var urlPart = realUrl.textContent.replace(
+        /(?:[\s\S]*)?Your real URL will be : \.\.\. \/home(\S+)?(?:[\s\S]*)?/gm,
+        "$1"
+      );
+      sendResponse(urlPart);
+    });
 
-  // return true from the event listener to indicate you wish to send a response asynchronously
-  // (this will keep the message channel open to the other end until sendResponse is called).
-  return true;
+    // return true from the event listener to indicate you wish to send a response asynchronously
+    // (this will keep the message channel open to the other end until sendResponse is called).
+    return true;
+  }
 });
 
 function waitRealAuthorPath() {
@@ -70,25 +66,19 @@ function CatErrors() {
   if (!url.includes(".html")) {
     url = url.replace(/.$/, ".html");
 
-    openWindow = true;
-  }
+    if (
+      !parentUrl.includes("editor.html") &&
+      !parentUrl.includes("cf#") &&
+      !parentUrl.includes("?wcmmode=disabled")
+    ) {
+      url = url.replace(
+        /(.+wwwperf\.brandeuauthorlb\.ford\.com)?(\/)(.+)?/,
+        "$1/editor.html/$3"
+      );
 
-  if (
-    !parentUrl.includes("editor.html") &&
-    !parentUrl.includes("cf#") &&
-    !parentUrl.includes("?wcmmode=disabled")
-  ) {
-    url = url.replace(
-      /(.+wwwperf\.brandeuauthorlb\.ford\.com)?(\/)(.+)?/,
-      "$1/editor.html/$3"
-    );
-
-    openWindow = true;
-  }
-
-  if (openWindow) {
-    window.open(url, "_parent");
-    return;
+      window.open(url, "_parent");
+      return;
+    }
   }
 
   CatErrors();
