@@ -1,5 +1,5 @@
 function blurAll() {
-  var tmp = document.createElement("input");
+  let tmp = document.createElement("input");
   document.body.appendChild(tmp);
   tmp.focus();
   document.body.removeChild(tmp);
@@ -7,7 +7,7 @@ function blurAll() {
 
 (function AutoLogIn() {
   waitForElm("#input28").then((oktaForm) => {
-    var intervaID = setInterval(function () {
+    const intervaID = setInterval(function () {
       if (oktaForm.value.isEmpty()) {
         return;
       } else {
@@ -15,10 +15,10 @@ function blurAll() {
       }
       clearInterval(intervaID);
 
-      var checkbox = document.querySelector("#input36");
+      let checkbox = document.querySelector("#input36");
       checkbox.click();
 
-      var submitButton = document.querySelector(
+      let submitButton = document.querySelector(
         "#form20 > div.o-form-button-bar > input"
       );
       submitButton.click();
@@ -36,7 +36,7 @@ function blurAll() {
   });
 
   waitForElm("#userNameInput").then((logInForm) => {
-    var intervaID = setInterval(function () {
+    const intervaID = setInterval(function () {
       if (logInForm.value.isEmpty()) {
         return;
       } else {
@@ -44,7 +44,7 @@ function blurAll() {
       }
       clearInterval(intervaID);
 
-      var logInButton = document.querySelector("#submitButton");
+      let logInButton = document.querySelector("#submitButton");
       logInButton.click();
     }, 500);
   });

@@ -5,22 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="popup.css" />
+    <link rel="stylesheet" href="node_modules/bulma/css/bulma.css" />
+    <!-- https://bulma.io/documentation/elements/button -->
   </head>
   <body>
-    <button id="buttonCreateWF">Create WF</button>
-
-    <div class="topContainer">
-      <button id="buttonToLive">To Live</button>
-      <button id="buttonToPerf">To Perf</button>
-      <button id="buttonToProd">To Prod</button>
-      <button id="buttonToTouch">To Touch</button>
-      <button id="buttonToClassic">To Classic</button>
+    <div class="container" style="margin-top: 30px">
+      <div class="buttons is-centered">
+        <button
+          class="button is-invisible is-primary is-outlined"
+          id="buttonCreateWF"
+        >
+          Create WF
+        </button>
+      </div>
     </div>
 
-    <div class="bottomContainer">
-      <button id="buttonOpenPropertiesTouchUI">Open Properties Touch UI</button>
-      <button id="buttonShowAltTexts">Alt Texts</button>
-      <button id="buttonCopyAllLinks">Copy all links</button>
+    <div class="container" style="margin-top: 30px">
+      <div class="buttons is-centered has-addons">
+        <button class="button is-invisible is-success" id="buttonToLive">
+          To Live
+        </button>
+        <button class="button is-invisible is-link" id="buttonToPerf">
+          To Perf
+        </button>
+        <button class="button is-invisible is-warning" id="buttonToProd">
+          To Prod
+        </button>
+        <button class="button is-invisible is-info" id="buttonToTouch">
+          To Touch
+        </button>
+        <button class="button is-invisible is-danger" id="buttonToClassic">
+          To Classic
+        </button>
+      </div>
+    </div>
+
+    <div class="container" style="margin-top: 30px">
+      <div class="buttons is-centered has-addons">
+        <button
+          class="button is-invisible is-light"
+          id="buttonOpenPropertiesTouchUI"
+        >
+          Open Properties Touch UI
+        </button>
+        <button class="button is-invisible is-primary" id="buttonShowAltTexts">
+          Alt Texts
+        </button>
+        <button class="button is-invisible is-info" id="buttonCopyAllLinks">
+          Copy all links
+        </button>
+      </div>
     </div>
 
     <script src="sharedTools.js"></script>

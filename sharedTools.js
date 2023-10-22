@@ -4,13 +4,13 @@ const regexWCMWorkflows =
   /wwwperf\.brandeuauthorlb\.ford\.com\/miscadmin#\/etc\/workflow\/packages\/ESM\//gm;
 const regexInbox = /wwwperf\.brandeuauthorlb\.ford\.com\/inbox/gm;
 const regexResourceResolver =
-  /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxacc\/tools\/resource\-resolver\-tool/gm;
+  /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxacc\/tools\/resource-resolvertool/gm;
 const regexFindAndReplaceLinks =
-  /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxfoe\/tools\/find\-replace\-links/gm;
+  /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxfoe\/tools\/find-replace-links/gm;
 const regexLogInForm =
   /corpqa\.sts\.ford\.com\/adfs\/ls|corp\.sts\.ford\.com\/adfs\/oauth2\/authorize/gm;
 
-const regexUrlPart = /(http[s]?:\/\/)?([^\/\s]+)(.*)/gm;
+const regexUrlPart = /(http(?:s)?:\/\/)?([^/\s]+)(.*)/gm;
 
 const regexLive =
   /(?:.+)?(?:secure|www)(?:\.(\w\w))?\.ford\.(\w\w)(?:\.(\w\w))?(?:.+)?/gm;
@@ -35,11 +35,7 @@ const marketsInBeta = [
 const regexJira = /jira\.uhub\.biz\/browse\//gm;
 
 String.prototype.isEmpty = function () {
-  if (this.trim().length === 0) {
-    return true;
-  } else {
-    return false;
-  }
+  return this.trim().length === 0;
 };
 
 function ifWorkflow(url) {

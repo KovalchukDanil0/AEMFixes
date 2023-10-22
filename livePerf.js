@@ -1,7 +1,7 @@
 function ReplaceByRandElmArray(elm, replaceArray) {
-  var string = elm.textContent;
+  let string = elm.textContent;
   string = string.replace(/\S+/gm, function () {
-    var replacedString =
+    let replacedString =
       replaceArray[Math.floor(Math.random() * replaceArray.length)];
 
     if (elm.tagName != "P") {
@@ -16,7 +16,7 @@ function ReplaceByRandElmArray(elm, replaceArray) {
 function RandomProgrammerMemes() {
   if (document.title != "404") return;
 
-  var githubPath =
+  let githubPath =
     "https://raw.githubusercontent.com/deep5050/programming-memes/main/";
 
   const request = new XMLHttpRequest();
@@ -28,19 +28,19 @@ function RandomProgrammerMemes() {
     if (request.status === 200) {
       console.log("Success"); // So extract data from json and create table
 
-      var data = JSON.parse(request.response);
-      var count = Object.keys(data).length;
+      let data = JSON.parse(request.response);
+      let count = Object.keys(data).length;
 
       //Extracting data
-      var memeImage = data[generateRandom(count - 1)].path;
+      let memeImage = data[generateRandom(count - 1)].path;
 
-      var arrayQuerySel = [
+      let arrayQuerySel = [
         "#accelerator-page > div.content > div > div.box-content.cq-dd-image > div > div.billboard.billboard-image-sets-height > div > div.billboard-inner",
         "#global-ux > div.content.clearfix > div:nth-child(1) > div.billboard.section > div > div.billboard-inner",
       ];
 
-      var index = -1;
-      var billboardContainer = null;
+      let index = -1;
+      let billboardContainer = null;
       while (index <= arrayQuerySel.length) {
         index += 1;
         billboardContainer = document.querySelector(arrayQuerySel[index]);
@@ -48,8 +48,8 @@ function RandomProgrammerMemes() {
         if (billboardContainer != null) break;
       }
 
-      var billboardImages = [];
-      var billboardText;
+      let billboardImages = [];
+      let billboardText;
       switch (index) {
         case 0:
           billboardImages = document.querySelectorAll(

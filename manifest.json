@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Ford All You Need",
+  "name": "AEMFixes",
   "description": "Tissue for wiping Junior Content Editors tears",
   "version": "0.1",
   "icons": {
@@ -16,76 +16,46 @@
     "service_worker": "background.js"
   },
   "minimum_chrome_version": "92",
-  "permissions": [
-    "tabs",
-    "storage",
-    "contextMenus"
-  ],
+  "options_page": "options.html",
+  "permissions": ["tabs", "storage", "contextMenus"],
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "/tools/showAltTexts.js"
-      ]
+      "matches": ["<all_urls>"],
+      "js": ["/tools/showAltTexts.js"]
     },
     {
-      "matches": [
-        "https://jira.uhub.biz/browse/*"
-      ],
-      "js": [
-        "createWFButton.js"
-      ]
+      "matches": ["https://jira.uhub.biz/browse/*"],
+      "js": ["jira.js"]
     },
     {
-      "matches": [
-        "https://wwwperf.brandeuauthorlb.ford.com/miscadmin"
-      ],
-      "js": [
-        "sharedTools.js",
-        "createWFAEMTools.js"
-      ]
+      "matches": ["https://wwwperf.brandeuauthorlb.ford.com/miscadmin"],
+      "js": ["sharedTools.js", "createWFAEMTools.js"]
     },
     {
       "matches": [
         "https://wwwperf.brandeuauthorlb.ford.com/etc/workflow/packages/ESM/*"
       ],
       "all_frames": true,
-      "js": [
-        "sharedTools.js",
-        "fixWFPage.js"
-      ]
+      "js": ["sharedTools.js", "fixWFPage.js"]
     },
     {
-      "matches": [
-        "https://wwwperf.brandeuauthorlb.ford.com/content/*"
-      ],
+      "matches": ["https://wwwperf.brandeuauthorlb.ford.com/content/*"],
       "all_frames": true,
-      "js": [
-        "sharedTools.js",
-        "author.js"
-      ]
+      "js": ["sharedTools.js", "author.js"]
     },
     {
       "matches": [
         "https://wwwperf.brandeuauthorlb.ford.com/etc/guxacc/tools/resource-resolver-tool.html"
       ],
       "all_frames": true,
-      "js": [
-        "sharedTools.js",
-        "resourceResolver.js"
-      ]
+      "js": ["sharedTools.js", "resourceResolver.js"]
     },
     {
       "matches": [
         "https://wwwperf.brandeuauthorlb.ford.com/etc/guxfoe/tools/find-replace-links.html"
       ],
       "all_frames": true,
-      "js": [
-        "sharedTools.js",
-        "findReplace.js"
-      ]
+      "js": ["sharedTools.js", "findReplace.js"]
     },
     {
       "matches": [
@@ -114,9 +84,7 @@
         "https://www.ford.dk/*",
         "https://*.brandeulb.ford.com/*"
       ],
-      "js": [
-        "livePerf.js"
-      ]
+      "js": ["livePerf.js"]
     },
     {
       "matches": [
@@ -124,10 +92,7 @@
         "https://corp.sts.ford.com/*",
         "https://wpp.okta.com/app/wpp_uhubjira_1/*"
       ],
-      "js": [
-        "sharedTools.js",
-        "autoLogin.js"
-      ]
+      "js": ["sharedTools.js", "autoLogin.js"]
     }
   ]
 }

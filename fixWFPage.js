@@ -1,4 +1,4 @@
-var url = document.location.href;
+let url = document.location.href;
 
 function getLinksInWF() {
   return document.querySelectorAll(".content-conf > .configSection > div a");
@@ -30,7 +30,7 @@ function AutoFillWF() {
         waitForElm(
           "#CQ > div.x-window-plain.x-form-label-left > div > form > div.x-window.cq-insertdialog.cq-insertdialog-filters_47_42.x-window-plain.x-resizable-pinned > div.x-window-bwrap > div.x-window-ml > div > div > div > div > div > div > div > div.x-panel-bwrap > div > div > table.x-btn.x-btn-noicon.cq-cmpt-Content_32Promotion_32Page.x-btn-selected"
         ).then((promPageSelected) => {
-          var OKButton = document.querySelector(
+          let OKButton = document.querySelector(
             "#CQ > div.x-window-plain.x-form-label-left > div > form > div.x-window.cq-insertdialog.cq-insertdialog-filters_47_42.x-window-plain.x-resizable-pinned > div.x-window-bwrap > div.x-window-bl > div > div > div > div.x-panel-fbar.x-small-editor.x-toolbar-layout-ct > table > tbody > tr > td.x-toolbar-right > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(1) > table"
           );
           OKButton.click();
@@ -48,7 +48,7 @@ function AutoFillWF() {
                   pagePathForm.value =
                     "/content/guxeu/fi/fi_fi/home/hyotyajoneuvot/e-transit";
 
-                  var OKButton = document.querySelector(
+                  let OKButton = document.querySelector(
                     "#CQ > div:nth-child(7) > div > form > div.x-window.x-window-plain.x-resizable-pinned > div.x-window-bwrap > div.x-window-bl > div > div > div > div.x-panel-fbar.x-small-editor.x-toolbar-layout-ct > table > tbody > tr > td.x-toolbar-right > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(1) > table"
                   );
                   OKButton.click();
@@ -72,7 +72,7 @@ function waitForWorkflowTitleInput() {
 
 (function WorkflowFixes() {
   waitForWorkflowTitleInput().then((form) => {
-    var WorkflowID = WFID();
+    let WorkflowID = WFID();
 
     form.value = WorkflowID;
     getLinksInWF().forEach((data) => (data.href = data.href.addBetaToLink()));
@@ -83,7 +83,7 @@ function waitForWorkflowTitleInput() {
           alert("child is appended");
         });*/
 
-    var requestButton = document.querySelector("#start-request-workflow");
+    let requestButton = document.querySelector("#start-request-workflow");
     requestButton.removeAttribute("disabled");
 
     insertAfter(document.createTextNode(" "), requestButton);

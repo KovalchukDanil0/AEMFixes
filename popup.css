@@ -1,41 +1,8 @@
 html {
-    height: 100px;
-    width: 400px;
-}
-
-div {
-    display: grid;
-    grid-gap: 20px;
-    justify-content: center;
-}
-
-div .topContainer {
-    display: inherit;
-    grid-gap: inherit;
-    justify-content: inherit;
-
-    grid-template-columns: repeat(3, calc(33.33% - 45px));
-}
-
-div .bottomContainer {
-    display: inherit;
-    grid-gap: inherit;
-    justify-content: inherit;
-
-    grid-template-columns: repeat(3, calc(33.33% - 45px));
+    width: 500px;
+    height: auto;
 }
 
 button {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 6px 12px;
-    text-decoration: none;
-    font-size: 16px;
-    margin: 1px;
-    margin-top: 5px;
-    margin-bottom: 5px;
     display: none;
-    align-items: center;
-    justify-content: center;
 }

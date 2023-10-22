@@ -1,16 +1,16 @@
 function ResourceResolverGetOrigPath() {
-  var wrongLink = GMGetADeleteValue("WrongLink");
+  let wrongLink = GMGetADeleteValue("WrongLink");
   if (wrongLink == "")
     throw new Error("Link is not defined, resource resolver opened manually");
 
   waitForAliasPath().then((form) => {
     form.value = wrongLink;
 
-    var button = resolverToolButton();
+    let button = resolverToolButton();
     button.click();
 
-    var intervaID = setInterval(function () {
-      var originalPath = originalPath().replace("-gf3-test", "");
+    const intervaID = setInterval(function () {
+      const originalPath = originalPath().replace("-gf3-test", "");
       if (!originalPath.isEmpty) return;
       clearInterval(intervaID);
 

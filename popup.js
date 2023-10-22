@@ -1,18 +1,18 @@
 const parser = document.createElement("a");
 
 function isMarketInBeta(market) {
-  if (marketsInBeta.some((link) => market.includes(link))) return true;
-  return false;
+  return !!marketsInBeta.some((link) => market.includes(link));
 }
 
+// replace almost all parameters with global variables
 function ToEnvironment(tab, url, env, newTab) {
   parser.href = url;
-  var urlPart = parser.pathname + parser.search + parser.hash;
+  let urlPart = parser.pathname + parser.search + parser.hash;
 
-  var isAuthorBeta,
+  let isAuthorBeta,
     ifSameEnv = false;
-  var beta = "";
-  var market, localLanguage;
+  let beta = "";
+  let market, localLanguage;
 
   // Live
   if (url.match(regexLive)) {
@@ -108,8 +108,6 @@ function determineEnv(
   //window.close();
 
   switch (env) {
-    default:
-      throw new Error("No such environment");
     case "live":
       makeLive(tab, market, localLanguage, urlPart, newTab);
       break;
@@ -130,6 +128,8 @@ function determineEnv(
         ifSameEnv
       );
       break;
+    default:
+      throw new Error("No such environment");
   }
 }
 
@@ -137,7 +137,7 @@ function fixMarket(market) {
   const marketsFixAuthor = ["gb"];
   const marketsFixPerf = ["uk"];
 
-  var idx = marketsFixAuthor.indexOf(market);
+  let idx = marketsFixAuthor.indexOf(market);
   if (idx >= 0) {
     return marketsFixPerf[idx];
   }
@@ -197,7 +197,7 @@ function fixLocalLanguage(localLanguage, market, toAuthor) {
 }
 
 function makeLive(tab, market, localLanguage, urlPart, newTab) {
-  var britain = "";
+  let britain = "";
   if (market == "uk") {
     britain = market;
     market = localLanguage + ".";
@@ -242,7 +242,7 @@ function makeAuthor(
   newTab,
   ifSameEnv
 ) {
-  var wrongLink =
+  let wrongLink =
     "/content/guxeu" +
     beta +
     "/" +
@@ -272,24 +272,18 @@ function makeAuthor(
       .then((response) => response.json())
       .then(
         (response) =>
-          makeRealAuthorLink(
-            env,
-            tab,
-            response["map"]["originalPath"],
-            newTab,
-            ifSameEnv
-          ),
+          makeRealAuthorLink(env, tab, response["map"]["originalPath"], newTab),
         newTab
       );
   } else {
-    makeRealAuthorLink(env, tab, wrongLink, newTab, ifSameEnv);
+    makeRealAuthorLink(env, tab, wrongLink, newTab);
   }
 
   /* });*/
 }
 
 function makeRealAuthorLink(env, tab, wrongLink, newTab) {
-  var trueLink =
+  let trueLink =
     "https://wwwperf.brandeuauthorlb.ford.com/" + env + wrongLink + ".html";
 
   ifOpenNewTab(tab, trueLink, newTab);
@@ -306,8 +300,8 @@ function ifOpenNewTab(tab, newUrl, newTab) {
 }
 
 function ButtonOnClick(selector, func, ...args) {
-  var button = document.querySelector(selector);
-  button.style.display = "inherit";
+  let button = document.querySelector(selector);
+  button.classList.remove("is-invisible");
 
   button.addEventListener("click", () =>
     ExecuteOnEachTab(func, false, ...args)
@@ -320,8 +314,8 @@ function ButtonOnClick(selector, func, ...args) {
 }
 
 function ButtonOnClickOnce(selector, func, ...args) {
-  var button = document.querySelector(selector);
-  button.style.display = "inherit";
+  let button = document.querySelector(selector);
+  button.classList.remove("is-invisible");
 
   button.addEventListener("click", () => func(...args));
   button.addEventListener("auxclick", function (e) {
@@ -335,9 +329,9 @@ function ExecuteOnEachTab(func, newTab, ...args) {
   chrome.tabs.query(
     { highlighted: true, currentWindow: true },
     function (tabs) {
-      for (let index = 0; index < tabs.length; index++) {
-        const tab = tabs[index];
-        var url = tab.url;
+      for (const element of tabs) {
+        const tab = element;
+        let url = tab.url;
 
         func(tab, url, ...args, newTab);
       }
@@ -346,7 +340,7 @@ function ExecuteOnEachTab(func, newTab, ...args) {
 }
 
 function openPropertiesTouchUI(tab) {
-  var newUrl = tab.url.replace(
+  let newUrl = tab.url.replace(
     regexAuthor,
     "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$2"
   );
@@ -358,14 +352,14 @@ function openPropertiesTouchUI(tab) {
 }
 
 function CopyAllLinks() {
-  var highlightedPageLinks = [];
+  let highlightedPageLinks = [];
 
   chrome.tabs.query(
     { highlighted: true, currentWindow: true },
     function (tabs) {
-      for (let index = 0; index < tabs.length; index++) {
-        const tab = tabs[index];
-        var url = tab.url;
+      for (const element of tabs) {
+        const tab = element;
+        let url = tab.url;
 
         highlightedPageLinks += url + "\n";
         navigator.clipboard.writeText(highlightedPageLinks);
@@ -392,7 +386,7 @@ function CopyAllLinks() {
 
     //HighlightHeading()
 
-    ifJira = url.match(regexJira);
+    let ifJira = url.match(regexJira);
     if (ifJira) {
       ButtonOnClick("#buttonCreateWF", function () {
         chrome.tabs.sendMessage(tab.id, { from: "popup", subject: "createWF" });
@@ -401,12 +395,13 @@ function CopyAllLinks() {
       return;
     }
 
-    ifLive = url.match(regexLive);
-    ifPerf = url.replace(regexPerfProd, "$1") == "perf";
-    ifProd = url.replace(regexPerfProd, "$1") == "prod";
-    ifPerfProd = url.match(regexPerfProd);
-    ifAuthor = url.match(regexAuthor);
+    let ifLive = url.match(regexLive);
+    let ifPerf = url.replace(regexPerfProd, "$1") == "perf";
+    let ifProd = url.replace(regexPerfProd, "$1") == "prod";
+    let ifPerfProd = url.match(regexPerfProd);
+    let ifAuthor = url.match(regexAuthor);
 
+    // simplify
     if (ifLive || ifPerfProd || ifAuthor) {
       if (!ifLive) {
         ButtonOnClick("#buttonToLive", ToEnvironment, "live");

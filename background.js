@@ -1,5 +1,5 @@
 try {
-  importScripts("/thirdParty/convertCase.js");
+  importScripts("node_modules/js-convert-case/dist/js-convert-case.js");
 } catch (e) {
   console.error(e);
 }

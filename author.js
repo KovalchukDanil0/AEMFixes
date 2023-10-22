@@ -2,7 +2,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // Asynchronously process your "item", but DON'T return the promise
   if (msg.from === "popup" && msg.subject === "getAlias") {
     waitRealAuthorPath().then((realUrl) => {
-      var urlPart = realUrl.textContent.replace(
+      let urlPart = realUrl.textContent.replace(
         /(?:[\s\S]*)?Your real URL will be : \.\.\. \/home(\S+)?(?:[\s\S]*)?/gm,
         "$1"
       );
@@ -20,8 +20,8 @@ function waitRealAuthorPath() {
 }
 
 function CatErrors() {
-  var errorText = document.querySelector("body > header > title");
-  var errorImage =
+  let errorText = document.querySelector("body > header > title");
+  let errorImage =
     '<img style="display: block;-webkit-user-select: none; display: block; margin-left: auto; margin-right: auto; width: 50%;" src="https://cataas.com/cat/says/';
   if (
     errorText != null &&
@@ -53,15 +53,12 @@ function CatErrors() {
       );
       return;
     }
-    return;
   }
 }
 
 (function () {
-  var parentUrl = parent.window.location.href;
-  var url = window.location.href;
-
-  var openWindow = false;
+  let parentUrl = parent.window.location.href;
+  let url = window.location.href;
 
   if (!url.includes(".html")) {
     url = url.replace(/.$/, ".html");
