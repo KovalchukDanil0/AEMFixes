@@ -1,8 +1,18 @@
 html {
     width: 500px;
-    height: auto;
+    background-image: url("images/armageddon.png");
 }
 
 button {
     display: none;
+}
+
+p {
+    word-break: break-all;
+    white-space: normal;
+}
+
+.future-font {
+    font-family: 'DO Futuristic', sans-serif;
+    mix-blend-mode: difference;
 }

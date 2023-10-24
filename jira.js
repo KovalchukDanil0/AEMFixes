@@ -112,10 +112,15 @@ function textToWFPath(market, localLanguage, title) {
       break;
     case "Ford of Switzerland":
       fullPath = "CH";
-      // should be another local lang
       switch (localLanguage) {
         case "German":
           fullPath += "/" + fullPath + "DE";
+          break;
+        case "French":
+          fullPath += "/" + fullPath + "FR";
+          break;
+        case "Italian":
+          fullPath += "/" + fullPath + "IT";
           break;
         default:
           fullPath = WFPathFromTitle(title);
@@ -156,8 +161,8 @@ function WFPathFromTitle(title) {
 function AEMToolsCreateWF() {
   let title = ticketTitle();
 
-  chrome.storage.local.set({ WFTitle: title }).then(() => {
-    chrome.storage.local.set({ WFName: ticketNumber() }).then(() => {
+  browser.storage.local.set({ WFTitle: title }).then(() => {
+    browser.storage.local.set({ WFName: ticketNumber() }).then(() => {
       let WFPath = textToWFPath(ticketMarket(), ticketLocalLanguage(), title);
 
       window.open(
@@ -168,7 +173,7 @@ function AEMToolsCreateWF() {
   });
 }
 
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.from === "popup" && msg.subject === "createWF") {
     AEMToolsCreateWF();
   }

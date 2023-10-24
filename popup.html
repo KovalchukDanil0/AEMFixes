@@ -4,7 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+
+    <link
+      href="https://fonts.cdnfonts.com/css/do-futuristic"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="popup.css" />
+    <link rel="stylesheet" href="cyberpunk.css" />
     <link rel="stylesheet" href="node_modules/bulma/css/bulma.css" />
     <!-- https://bulma.io/documentation/elements/button -->
   </head>
@@ -12,8 +19,9 @@
     <div class="container" style="margin-top: 30px">
       <div class="buttons is-centered">
         <button
-          class="button is-invisible is-primary is-outlined"
+          class="button is-primary is-outlined"
           id="buttonCreateWF"
+          disabled
         >
           Create WF
         </button>
@@ -22,19 +30,19 @@
 
     <div class="container" style="margin-top: 30px">
       <div class="buttons is-centered has-addons">
-        <button class="button is-invisible is-success" id="buttonToLive">
+        <button class="button is-success" id="buttonToLive" disabled>
           To Live
         </button>
-        <button class="button is-invisible is-link" id="buttonToPerf">
+        <button class="button is-link" id="buttonToPerf" disabled>
           To Perf
         </button>
-        <button class="button is-invisible is-warning" id="buttonToProd">
+        <button class="button is-warning" id="buttonToProd" disabled>
           To Prod
         </button>
-        <button class="button is-invisible is-info" id="buttonToTouch">
+        <button class="button is-info" id="buttonToTouch" disabled>
           To Touch
         </button>
-        <button class="button is-invisible is-danger" id="buttonToClassic">
+        <button class="button is-danger" id="buttonToClassic" disabled>
           To Classic
         </button>
       </div>
@@ -43,20 +51,39 @@
     <div class="container" style="margin-top: 30px">
       <div class="buttons is-centered has-addons">
         <button
-          class="button is-invisible is-light"
+          class="button is-light"
           id="buttonOpenPropertiesTouchUI"
+          disabled
         >
           Open Properties Touch UI
         </button>
-        <button class="button is-invisible is-primary" id="buttonShowAltTexts">
+        <button class="button is-primary" id="buttonShowAltTexts" disabled>
           Alt Texts
         </button>
-        <button class="button is-invisible is-info" id="buttonCopyAllLinks">
+        <button class="button is-info" id="buttonCopyAllLinks" disabled>
           Copy all links
         </button>
       </div>
     </div>
 
+    <div class="container" style="margin-top: 30px">
+      <div class="buttons is-centered">
+        <span class="cyber-glitch-1"
+          ><p
+            id="statusBar"
+            class="fg-yellow future-font"
+            style="font-size: 20px; text-align: center; display: none"
+          >
+            LOREM IPSUM DOLOR SIT AMET CONSECTETUR ADIPISICING ELIT. ACCUSAMUS
+            IPSA, NECESSITATIBUS DELECTUS EXERCITATIONEM EXCEPTURI REPUDIANDAE!
+            SINT ET PERFERENDIS IPSUM DUCIMUS, UNDE ARCHITECTO FACILIS PORRO.
+            DUCIMUS,
+          </p></span
+        >
+      </div>
+    </div>
+    g
+    <script src="./node_modules/webextension-polyfill/dist/browser-polyfill.js"></script>
     <script src="sharedTools.js"></script>
     <script src="popup.js"></script>
   </body>

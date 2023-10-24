@@ -21,7 +21,12 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["/tools/showAltTexts.js"]
+      "all_frames": true,
+      "js": [
+        "./node_modules/webextension-polyfill/dist/browser-polyfill.js",
+        "sharedTools.js",
+        "showAltTexts.js"
+      ]
     },
     {
       "matches": ["https://jira.uhub.biz/browse/*"],
@@ -29,33 +34,33 @@
     },
     {
       "matches": ["https://wwwperf.brandeuauthorlb.ford.com/miscadmin"],
-      "js": ["sharedTools.js", "createWFAEMTools.js"]
+      "js": ["createWFAEMTools.js"]
     },
     {
       "matches": [
         "https://wwwperf.brandeuauthorlb.ford.com/etc/workflow/packages/ESM/*"
       ],
       "all_frames": true,
-      "js": ["sharedTools.js", "fixWFPage.js"]
+      "js": ["fixWFPage.js"]
     },
     {
       "matches": ["https://wwwperf.brandeuauthorlb.ford.com/content/*"],
       "all_frames": true,
-      "js": ["sharedTools.js", "author.js"]
+      "js": ["author.js"]
     },
     {
       "matches": [
         "https://wwwperf.brandeuauthorlb.ford.com/etc/guxacc/tools/resource-resolver-tool.html"
       ],
       "all_frames": true,
-      "js": ["sharedTools.js", "resourceResolver.js"]
+      "js": ["resourceResolver.js"]
     },
     {
       "matches": [
         "https://wwwperf.brandeuauthorlb.ford.com/etc/guxfoe/tools/find-replace-links.html"
       ],
       "all_frames": true,
-      "js": ["sharedTools.js", "findReplace.js"]
+      "js": ["findReplace.js"]
     },
     {
       "matches": [
@@ -92,7 +97,7 @@
         "https://corp.sts.ford.com/*",
         "https://wpp.okta.com/app/wpp_uhubjira_1/*"
       ],
-      "js": ["sharedTools.js", "autoLogin.js"]
+      "js": ["autoLogin.js"]
     }
   ]
 }

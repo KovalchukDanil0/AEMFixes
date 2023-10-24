@@ -1,10 +1,13 @@
 try {
-  importScripts("node_modules/js-convert-case/dist/js-convert-case.js");
+  importScripts(
+    "./node_modules/js-convert-case/dist/js-convert-case.js",
+    "./node_modules/webextension-polyfill/dist/browser-polyfill.js"
+  );
 } catch (e) {
   console.error(e);
 }
 
-chrome.contextMenus.onClicked.addListener(menusOnClick);
+browser.contextMenus.onClicked.addListener(menusOnClick);
 
 function menusOnClick(info) {
   switch (info.menuItemId) {
@@ -15,8 +18,8 @@ function menusOnClick(info) {
       console.log("Standard context menu item clicked.");
   }
 }
-chrome.runtime.onInstalled.addListener(function () {
-  chrome.contextMenus.create({
+browser.runtime.onInstalled.addListener(function () {
+  browser.contextMenus.create({
     title: "toCamelCase",
     contexts: ["selection"],
     id: "camelCase",

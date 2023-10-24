@@ -62,6 +62,16 @@ function ifLogInForm(url) {
   return url.match(regexLogInForm);
 }
 
+function getElementByXpath(path) {
+  return document.evaluate(
+    path,
+    document,
+    null,
+    XPathResult.FIRST_ORDERED_NODE_TYPE,
+    null
+  ).singleNodeValue;
+}
+
 function waitForElm(selector, timeout = Number.MAX_VALUE) {
   return new Promise((resolve) =>
     setTimeout(function () {

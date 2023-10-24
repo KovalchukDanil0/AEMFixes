@@ -1,9 +1,9 @@
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   // Asynchronously process your "item", but DON'T return the promise
   if (msg.from === "popup" && msg.subject === "getAlias") {
     waitRealAuthorPath().then((realUrl) => {
       let urlPart = realUrl.textContent.replace(
-        /(?:[\s\S]*)?Your real URL will be : \.\.\. \/home(\S+)?(?:[\s\S]*)?/gm,
+        /(?:[\s\S]*)?Your real URL will be : \.\.\. (\S+)?(?:[\s\S]*)?/gm,
         "$1"
       );
       sendResponse(urlPart);

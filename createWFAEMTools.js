@@ -72,16 +72,16 @@ function AutoFillWF() {
   );
 }
 
-chrome.storage.local.get(["WFTitle"]).then((result) => {
+browser.storage.local.get(["WFTitle"]).then((result) => {
   let WFTitle = result["WFTitle"];
 
-  chrome.storage.local.get(["WFName"]).then((result) => {
+  browser.storage.local.get(["WFName"]).then((result) => {
     let WFName = result["WFName"];
 
     CreateWF(WFTitle, WFName);
     AutoFillWF();
 
-    chrome.storage.local.set({ WFTitle: "" });
-    chrome.storage.local.set({ WFName: "" });
+    browser.storage.local.set({ WFTitle: "" });
+    browser.storage.local.set({ WFName: "" });
   });
 });

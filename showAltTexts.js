@@ -35,7 +35,7 @@ function ShowAltTexts() {
   }
 }
 
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.from === "popup" && msg.subject === "showAltTexts") {
     ShowAltTexts();
   }

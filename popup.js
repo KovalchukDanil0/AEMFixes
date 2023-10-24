@@ -1,5 +1,18 @@
 const parser = document.createElement("a");
 
+var statusBar;
+
+var data = {
+  env: "",
+  tab: "",
+  market: "",
+  localLanguage: "",
+  beta: "", // replace by bool
+  urlPart: "",
+  newTab: false,
+  ifSameEnv: false,
+};
+
 function isMarketInBeta(market) {
   return !!marketsInBeta.some((link) => market.includes(link));
 }
@@ -9,8 +22,7 @@ function ToEnvironment(tab, url, env, newTab) {
   parser.href = url;
   let urlPart = parser.pathname + parser.search + parser.hash;
 
-  let isAuthorBeta,
-    ifSameEnv = false;
+  let ifSameEnv = false;
   let beta = "";
   let market, localLanguage;
 
@@ -53,44 +65,40 @@ function ToEnvironment(tab, url, env, newTab) {
 
     if (isMarketInBeta(market)) {
       beta = "-beta";
-      isAuthorBeta = true;
 
-      chrome.tabs.sendMessage(
-        tab.id,
-        { from: "popup", subject: "getAlias" },
-        (urlPart) => {
-          determineEnv(
-            env,
-            tab,
-            market,
-            localLanguage,
-            beta,
-            urlPart,
-            newTab,
-            ifSameEnv
-          );
-        }
-      );
-    } else {
-      urlPart = urlPart.replace(
-        /(?:.+)?\/content.+\/home(.+)?\.html(?:.+)?/gm,
-        "$1"
-      );
+      browser.tabs
+        .sendMessage(tab.id, { from: "popup", subject: "getAlias" })
+        .then(function (tempUrlPart) {
+          if (tempUrlPart != undefined) {
+            tempUrlPart = fixUrlPart(tempUrlPart);
+
+            determineEnv(
+              env,
+              tab,
+              market,
+              localLanguage,
+              beta,
+              tempUrlPart,
+              newTab,
+              ifSameEnv
+            );
+          }
+        });
     }
+
+    urlPart = fixUrlPart(urlPart);
   }
 
-  if (!isAuthorBeta) {
-    determineEnv(
-      env,
-      tab,
-      market,
-      localLanguage,
-      beta,
-      urlPart,
-      newTab,
-      ifSameEnv
-    );
-  }
+  determineEnv(
+    env,
+    tab,
+    market,
+    localLanguage,
+    beta,
+    urlPart,
+    newTab,
+    ifSameEnv
+  );
 }
 
 function determineEnv(
@@ -131,6 +139,19 @@ function determineEnv(
     default:
       throw new Error("No such environment");
   }
+}
+
+function fixUrlPart(urlPart) {
+  const regexFixSWAuthor =
+    /(?:\S+)?(?:\/content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w\/)?(site-wide-content|home)((?:\S+)?)/gm;
+
+  if (urlPart.replace(regexFixSWAuthor, "$1") == "site-wide-content") {
+    urlPart = urlPart.replace(regexFixSWAuthor, "/content$2");
+  } else {
+    urlPart = urlPart.replace(regexFixSWAuthor, "$2");
+  }
+
+  return urlPart;
 }
 
 function fixMarket(market) {
@@ -254,11 +275,20 @@ function makeAuthor(
     "/home" +
     urlPart;
 
-  /*chrome.storage.local
+  alert(wrongLink);
+
+  const regexFixSiteWide =
+    /((?:\S+)?\/content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w)(\/home\/)(content)?(\S+)?/gm;
+  if (wrongLink.replace(regexFixSiteWide, "$3") == "content") {
+    wrongLink = wrongLink.replace(regexFixSiteWide, "$1/site-wide-content$4");
+  }
+
+  /*browser.storage.local
     .set({ LinkPart: parser.search + parser.hash })
     .then(() => { */
 
   if (beta == "-beta" && urlPart != "" && !ifSameEnv) {
+    ShowMessage("PLEASE WAIT", Number.POSITIVE_INFINITY);
     fetch(
       "https://wwwperf.brandeuauthorlb.ford.com/bin/guxacc/tools/customslingresresolver?page-path=" +
         wrongLink,
@@ -270,11 +300,10 @@ function makeAuthor(
       }
     )
       .then((response) => response.json())
-      .then(
-        (response) =>
-          makeRealAuthorLink(env, tab, response["map"]["originalPath"], newTab),
-        newTab
-      );
+      .then(function (response) {
+        ShowMessage("ALL GOOD!!!");
+        makeRealAuthorLink(env, tab, response["map"]["originalPath"], newTab);
+      });
   } else {
     makeRealAuthorLink(env, tab, wrongLink, newTab);
   }
@@ -291,52 +320,69 @@ function makeRealAuthorLink(env, tab, wrongLink, newTab) {
 
 function ifOpenNewTab(tab, newUrl, newTab) {
   if (newTab) {
-    chrome.tabs.create({ url: newUrl, index: tab.index + 1 });
+    browser.tabs.create({ url: newUrl, index: tab.index + 1 });
   } else {
-    chrome.tabs.update(tab.id, {
+    browser.tabs.update(tab.id, {
       url: newUrl,
     });
   }
 }
 
-function ButtonOnClick(selector, func, ...args) {
+function ButtonOnClick(selector, showLoading = true, func, ...args) {
   let button = document.querySelector(selector);
-  button.classList.remove("is-invisible");
+  button.disabled = false;
 
-  button.addEventListener("click", () =>
-    ExecuteOnEachTab(func, false, ...args)
-  );
+  button.addEventListener("click", function () {
+    if (showLoading) {
+      button.classList.add("is-loading");
+    }
+
+    ExecuteOnEachTab(func, false, ...args);
+  });
   button.addEventListener("auxclick", function (e) {
     if (e.button == 1) {
+      if (showLoading) {
+        button.classList.add("is-loading");
+      }
+
       ExecuteOnEachTab(func, true, ...args);
     }
   });
 }
 
-function ButtonOnClickOnce(selector, func, ...args) {
+function ButtonOnClickOnce(selector, showLoading = true, func, ...args) {
   let button = document.querySelector(selector);
-  button.classList.remove("is-invisible");
+  button.disabled = false;
 
-  button.addEventListener("click", () => func(...args));
+  button.addEventListener("click", function () {
+    if (showLoading) {
+      button.classList.add("is-loading");
+    }
+
+    func(...args);
+  });
   button.addEventListener("auxclick", function (e) {
     if (e.button == 1) {
+      if (showLoading) {
+        button.classList.add("is-loading");
+      }
+
       func(...args);
     }
   });
 }
 
 function ExecuteOnEachTab(func, newTab, ...args) {
-  chrome.tabs.query(
-    { highlighted: true, currentWindow: true },
-    function (tabs) {
+  browser.tabs
+    .query({ highlighted: true, currentWindow: true })
+    .then(function (tabs) {
       for (const element of tabs) {
         const tab = element;
         let url = tab.url;
 
         func(tab, url, ...args, newTab);
       }
-    }
-  );
+    });
 }
 
 function openPropertiesTouchUI(tab) {
@@ -345,88 +391,112 @@ function openPropertiesTouchUI(tab) {
     "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$2"
   );
 
-  chrome.tabs.create({
+  browser.tabs.create({
     url: newUrl,
     index: tab.index + 1,
   });
 }
 
 function CopyAllLinks() {
-  let highlightedPageLinks = [];
+  let highlightedPageLinks;
 
-  chrome.tabs.query(
-    { highlighted: true, currentWindow: true },
-    function (tabs) {
+  browser.tabs
+    .query({ highlighted: true, currentWindow: true })
+    .then(function (tabs) {
       for (const element of tabs) {
         const tab = element;
         let url = tab.url;
 
-        highlightedPageLinks += url + "\n";
+        highlightedPageLinks += url + "\n\n";
         navigator.clipboard.writeText(highlightedPageLinks);
+
+        ShowMessage("LINKS COPIED TO CLIPBOARD:\n" + highlightedPageLinks);
       }
-    }
-  );
+    });
 
   highlightedPageLinks = [];
 }
 
+function ShowMessage(message, time = 5000) {
+  if (statusBar == null) {
+    statusBar = document.getElementById("statusBar");
+  }
+
+  statusBar.textContent = message;
+  statusBar.style.display = "inherit";
+  if (time != Number.POSITIVE_INFINITY) {
+    setTimeout(() => {
+      statusBar.style.display = "none";
+    }, time);
+  }
+}
+
 (function ButtonsEvents() {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    const tab = tabs[0];
-    const url = tab.url;
+  browser.tabs
+    .query({ active: true, currentWindow: true })
+    .then(function (tabs) {
+      const tab = tabs[0];
+      const url = tab.url;
 
-    ButtonOnClick("#buttonShowAltTexts", function () {
-      chrome.tabs.sendMessage(tab.id, {
-        from: "popup",
-        subject: "showAltTexts",
+      ButtonOnClick("#buttonShowAltTexts", false, function () {
+        browser.tabs.sendMessage(tab.id, {
+          from: "popup",
+          subject: "showAltTexts",
+        });
       });
-    });
 
-    ButtonOnClickOnce("#buttonCopyAllLinks", CopyAllLinks);
+      ButtonOnClickOnce("#buttonCopyAllLinks", false, CopyAllLinks);
 
-    //HighlightHeading()
+      //HighlightHeading()
 
-    let ifJira = url.match(regexJira);
-    if (ifJira) {
-      ButtonOnClick("#buttonCreateWF", function () {
-        chrome.tabs.sendMessage(tab.id, { from: "popup", subject: "createWF" });
-      });
-      //CreateWFButton();
-      return;
-    }
-
-    let ifLive = url.match(regexLive);
-    let ifPerf = url.replace(regexPerfProd, "$1") == "perf";
-    let ifProd = url.replace(regexPerfProd, "$1") == "prod";
-    let ifPerfProd = url.match(regexPerfProd);
-    let ifAuthor = url.match(regexAuthor);
-
-    // simplify
-    if (ifLive || ifPerfProd || ifAuthor) {
-      if (!ifLive) {
-        ButtonOnClick("#buttonToLive", ToEnvironment, "live");
+      let ifJira = url.match(regexJira);
+      if (ifJira) {
+        ButtonOnClick("#buttonCreateWF", false, function () {
+          browser.tabs.sendMessage(tab.id, {
+            from: "popup",
+            subject: "createWF",
+          });
+        });
+        //CreateWFButton();
+        return;
       }
 
-      if (!ifPerf) {
-        ButtonOnClick("#buttonToPerf", ToEnvironment, "perf");
-      }
+      let ifLive = url.match(regexLive);
+      let ifPerf = url.replace(regexPerfProd, "$1") == "perf";
+      let ifProd = url.replace(regexPerfProd, "$1") == "prod";
+      let ifPerfProd = url.match(regexPerfProd);
+      let ifAuthor = url.match(regexAuthor);
 
-      if (!ifProd) {
-        ButtonOnClick("#buttonToProd", ToEnvironment, "prod");
-      }
-
-      if (!ifAuthor) {
-        ButtonOnClick("#buttonToClassic", ToEnvironment, "cf#");
-        ButtonOnClick("#buttonToTouch", ToEnvironment, "editor.html");
-      } else {
-        if (url.replace(regexAuthor, "$1") == "editor.html") {
-          ButtonOnClick("#buttonToClassic", ToEnvironment, "cf#");
-        } else {
-          ButtonOnClick("#buttonToTouch", ToEnvironment, "editor.html");
+      // simplify
+      if (ifLive || ifPerfProd || ifAuthor) {
+        if (!ifLive) {
+          ButtonOnClick("#buttonToLive", true, ToEnvironment, "live");
         }
 
-        ButtonOnClick("#buttonOpenPropertiesTouchUI", openPropertiesTouchUI);
+        if (!ifPerf) {
+          ButtonOnClick("#buttonToPerf", true, ToEnvironment, "perf");
+        }
+
+        if (!ifProd) {
+          ButtonOnClick("#buttonToProd", true, ToEnvironment, "prod");
+        }
+
+        if (!ifAuthor) {
+          ButtonOnClick("#buttonToClassic", true, ToEnvironment, "cf#");
+          ButtonOnClick("#buttonToTouch", true, ToEnvironment, "editor.html");
+        } else {
+          if (url.replace(regexAuthor, "$1") == "editor.html") {
+            ButtonOnClick("#buttonToClassic", true, ToEnvironment, "cf#");
+          } else {
+            ButtonOnClick("#buttonToTouch", true, ToEnvironment, "editor.html");
+          }
+
+          ButtonOnClick(
+            "#buttonOpenPropertiesTouchUI",
+            false,
+            openPropertiesTouchUI
+          );
+        }
       }
-    }
-  });
+    });
 })();
