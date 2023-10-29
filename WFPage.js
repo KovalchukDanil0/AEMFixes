@@ -70,7 +70,17 @@ function waitForWorkflowTitleInput() {
   return waitForElm("#workflow-title-input");
 }
 
+// \/etc\/workflow\/packages\/ESM\/FRFR\/ESM-157004(-\w+)?\.html
+
+function NewWFDesign() {
+  document
+    .querySelectorAll('style,link[rel="stylesheet"]')
+    .forEach((item) => item.remove());
+}
+
 (function WorkflowFixes() {
+  NewWFDesign();
+
   waitForWorkflowTitleInput().then((form) => {
     let WorkflowID = WFID();
 
@@ -86,7 +96,7 @@ function waitForWorkflowTitleInput() {
     let requestButton = document.querySelector("#start-request-workflow");
     requestButton.removeAttribute("disabled");
 
-    insertAfter(document.createTextNode(" "), requestButton);
+    //insertAfter(document.createTextNode(" "), requestButton);
 
     /*observeDOM(
       document.querySelector(

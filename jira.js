@@ -195,9 +195,13 @@ function FixSorting() {
   }
 }
 
-(function Jira() {
-  let WFButton = buttonsContainer().appendChild(createWFButton());
-  WFButton.addEventListener("click", AEMToolsCreateWF);
+(async function Jira() {
+  let savedData = await loadSavedData();
+
+  if (!savedData.disableCreateWF) {
+    let WFButton = buttonsContainer().appendChild(createWFButton());
+    WFButton.addEventListener("click", AEMToolsCreateWF);
+  }
 
   FixSorting();
 })();

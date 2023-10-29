@@ -72,24 +72,26 @@ function getElementByXpath(path) {
   ).singleNodeValue;
 }
 
-function waitForElm(selector, timeout = Number.MAX_VALUE) {
-  return new Promise((resolve) =>
-    setTimeout(function () {
+function waitForElm(selector) {
+  return new Promise((resolve) => {
+    if (document.querySelector(selector)) {
+      return resolve(document.querySelector(selector));
+    }
+
+    const observer = new MutationObserver(() => {
       if (document.querySelector(selector)) {
-        return resolve(document.querySelector(selector));
+        resolve(document.querySelector(selector));
+        observer.disconnect();
       }
+    });
 
-      const observer = new MutationObserver((mutations) => {
-        if (document.querySelector(selector)) {
-          resolve(document.querySelector(selector));
-          observer.disconnect();
-        }
-      });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  });
+}
 
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-      });
-    }, timeout)
-  );
+async function loadSavedData() {
+  return await browser.storage.sync.get({ disableCreateWF: true });
 }

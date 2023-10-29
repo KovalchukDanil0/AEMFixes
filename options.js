@@ -1,25 +1,21 @@
 // Saves options to browser.storage
-const saveOptions = () => {
-  const hideWFButtonJira = document.getElementById("hideWFButtonJira").checked;
+const saveOptions = async () => {
+  const disableCreateWF = document.getElementById("disCreateWF").checked;
 
-  browser.storage.sync.set({ hideWFButtonJira: hideWFButtonJira }, () => {
-    // Update status to let user know options were saved.
-    const status = document.getElementById("status");
-    status.textContent = "Options saved.";
-    setTimeout(() => {
-      status.textContent = "";
-    }, 750);
-  });
+  await browser.storage.sync.set({ disableCreateWF: disableCreateWF });
+  const status = document.getElementById("status");
+  status.textContent = "Options saved.";
+  setTimeout(() => {
+    status.textContent = "";
+  }, 750);
 };
 
 // Restores select box and checkbox state using the preferences
 // stored in browser.storage.
-const restoreOptions = () => {
-  browser.storage.sync.get({ hideWFButtonJira: true }, (items) => {
-    document.getElementById("color").value = items.favoriteColor;
-    document.getElementById("like").checked = items.likesColor;
-  });
+const restoreOptions = async () => {
+  let items = await loadSavedData();
+  document.getElementById("disCreateWF").checked = items.disableCreateWF;
 };
 
 document.addEventListener("DOMContentLoaded", restoreOptions);
-document.getElementById("save").addEventListener("click", saveOptions);
+document.getElementById("saveBut").addEventListener("click", saveOptions);

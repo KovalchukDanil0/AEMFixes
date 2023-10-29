@@ -108,4 +108,22 @@ function generateRandom(maxLimit) {
   }*/
 
   RandomProgrammerMemes();
+
+  /*if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/akam-sw.js").then(
+        function (registration) {
+          // Registration was successful
+          alert(
+            "ServiceWorker registration successful with scope: ",
+            registration.scope
+          );
+        },
+        function (err) {
+          // registration failed :(
+          alert("ServiceWorker registration failed: ", err);
+        }
+      );
+    }); 
+  }*/
 })();

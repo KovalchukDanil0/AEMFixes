@@ -41,7 +41,8 @@
         "https://wwwperf.brandeuauthorlb.ford.com/etc/workflow/packages/ESM/*"
       ],
       "all_frames": true,
-      "js": ["fixWFPage.js"]
+      "js": ["sharedTools.js", "WFPage.js"],
+      "css": ["WFPage.css"]
     },
     {
       "matches": ["https://wwwperf.brandeuauthorlb.ford.com/content/*"],

@@ -1,23 +1,20 @@
-browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-  // Asynchronously process your "item", but DON'T return the promise
+browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.from === "popup" && msg.subject === "getAlias") {
-    waitRealAuthorPath().then((realUrl) => {
-      let urlPart = realUrl.textContent.replace(
+    (async () => {
+      let realUrl = await waitForElm(
+        "#accelerator-page > div.info-banner > div:nth-child(1)"
+      );
+      realUrl = realUrl.textContent.replace(
         /(?:[\s\S]*)?Your real URL will be : \.\.\. (\S+)?(?:[\s\S]*)?/gm,
         "$1"
       );
-      sendResponse(urlPart);
-    });
+      sendResponse(realUrl);
+    })();
 
-    // return true from the event listener to indicate you wish to send a response asynchronously
-    // (this will keep the message channel open to the other end until sendResponse is called).
+    // Important! Return true to indicate you want to send a response asynchronously
     return true;
   }
 });
-
-function waitRealAuthorPath() {
-  return waitForElm("#accelerator-page > div.info-banner > div:nth-child(1)");
-}
 
 function CatErrors() {
   let errorText = document.querySelector("body > header > title");
@@ -56,7 +53,7 @@ function CatErrors() {
   }
 }
 
-(function () {
+function FixAuthorLink() {
   let parentUrl = parent.window.location.href;
   let url = window.location.href;
 
@@ -66,7 +63,8 @@ function CatErrors() {
     if (
       !parentUrl.includes("editor.html") &&
       !parentUrl.includes("cf#") &&
-      !parentUrl.includes("?wcmmode=disabled")
+      !parentUrl.includes("?wcmmode=disabled") &&
+      !parentUrl.includes("damadmin#")
     ) {
       url = url.replace(
         /(.+wwwperf\.brandeuauthorlb\.ford\.com)?(\/)(.+)?/,
@@ -77,6 +75,9 @@ function CatErrors() {
       return;
     }
   }
+}
 
+(function () {
+  FixAuthorLink();
   CatErrors();
 })();
