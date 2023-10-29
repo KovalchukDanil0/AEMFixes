@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="node_modules/bulma/css/bulma.css" />
   </head>
   <body>
-    <div style="padding-left: 30px; padding-top: 30px">
+    <div class="main-div">
       <div class="field">
         <div class="control">
-          <label class="checkbox">
+          <label class="checkbox has-text-white">
             <input id="disCreateWF" type="checkbox" />
             Disable Create Workflow button
           </label>
@@ -20,9 +20,9 @@
 
       <div class="field">
         <div class="control">
-          <label class="checkbox">
-            <input id="save" type="checkbox" />
-            Hide WF Button in Jira
+          <label class="checkbox has-text-white">
+            <input id="enableFunErr" type="checkbox" />
+            Enable funny Error Replacement
           </label>
         </div>
       </div>
@@ -33,7 +33,9 @@
         </div>
       </div>
 
-      <div id="status"></div>
+      <article class="message is-success">
+        <div id="status"></div>
+      </article>
     </div>
 
     <script src="./node_modules/webextension-polyfill/dist/browser-polyfill.js"></script>

@@ -55,17 +55,7 @@ browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   const tab = tabs[0];
   const url = tab.url;
 
-  ButtonOnClick(
-    "#buttonShowAltTexts",
-    function () {
-      browser.tabs.sendMessage(tab.id, {
-        from: "popup",
-        subject: "showAltTexts",
-      });
-    },
-    false,
-    true
-  );
+  ButtonOnClick("#buttonShowAltTexts", "ShowAltText", false, true, tab);
 
   ButtonOnClick("#buttonCopyAllLinks", "CopyAllLinks", false, true);
 

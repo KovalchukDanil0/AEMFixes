@@ -77,7 +77,11 @@ function FixAuthorLink() {
   }
 }
 
-(function () {
+(async function () {
+  let savedData = await loadSavedData();
+  if (savedData.enableFunErr) {
+    CatErrors();
+  }
+
   FixAuthorLink();
-  CatErrors();
 })();

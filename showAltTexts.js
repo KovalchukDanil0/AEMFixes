@@ -25,7 +25,8 @@ function ShowAltTexts() {
     }
 
     altTextContainerElm = document.body.appendChild(altTextContainer);
-
+    altShowed = true;
+  } else {
     document.querySelectorAll(".noAltText").forEach((element) => {
       element.remove();
     });
@@ -36,7 +37,7 @@ function ShowAltTexts() {
 }
 
 browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.from === "popup" && msg.subject === "showAltTexts") {
+  if (msg.from === "background" && msg.subject === "showAltTexts") {
     ShowAltTexts();
   }
 });

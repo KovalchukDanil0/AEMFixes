@@ -93,7 +93,7 @@ function generateRandom(maxLimit) {
   return rand;
 }
 
-(function () {
+(async function () {
   /*var regexFixShortLink =
     /((?:.+)?wwwperf\.)(brandeulb\.ford\.com(?:\/)?(?:editor\.html|cf#)?\/)(content\/(?:.+)?)/gm;
   if (window.location.href.match(regexFixShortLink)) {
@@ -107,7 +107,10 @@ function generateRandom(maxLimit) {
     return;
   }*/
 
-  RandomProgrammerMemes();
+  let savedData = await loadSavedData();
+  if (savedData.enableFunErr) {
+    RandomProgrammerMemes();
+  }
 
   /*if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {

@@ -317,6 +317,13 @@ function openPropertiesTouchUI(tab) {
   });
 }
 
+function ShowAltText(tab) {
+  browser.tabs.sendMessage(tab.id, {
+    from: "background",
+    subject: "showAltTexts",
+  });
+}
+
 function CopyAllLinks() {
   let highlightedPageLinks;
 

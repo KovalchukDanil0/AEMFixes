@@ -93,5 +93,8 @@ function waitForElm(selector) {
 }
 
 async function loadSavedData() {
-  return await browser.storage.sync.get({ disableCreateWF: true });
+  return await browser.storage.sync.get({
+    disableCreateWF: false,
+    enableFunErr: false,
+  });
 }
