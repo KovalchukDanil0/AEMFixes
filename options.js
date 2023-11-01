@@ -4,22 +4,24 @@ const saveOptions = async () => {
   const enableFunErr = document.getElementById("enableFunErr").checked;
 
   await browser.storage.sync.set({
-    disableCreateWF: disableCreateWF,
-    enableFunErr: enableFunErr,
+    disableCreateWF,
+    enableFunErr,
   });
   const status = document.getElementById("status");
   status.textContent = "Options saved.";
   status.classList.add("message-body");
+
+  const timeout = 750;
   setTimeout(() => {
     status.textContent = "";
     status.className = "";
-  }, 750);
+  }, timeout);
 };
 
 // Restores select box and checkbox state using the preferences
 // stored in browser.storage.
 const restoreOptions = async () => {
-  let items = await loadSavedData();
+  const items = await loadSavedData();
   document.getElementById("disCreateWF").checked = items.disableCreateWF;
   document.getElementById("enableFunErr").checked = items.enableFunErr;
 };

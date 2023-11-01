@@ -71,7 +71,7 @@
 
 html {
     font-size: var(--root-font-size);
-    font-family: "BlenderProBook";
+    font-family: "BlenderProBook", sans-serif;
     padding: 0;
     margin: 0;
 }
@@ -86,14 +86,14 @@ body {
 
 /*#region cyberpunk font*/
 .oxanium-font {
-    font-family: Oxanium !important;
+    font-family: "Oxanium", sans-serif !important;
 }
 
 .cyberpunk-font,
 .cyberpunk-font *,
 .cyberpunk-font-og,
 .cyberpunk-font-og * {
-    font-family: Cyberpunk !important;
+    font-family: "Cyberpunk", sans-serif !important;
     text-transform: uppercase !important;
     letter-spacing: -.25em;
 }
@@ -899,7 +899,7 @@ code,
     background-color: var(--dark);
     color: var(--cyan);
     padding: .3rem .4rem .2rem .4rem;
-    font-family: Oxanium !important;
+    font-family: "Oxanium", sans-serif !important;
     font-size: .75rem;
 }
 
@@ -1155,7 +1155,7 @@ Note: Inline svg shit doesnt work sometimes. Make sure to optimize it with https
 .cyber-select-long select,
 .cyber-select-full select {
     width: calc(var(--input-width) + var(--input-padding-left) + var(--input-padding-right));
-    font-family: BlenderProBook;
+    font-family: "BlenderProBook", sans-serif;
     appearance: none;
     background-color: transparent;
     cursor: pointer;
@@ -1164,7 +1164,7 @@ Note: Inline svg shit doesnt work sometimes. Make sure to optimize it with https
 .cyber-select select option,
 .cyber-select-long select option,
 .cyber-select-full select option {
-    font-family: "Courier New";
+    font-family: "Courier New", sans-serif;
     font-size: .85rem;
 }
 

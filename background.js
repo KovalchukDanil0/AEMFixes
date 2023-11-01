@@ -8,15 +8,15 @@ try {
   throw new Error(e);
 }
 
-async function ToEnvironment(tab, url, env, newTab) {
-  let data = {
+async function toEnvironment(tab, url, env, newTab) {
+  const data = {
     market: "",
     localLanguage: "",
     beta: "",
     urlPart: "",
     ifSameEnv: false,
 
-    isMarketInBeta: function () {
+    isMarketInBeta() {
       if (marketsInBeta.some((link) => this.market.includes(link))) {
         this.beta = "-beta";
         return true;
@@ -26,7 +26,7 @@ async function ToEnvironment(tab, url, env, newTab) {
       }
     },
 
-    fixMarket: function () {
+    fixMarket() {
       const marketsFixAuthor = ["gb", "gl"];
       const marketsFixPerf = ["uk", "mothersite"];
 
@@ -46,9 +46,11 @@ async function ToEnvironment(tab, url, env, newTab) {
       return this.market;
     },
 
-    fixLocalLanguage: function (env) {
-      if (env == "editor.html" || env == "cf#") {
-        if (this.localLanguage == "") this.localLanguage = this.market;
+    fixLocalLanguage() {
+      if (env === "editor.html" || env === "cf#") {
+        if (this.localLanguage === "") {
+          this.localLanguage = this.market;
+        }
 
         switch (this.market) {
           case "uk":
@@ -70,6 +72,9 @@ async function ToEnvironment(tab, url, env, newTab) {
           case "gr":
             this.localLanguage = "el";
             break;
+          default: {
+            throw new Error("This market doesn't exist");
+          }
         }
       } else {
         switch (this.market) {
@@ -84,20 +89,27 @@ async function ToEnvironment(tab, url, env, newTab) {
           case "uk":
             this.localLanguage = "co";
             break;
+          default: {
+            throw new Error("This market doesn't exist");
+          }
         }
 
-        if (this.localLanguage == this.market) this.localLanguage = "";
+        if (this.localLanguage === this.market) {
+          this.localLanguage = "";
+        }
       }
 
       console.log("fixed localLanguage is " + this.localLanguage);
       return this.localLanguage;
     },
 
-    fixUrlPart: function () {
+    fixUrlPart() {
       const regexFixSWAuthor =
         /(?:\S+)?(site-wide-content|home)(\S+?(?=\.html)|\S+)(?:\S+)?/gm;
 
-      if (this.urlPart.replace(regexFixSWAuthor, "$1") == "site-wide-content") {
+      if (
+        this.urlPart.replace(regexFixSWAuthor, "$1") === "site-wide-content"
+      ) {
         this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/content$2");
       } else {
         this.urlPart = this.urlPart.replace(regexFixSWAuthor, "$2");
@@ -117,7 +129,7 @@ async function ToEnvironment(tab, url, env, newTab) {
         time: Number.MAX_VALUE,
       });
 
-      let parser = new URL(url);
+      const parser = new URL(url);
       data.urlPart = parser.pathname + parser.search + parser.hash;
 
       // Live
@@ -151,11 +163,11 @@ async function ToEnvironment(tab, url, env, newTab) {
         data.market = url.replace(regexAuthor, "$3");
         data.localLanguage = url.replace(regexAuthor, "$4");
 
-        data.fixLocalLanguage(env);
+        data.fixLocalLanguage();
         data.ifSameEnv = true;
 
         if (data.isMarketInBeta()) {
-          data.urlPart = undefined;
+          data.urlPart = null;
           data.urlPart = await browser.tabs.sendMessage(tab.id, {
             from: "popup",
             subject: "getAlias",
@@ -163,13 +175,17 @@ async function ToEnvironment(tab, url, env, newTab) {
         }
 
         data.fixUrlPart();
+      } else {
+        throw new Error("Link doesn't math any of the env");
       }
 
       determineEnv();
     })();
 
     function determineEnv() {
-      if (data.market == "") reject(new Error("Market is not set!"));
+      if (data.market === "") {
+        reject(new Error("Market is not set!"));
+      }
 
       //window.close();
 
@@ -192,65 +208,47 @@ async function ToEnvironment(tab, url, env, newTab) {
 
     function makeLive() {
       let britain = "";
-      if (data.market == "uk") {
+      if (data.market === "uk") {
         britain = data.market;
         data.market = data.localLanguage + ".";
         data.localLanguage = "";
       }
 
-      if (data.localLanguage != "") data.localLanguage += ".";
+      if (data.localLanguage !== "") {
+        data.localLanguage += ".";
+      }
 
       ifOpenNewTab(
-        "https://www." +
-          data.localLanguage +
-          "ford." +
-          data.market +
-          britain +
-          data.urlPart
+        `https://www.${data.localLanguage}ford.${data.market}${britain}${data.urlPart}`
       );
     }
 
     function makePerf() {
-      if (data.market == "uk" || data.market == "gb") {
+      if (data.market === "uk" || data.market === "gb") {
         [data.localLanguage, data.market] = [data.market, data.localLanguage];
       }
 
       ifOpenNewTab(
-        "https://www" +
-          env +
-          data.beta +
-          "-" +
-          data.market +
-          data.localLanguage +
-          ".brandeulb.ford.com" +
-          data.urlPart
+        `https://www${env}${data.beta}-${data.market}${data.localLanguage}.brandeulb.ford.com${data.urlPart}`
       );
     }
 
     async function makeAuthor() {
-      let wrongLink =
-        "/content/guxeu" +
-        data.beta +
-        "/" +
-        data.market +
-        "/" +
-        data.fixLocalLanguage(env) +
-        "_" +
-        data.fixMarket() +
-        "/home" +
-        data.urlPart;
+      let wrongLink = `/content/guxeu${data.beta}/${
+        data.market
+      }/${data.fixLocalLanguage()}_${data.fixMarket()}/home${data.urlPart}`;
 
       const regexFixSiteWide =
         /((?:\S+)?\/content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w)(\/home\/)(content)?(\S+)?/gm;
-      if (wrongLink.replace(regexFixSiteWide, "$3") == "content") {
+      if (wrongLink.replace(regexFixSiteWide, "$3") === "content") {
         wrongLink = wrongLink.replace(
           regexFixSiteWide,
           "$1/site-wide-content$4"
         );
       }
 
-      if (data.beta == "-beta" && data.urlPart != "" && !data.ifSameEnv) {
-        let response = await fetch(
+      if (data.beta === "-beta" && data.urlPart !== "" && !data.ifSameEnv) {
+        const response = await fetch(
           "https://wwwperf.brandeuauthorlb.ford.com/bin/guxacc/tools/customslingresresolver?page-path=" +
             wrongLink,
           {
@@ -260,7 +258,7 @@ async function ToEnvironment(tab, url, env, newTab) {
             },
           }
         );
-        let customResolverData = await response.json();
+        const customResolverData = await response.json();
 
         makeRealAuthorLink(customResolverData["map"]["originalPath"]);
       } else {
@@ -270,7 +268,7 @@ async function ToEnvironment(tab, url, env, newTab) {
 
     function makeRealAuthorLink(wrongLink) {
       ifOpenNewTab(
-        "https://wwwperf.brandeuauthorlb.ford.com/" + env + wrongLink + ".html"
+        `https://wwwperf.brandeuauthorlb.ford.com/${env}${wrongLink}.html`
       );
     }
 
@@ -288,8 +286,44 @@ async function ToEnvironment(tab, url, env, newTab) {
   });
 }
 
-async function ExecuteOnEachTab(func, newTab, ...args) {
-  let tabs = await browser.tabs.query({
+function openPropertiesTouchUI() {
+  const tabs = browser.tabs.query({ currentWindow: true, active: true });
+
+  const newUrl = tabs[0].url.replace(
+    regexAuthor,
+    "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$2"
+  );
+
+  browser.tabs.create({
+    url: newUrl,
+    index: tab.index + 1,
+  });
+}
+
+function showAltText(tab) {
+  browser.tabs.sendMessage(tab.id, {
+    from: "background",
+    subject: "showAltTexts",
+  });
+}
+
+function copyAllLinks() {
+  let highlightedPageLinks;
+
+  const tabs = browser.tabs.query({ highlighted: true, currentWindow: true });
+
+  for (const element of tabs) {
+    const tab = element;
+
+    highlightedPageLinks += tab.url + "\n\n";
+    navigator.clipboard.writeText(highlightedPageLinks);
+
+    ShowMessage("LINKS COPIED TO CLIPBOARD:\n" + highlightedPageLinks);
+  }
+}
+
+async function executeOnEachTab(func, newTab, ...args) {
+  const tabs = await browser.tabs.query({
     highlighted: true,
     currentWindow: true,
   });
@@ -305,62 +339,18 @@ async function ExecuteOnEachTab(func, newTab, ...args) {
   });
 }
 
-function openPropertiesTouchUI(tab) {
-  let newUrl = tab.url.replace(
-    regexAuthor,
-    "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$2"
-  );
-
-  browser.tabs.create({
-    url: newUrl,
-    index: tab.index + 1,
-  });
-}
-
-function ShowAltText(tab) {
-  browser.tabs.sendMessage(tab.id, {
-    from: "background",
-    subject: "showAltTexts",
-  });
-}
-
-function CopyAllLinks() {
-  let highlightedPageLinks;
-
-  let tabs = browser.tabs.query({ highlighted: true, currentWindow: true });
-
-  for (const element of tabs) {
-    const tab = element;
-    let url = tab.url;
-
-    highlightedPageLinks += url + "\n\n";
-    navigator.clipboard.writeText(highlightedPageLinks);
-
-    ShowMessage("LINKS COPIED TO CLIPBOARD:\n" + highlightedPageLinks);
-  }
-}
-
-browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
   if (msg.from === "popup" && msg.subject === "buttonClick") {
     msg.func = this[msg.func];
 
     if (!msg.once) {
-      ExecuteOnEachTab(msg.func, msg.newTab, ...msg.args);
-    } else msg.func(...msg.args);
+      executeOnEachTab(msg.func, msg.newTab, ...msg.args);
+    } else {
+      msg.func(...msg.args);
+    }
   }
 });
 
-browser.contextMenus.onClicked.addListener(menusOnClick);
-
-function menusOnClick(info) {
-  switch (info.menuItemId) {
-    case "camelCase":
-      console.log(jsConvert.toCamelCase("param-case"));
-      break;
-    default:
-      console.log("Standard context menu item clicked.");
-  }
-}
 browser.runtime.onInstalled.addListener(function () {
   browser.contextMenus.create({
     title: "toCamelCase",
@@ -368,3 +358,15 @@ browser.runtime.onInstalled.addListener(function () {
     id: "camelCase",
   });
 });
+
+const menusOnClick = function (info) {
+  switch (info.menuItemId) {
+    case "camelCase":
+      console.log(jsConvert.toCamelCase("param-case"));
+      break;
+    default:
+      console.log("Standard context menu item clicked.");
+  }
+};
+
+browser.contextMenus.onClicked.addListener(menusOnClick);

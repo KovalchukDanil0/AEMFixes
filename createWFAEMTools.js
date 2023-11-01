@@ -1,13 +1,14 @@
-function CreateWF(WFTitle, WFName) {
-  if (WFTitle == "" || WFName == "")
+window.createWF = function (WFTitle, WFName) {
+  if (WFTitle === "" || WFName === "") {
     throw new Error(
       "WFTitle or WFName are not defined, workflows opened manually"
     );
+  }
 
   waitForElm(
     "#cq-gen75 > div.x-grid3-row.x-grid3-row-first > table > tbody > tr > td.x-grid3-col.x-grid3-cell.x-grid3-td-title > div"
-  ).then((firstItemInList) => {
-    let button = document.getElementById("cq-gen91");
+  ).then(() => {
+    const button = document.getElementById("cq-gen91");
     button.click();
 
     waitForElm("#ext-comp-1079").then((form) => {
@@ -21,17 +22,19 @@ function CreateWF(WFTitle, WFName) {
       promotionButton.click();
     });
   });
-}
+};
 
-browser.storage.local.get(["WFTitle"]).then((result) => {
-  let WFTitle = result["WFTitle"];
-
-  browser.storage.local.get(["WFName"]).then((result) => {
-    let WFName = result["WFName"];
+browser.storage.local
+  .get({
+    WFTitle: "",
+    WFName: "",
+  })
+  .then((result) => {
+    const WFTitle = result["WFTitle"];
+    const WFName = result["WFName"];
 
     CreateWF(WFTitle, WFName);
 
     browser.storage.local.set({ WFTitle: "" });
     browser.storage.local.set({ WFName: "" });
   });
-});

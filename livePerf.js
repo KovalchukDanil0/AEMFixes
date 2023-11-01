@@ -1,22 +1,24 @@
-function ReplaceByRandElmArray(elm, replaceArray) {
+window.ReplaceByRandElmArray = function (elm, replaceArray) {
   let string = elm.textContent;
   string = string.replace(/\S+/gm, function () {
     let replacedString =
       replaceArray[Math.floor(Math.random() * replaceArray.length)];
 
-    if (elm.tagName != "P") {
+    if (elm.tagName !== "P") {
       replacedString = replacedString.toUpperCase();
     }
     return replacedString;
   });
 
   return string;
-}
+};
 
-function RandomProgrammerMemes() {
-  if (document.title != "404") return;
+window.RandomProgrammerMemes = function () {
+  if (document.title !== "404") {
+    return;
+  }
 
-  let githubPath =
+  const githubPath =
     "https://raw.githubusercontent.com/deep5050/programming-memes/main/";
 
   const request = new XMLHttpRequest();
@@ -25,16 +27,16 @@ function RandomProgrammerMemes() {
   request.send();
 
   request.onload = () => {
-    if (request.status === 200) {
-      console.log("Success"); // So extract data from json and create table
+    const sucess = 200;
 
-      let data = JSON.parse(request.response);
-      let count = Object.keys(data).length;
+    if (request.status === sucess) {
+      const data = JSON.parse(request.response);
+      const count = Object.keys(data).length;
 
       //Extracting data
-      let memeImage = data[generateRandom(count - 1)].path;
+      const memeImage = data[generateRandom(count - 1)].path;
 
-      let arrayQuerySel = [
+      const arrayQuerySel = [
         "#accelerator-page > div.content > div > div.box-content.cq-dd-image > div > div.billboard.billboard-image-sets-height > div > div.billboard-inner",
         "#global-ux > div.content.clearfix > div:nth-child(1) > div.billboard.section > div > div.billboard-inner",
       ];
@@ -45,7 +47,9 @@ function RandomProgrammerMemes() {
         index += 1;
         billboardContainer = document.querySelector(arrayQuerySel[index]);
 
-        if (billboardContainer != null) break;
+        if (billboardContainer != null) {
+          break;
+        }
       }
 
       let billboardImages = [];
@@ -73,6 +77,9 @@ function RandomProgrammerMemes() {
           billboardText.remove();
 
           break;
+        default: {
+          throw new Error("No such Error page");
+        }
       }
 
       billboardImages.forEach((image) => {
@@ -84,14 +91,14 @@ function RandomProgrammerMemes() {
   request.onerror = () => {
     throw new Error("no more memes error");
   };
-}
+};
 
-function generateRandom(maxLimit) {
+window.generateRandom = function (maxLimit) {
   let rand = Math.random() * maxLimit;
   rand = Math.floor(rand);
 
   return rand;
-}
+};
 
 (async function () {
   /*var regexFixShortLink =
@@ -107,7 +114,7 @@ function generateRandom(maxLimit) {
     return;
   }*/
 
-  let savedData = await loadSavedData();
+  const savedData = await loadSavedData();
   if (savedData.enableFunErr) {
     RandomProgrammerMemes();
   }
@@ -127,6 +134,6 @@ function generateRandom(maxLimit) {
           alert("ServiceWorker registration failed: ", err);
         }
       );
-    }); 
+    });
   }*/
 })();

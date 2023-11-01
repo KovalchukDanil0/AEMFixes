@@ -1,4 +1,4 @@
-browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.from === "popup" && msg.subject === "getAlias") {
     (async () => {
       let realUrl = await waitForElm(
@@ -14,15 +14,17 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     // Important! Return true to indicate you want to send a response asynchronously
     return true;
   }
+
+  return false;
 });
 
-function CatErrors() {
+window.catErrors = function () {
   let errorText = document.querySelector("body > header > title");
-  let errorImage =
+  const errorImage =
     '<img style="display: block;-webkit-user-select: none; display: block; margin-left: auto; margin-right: auto; width: 50%;" src="https://cataas.com/cat/says/';
   if (
     errorText != null &&
-    errorText.textContent == "AEM Permissions Required"
+    errorText.textContent === "AEM Permissions Required"
   ) {
     document.body.innerHTML = "";
     document.body.insertAdjacentHTML(
@@ -34,7 +36,7 @@ function CatErrors() {
 
   errorText = document.querySelector("body > h1");
   if (errorText != null) {
-    if (errorText.textContent == "Forbidden") {
+    if (errorText.textContent === "Forbidden") {
       document.body.innerHTML = "";
       document.body.insertAdjacentHTML(
         "afterbegin",
@@ -42,7 +44,7 @@ function CatErrors() {
       );
       return;
     }
-    if (errorText.textContent == "Bad Gateway") {
+    if (errorText.textContent === "Bad Gateway") {
       document.body.innerHTML = "";
       document.body.insertAdjacentHTML(
         "afterbegin",
@@ -51,10 +53,10 @@ function CatErrors() {
       return;
     }
   }
-}
+};
 
-function FixAuthorLink() {
-  let parentUrl = parent.window.location.href;
+window.fixAuthorLink = function () {
+  const parentUrl = parent.window.location.href;
   let url = window.location.href;
 
   if (!url.includes(".html")) {
@@ -75,13 +77,13 @@ function FixAuthorLink() {
       return;
     }
   }
-}
+};
 
 (async function () {
-  let savedData = await loadSavedData();
+  const savedData = await loadSavedData();
   if (savedData.enableFunErr) {
-    CatErrors();
+    catErrors();
   }
 
-  FixAuthorLink();
+  fixAuthorLink();
 })();

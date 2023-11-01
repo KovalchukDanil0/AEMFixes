@@ -1,32 +1,36 @@
-function ResourceResolverGetOrigPath() {
-  let wrongLink = GMGetADeleteValue("WrongLink");
-  if (wrongLink == "")
+window.ResourceResolverGetOrigPath = function () {
+  const wrongLink = GMGetADeleteValue("WrongLink");
+  if (wrongLink === "") {
     throw new Error("Link is not defined, resource resolver opened manually");
+  }
 
   waitForAliasPath().then((form) => {
     form.value = wrongLink;
 
-    let button = resolverToolButton();
+    const button = resolverToolButton();
     button.click();
 
+    const interval = 500;
     const intervaID = setInterval(function () {
       const originalPath = originalPath().replace("-gf3-test", "");
-      if (!originalPath.isEmpty) return;
+      if (!originalPath.isEmpty) {
+        return;
+      }
       clearInterval(intervaID);
 
       makeRealAuthorLink(originalPath);
-    }, 500);
+    }, interval);
   });
-}
+};
 
-function waitForAliasPath() {
+window.waitForAliasPath = function () {
   return waitForElm("#aliasPath");
-}
+};
 
-function resolverToolButton() {
+window.resolverToolButton = function () {
   return document.querySelector("#resolvertool");
-}
+};
 
-function originalPath() {
+window.originalPath = function () {
   return document.querySelector("#originalPath").textContent;
-}
+};

@@ -1,13 +1,13 @@
 const regexRemoveSpaces = /^\s+|\s+$|\s+(?=\s)/gm;
 
-let buttonsContainer = function () {
+const buttonsContainer = function () {
   return document.querySelector(
     "#stalker > div > div.command-bar > div > div > div > div.aui-toolbar2-primary"
   );
 };
 
-function createWFButton() {
-  let button = document.querySelector("#assign-issue").cloneNode(true);
+window.createWFButton = function () {
+  const button = document.querySelector("#assign-issue").cloneNode(true);
 
   button.removeAttribute("id");
   button.removeAttribute("href");
@@ -18,34 +18,34 @@ function createWFButton() {
   button.textContent = "Create WF";
 
   return button;
-}
+};
 
-function selectorTextNoSpaces(selector) {
+window.selectorTextNoSpaces = function (selector) {
   return document
     .querySelector(selector)
     .textContent.replace(regexRemoveSpaces, "");
-}
+};
 
-function ticketMarket() {
+window.ticketMarket = function () {
   return selectorTextNoSpaces("#customfield_13300-val");
-}
+};
 
-function ticketLocalLanguage() {
+window.ticketLocalLanguage = function () {
   return selectorTextNoSpaces("#customfield_15000-val");
-}
+};
 
-function ticketTitle() {
+window.ticketTitle = function () {
   return selectorTextNoSpaces("#summary-val");
-}
+};
 
-function ticketNumber() {
+window.ticketNumber = function () {
   return document
     .querySelector("#parent_issue_summary")
     .getAttribute("data-issue-key")
     .match(/ESM-\w+/gm);
-}
+};
 
-function textToWFPath(market, localLanguage, title) {
+window.textToWFPath = function (market, localLanguage, title) {
   let fullPath;
   switch (market) {
     case "Ford of Germany":
@@ -94,10 +94,10 @@ function textToWFPath(market, localLanguage, title) {
       fullPath = "BE";
       switch (localLanguage) {
         case "Dutch":
-          fullPath += "/" + fullPath + "NL";
+          fullPath += `/${fullPath}NL`;
           break;
         case "French":
-          fullPath += "/" + fullPath + "FR";
+          fullPath += `/${fullPath}FR`;
           break;
         default:
           fullPath = WFPathFromTitle(title);
@@ -114,13 +114,13 @@ function textToWFPath(market, localLanguage, title) {
       fullPath = "CH";
       switch (localLanguage) {
         case "German":
-          fullPath += "/" + fullPath + "DE";
+          fullPath += `/${fullPath}DE`;
           break;
         case "French":
-          fullPath += "/" + fullPath + "FR";
+          fullPath += `/${fullPath}FR`;
           break;
         case "Italian":
-          fullPath += "/" + fullPath + "IT";
+          fullPath += `/${fullPath}IT`;
           break;
         default:
           fullPath = WFPathFromTitle(title);
@@ -143,63 +143,63 @@ function textToWFPath(market, localLanguage, title) {
   }
 
   return fullPath;
-}
+};
 
-function WFPathFromTitle(title) {
+window.WFPathFromTitle = function (title) {
   const regexWFTitle = /^(?:NWP_)?(\w\w)(\w\w)?(?:.+)?/gm;
 
-  let market = title.replace(regexWFTitle, "$1");
-  let localLanguage = title.replace(regexWFTitle, "$2");
+  const market = title.replace(regexWFTitle, "$1");
+  const localLanguage = title.replace(regexWFTitle, "$2");
 
-  if (localLanguage == "") {
+  if (localLanguage === "") {
     return market + market;
   } else {
-    return market + "/" + market + localLanguage;
+    return `${market}/${market}${localLanguage}`;
   }
-}
+};
 
-function AEMToolsCreateWF() {
-  let title = ticketTitle();
+window.AEMToolsCreateWF = function () {
+  const title = ticketTitle();
 
-  browser.storage.local.set({ WFTitle: title }).then(() => {
-    browser.storage.local.set({ WFName: ticketNumber() }).then(() => {
-      let WFPath = textToWFPath(ticketMarket(), ticketLocalLanguage(), title);
+  browser.storage.local
+    .set({ WFTitle: title, WFName: ticketNumber() })
+    .then(() => {
+      const WFPath = textToWFPath(ticketMarket(), ticketLocalLanguage(), title);
 
       window.open(
         "https://wwwperf.brandeuauthorlb.ford.com/miscadmin#/etc/workflow/packages/ESM/" +
           WFPath
       );
     });
-  });
-}
+};
 
-browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "popup" && msg.subject === "createWF") {
     AEMToolsCreateWF();
   }
 });
 
-function FixSorting() {
-  let sortByDate = document.querySelector(
+window.FixSorting = function () {
+  const sortByDate = document.querySelector(
     '#attachment-sorting-options > li:nth-child(2) > a:not([class*="aui-checked"])'
   );
   if (sortByDate != null) {
     sortByDate.click();
   }
 
-  let descending = document.querySelector(
+  const descending = document.querySelector(
     '#attachment-sorting-order-options > li:nth-child(2) > a:not([class*="aui-checked"])'
   );
   if (descending != null) {
     descending.click();
   }
-}
+};
 
 (async function Jira() {
-  let savedData = await loadSavedData();
+  const savedData = await loadSavedData();
 
   if (!savedData.disableCreateWF) {
-    let WFButton = buttonsContainer().appendChild(createWFButton());
+    const WFButton = buttonsContainer().appendChild(createWFButton());
     WFButton.addEventListener("click", AEMToolsCreateWF);
   }
 

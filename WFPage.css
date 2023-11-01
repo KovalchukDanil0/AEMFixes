@@ -58,7 +58,6 @@ input[type="text"]:focus {
     font-weight: 700;
 
     padding-bottom: 6px;
-    font-weight: 700;
     border-width: 3px;
     border-image: linear-gradient(to right, #11998e, #38ef7d);
     border-image-slice: 1;
@@ -71,10 +70,6 @@ body>div.wrapper-conf>div>div.content-conf.workflow-package-page>div.config-warn
 body>div.workflows-warning-bar {
     background-color: yellow;
 }
-
-p {}
-
-.configSubSection {}
 
 div>.x-window-tl {
     background-color: black;

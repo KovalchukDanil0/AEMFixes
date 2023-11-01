@@ -1,11 +1,13 @@
-function blurAll() {
-  let tmp = document.createElement("input");
+window.blurAll = function () {
+  const tmp = document.createElement("input");
   document.body.appendChild(tmp);
   tmp.focus();
   document.body.removeChild(tmp);
-}
+};
 
 (function AutoLogIn() {
+  const timeout = 500;
+
   waitForElm("#input28").then((oktaForm) => {
     const intervaID = setInterval(function () {
       if (oktaForm.value.isEmpty()) {
@@ -15,14 +17,14 @@ function blurAll() {
       }
       clearInterval(intervaID);
 
-      let checkbox = document.querySelector("#input36");
+      const checkbox = document.querySelector("#input36");
       checkbox.click();
 
-      let submitButton = document.querySelector(
+      const submitButton = document.querySelector(
         "#form20 > div.o-form-button-bar > input"
       );
       submitButton.click();
-    }, 500);
+    }, timeout);
   });
 
   waitForElm(
@@ -44,8 +46,8 @@ function blurAll() {
       }
       clearInterval(intervaID);
 
-      let logInButton = document.querySelector("#submitButton");
+      const logInButton = document.querySelector("#submitButton");
       logInButton.click();
-    }, 500);
+    }, timeout);
   });
 })();

@@ -1,6 +1,6 @@
 let altTextContainerElm;
 let altShowed = false;
-function ShowAltTexts() {
+window.ShowAltTexts = function () {
   if (!altShowed) {
     const imgElements = document.querySelectorAll("img");
 
@@ -12,7 +12,7 @@ function ShowAltTexts() {
     altTextContainer.classList.add("altTextExist");
 
     for (const element of imgElements) {
-      let altText = element.title;
+      const altText = element.title;
 
       if (altText === "") {
         element.after(noAltText.cloneNode(true));
@@ -34,9 +34,9 @@ function ShowAltTexts() {
 
     altShowed = false;
   }
-}
+};
 
-browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "background" && msg.subject === "showAltTexts") {
     ShowAltTexts();
   }

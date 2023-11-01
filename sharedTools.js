@@ -38,31 +38,31 @@ String.prototype.isEmpty = function () {
   return this.trim().length === 0;
 };
 
-function ifWorkflow(url) {
+const ifWorkflow = function (url) {
   return url.match(regexWorkflow);
-}
+};
 
-function ifWCMWorkflows(url) {
+const ifWCMWorkflows = function (url) {
   return url.match(regexWCMWorkflows);
-}
+};
 
-function ifInbox(url) {
+const ifInbox = function (url) {
   return url.match(regexInbox);
-}
+};
 
-function ifResourceResolver(url) {
+const ifResourceResolver = function (url) {
   return url.match(regexResourceResolver);
-}
+};
 
-function ifFindAndReplace(url) {
+const ifFindAndReplace = function (url) {
   return url.match(regexFindAndReplaceLinks);
-}
+};
 
-function ifLogInForm(url) {
+const ifLogInForm = function (url) {
   return url.match(regexLogInForm);
-}
+};
 
-function getElementByXpath(path) {
+const getElementByXpath = function (path) {
   return document.evaluate(
     path,
     document,
@@ -70,9 +70,9 @@ function getElementByXpath(path) {
     XPathResult.FIRST_ORDERED_NODE_TYPE,
     null
   ).singleNodeValue;
-}
+};
 
-function waitForElm(selector) {
+const waitForElm = function (selector) {
   return new Promise((resolve) => {
     if (document.querySelector(selector)) {
       return resolve(document.querySelector(selector));
@@ -90,11 +90,11 @@ function waitForElm(selector) {
       subtree: true,
     });
   });
-}
+};
 
-async function loadSavedData() {
-  return await browser.storage.sync.get({
+const loadSavedData = async function () {
+  return browser.storage.sync.get({
     disableCreateWF: false,
     enableFunErr: false,
   });
-}
+};
