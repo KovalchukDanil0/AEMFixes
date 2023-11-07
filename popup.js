@@ -6,9 +6,12 @@ window.showMessage = function (message, time) {
 
   statusBar.textContent = message;
   statusBar.style.display = "inherit";
+  statusBar.classList.add("message-body");
+
   if (time !== Number.MAX_VALUE) {
     setTimeout(() => {
       statusBar.style.display = "none";
+      status.className = "";
     }, time);
   }
 };
@@ -63,10 +66,15 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
   const tab = tabs[0];
 
   buttonOnClick("#buttonShowAltTexts", "showAltText", false, true, tab);
-
+  buttonOnClick(
+    "#buttonHighlightHeading",
+    "highlightHeading",
+    false,
+    true,
+    tab
+  );
   buttonOnClick("#buttonCopyAllLinks", "copyAllLinks", false, true);
-
-  //HighlightHeading()
+  buttonOnClick("#buttonCheckMothersite", "checkMothersite", false, true, tab);
 
   const ifJira = tab.url.match(regexJira);
   if (ifJira) {

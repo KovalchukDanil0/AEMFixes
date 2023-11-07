@@ -33,7 +33,7 @@ browser.storage.local
     const WFTitle = result["WFTitle"];
     const WFName = result["WFName"];
 
-    CreateWF(WFTitle, WFName);
+    createWF(WFTitle, WFName);
 
     browser.storage.local.set({ WFTitle: "" });
     browser.storage.local.set({ WFName: "" });

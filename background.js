@@ -73,7 +73,7 @@ async function toEnvironment(tab, url, env, newTab) {
             this.localLanguage = "el";
             break;
           default: {
-            throw new Error("This market doesn't exist");
+            console.warn(`This market ${this.market} doesn't exist`);
           }
         }
       } else {
@@ -90,7 +90,7 @@ async function toEnvironment(tab, url, env, newTab) {
             this.localLanguage = "co";
             break;
           default: {
-            throw new Error("This market doesn't exist");
+            console.warn(`This market ${this.market} doesn't exist`);
           }
         }
 
@@ -286,10 +286,14 @@ async function toEnvironment(tab, url, env, newTab) {
   });
 }
 
-function openPropertiesTouchUI() {
-  const tabs = browser.tabs.query({ currentWindow: true, active: true });
+async function openPropertiesTouchUI() {
+  const tabs = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  const tab = tabs[0];
 
-  const newUrl = tabs[0].url.replace(
+  const newUrl = tab.url.replace(
     regexAuthor,
     "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$2"
   );
@@ -307,19 +311,39 @@ function showAltText(tab) {
   });
 }
 
-function copyAllLinks() {
+function highlightHeading(tab) {
+  browser.tabs.sendMessage(tab.id, {
+    from: "background",
+    subject: "highlightHeading",
+  });
+}
+
+// TODO: implement mothersite link checker
+function checkMothersite(tab) {
+  browser.tabs.sendMessage(tab.id, {
+    from: "background",
+    subject: "checkMothersite",
+  });
+}
+
+async function copyAllLinks() {
   let highlightedPageLinks;
 
-  const tabs = browser.tabs.query({ highlighted: true, currentWindow: true });
+  const tabs = await browser.tabs.query({
+    highlighted: true,
+    currentWindow: true,
+  });
 
-  for (const element of tabs) {
-    const tab = element;
-
+  for (let index = 0; index < tabs.length; index++) {
+    const tab = tabs[index];
     highlightedPageLinks += tab.url + "\n\n";
-    navigator.clipboard.writeText(highlightedPageLinks);
-
-    ShowMessage("LINKS COPIED TO CLIPBOARD:\n" + highlightedPageLinks);
   }
+
+  browser.tabs.sendMessage(tabs[0].id, {
+    from: "background",
+    subject: "writeToClipboard",
+    text: highlightedPageLinks,
+  });
 }
 
 async function executeOnEachTab(func, newTab, ...args) {
@@ -359,10 +383,21 @@ browser.runtime.onInstalled.addListener(function () {
   });
 });
 
-const menusOnClick = function (info) {
+const menusOnClick = async function (info) {
+  const tabs = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  const tab = tabs[0];
+
   switch (info.menuItemId) {
     case "camelCase":
-      console.log(jsConvert.toCamelCase("param-case"));
+      browser.tabs.sendMessage(tab.id, {
+        from: "background",
+        subject: "convertCase",
+        text: jsConvert.toCamelCase(info.selectionText),
+      });
+      console.log(jsConvert.toCamelCase(info.selectionText));
       break;
     default:
       console.log("Standard context menu item clicked.");

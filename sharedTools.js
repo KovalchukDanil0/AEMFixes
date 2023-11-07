@@ -98,3 +98,16 @@ const loadSavedData = async function () {
     enableFunErr: false,
   });
 };
+
+browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
+  if (msg.from === "background" && msg.subject === "writeToClipboard") {
+    navigator.clipboard.writeText(msg.text);
+
+    browser.runtime.sendMessage({
+      from: "background",
+      subject: "showMessage",
+      message: `LINKS COPIED TO CLIPBOARD:\n ${msg.text}`,
+      time: 5000,
+    });
+  }
+});
