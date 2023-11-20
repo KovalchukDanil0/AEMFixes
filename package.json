@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@xmldom/xmldom": "^0.8.10",
     "browserify": "^17.0.0",
     "bulma": "^0.9.4",
     "jquery": "^3.7.1",
