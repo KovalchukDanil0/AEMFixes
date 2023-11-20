@@ -5,7 +5,7 @@ window.getLinksInWF = function () {
 };
 
 window.WFID = function () {
-  return url.replace(regexWorkflow, "$1");
+  return url.replace(regexWorkflow, "$4");
 };
 
 window.insertAfter = function (newNode, existingNode) {
@@ -72,6 +72,18 @@ window.waitForWorkflowTitleInput = function () {
 
 // \/etc\/workflow\/packages\/ESM\/FRFR\/ESM-157004(-\w+)?\.html
 
+window.AddWFID = function () {
+  waitForWorkflowTitleInput().then((form) => {
+    const WorkflowID = WFID();
+
+    form.value = WorkflowID;
+    getLinksInWF().forEach((data) => (data.href = data.href.addBetaToLink()));
+
+    const requestButton = document.querySelector("#start-request-workflow");
+    requestButton.removeAttribute("disabled");
+  });
+};
+
 window.NewWFDesign = function () {
   document
     .querySelectorAll('style,link[rel="stylesheet"]')
@@ -80,50 +92,56 @@ window.NewWFDesign = function () {
   // add "WFPage.css"
 };
 
+// body > div.wrapper-conf > div > div.content-conf.workflow-package-page > div.configSection > div > div:nth-child(2)
+window.UsefulLinks = async function () {
+  const container = await waitForElm(
+    "body > div.wrapper-conf > div > div.content-conf.workflow-package-page > div.configSection > div > div:nth-child(2)"
+  );
+  const ULinkContainer = container.cloneNode(false);
+
+  const market = url.replace(regexWorkflow, "$1").toLowerCase();
+  const beta = IsMarketInBeta(fixMarket(market));
+
+  const localLanguage = url.replace(regexWorkflow, "$2$3").toLowerCase();
+
+  const env = "cf#";
+  const marketPath = `/content/guxeu${
+    beta ? "-beta" : ""
+  }/${localLanguage}/${market}_${localLanguage}`;
+
+  const betaButAcc = ["es", "it"];
+  if (betaButAcc.some((mar) => market.includes(mar))) {
+    addDisclosure(true);
+  } else {
+    addDisclosure();
+  }
+
+  if (!beta) {
+    addDisclosure(true);
+  }
+
+  function addDisclosure(acc = false) {
+    const a = document.createElement("a");
+
+    const disclosureLibrary = `/site-wide-content/${
+      acc ? "acc-" : ""
+    }disclosure-library.html`;
+    const linkText = document.createTextNode(marketPath + disclosureLibrary);
+    a.appendChild(linkText);
+    a.target = "_blank";
+    a.href = `/${env}${marketPath}${disclosureLibrary}`;
+    ULinkContainer.appendChild(a);
+
+    const linebreak = document.createElement("br");
+    a.appendChild(linebreak);
+
+    container.parentNode.insertBefore(ULinkContainer, container);
+  }
+};
+
 (function WorkflowFixes() {
   //NewWFDesign();
-
-  waitForWorkflowTitleInput().then((form) => {
-    const WorkflowID = WFID();
-
-    form.value = WorkflowID;
-    getLinksInWF().forEach((data) => (data.href = data.href.addBetaToLink()));
-
-    /*$(
-          "#cq-gen7 > div.wrapper-conf > div > div:nth-child(3) > div > div > div:nth-child(2)"
-        ).bind("DOMNodeInserted", function () {
-          alert("child is appended");
-        });*/
-
-    const requestButton = document.querySelector("#start-request-workflow");
-    requestButton.removeAttribute("disabled");
-
-    //insertAfter(document.createTextNode(" "), requestButton);
-
-    /*observeDOM(
-      document.querySelector(
-        "body > div.wrapper-conf > div > div:nth-child(3) > div > div > div.cq-element-filters"
-      ),
-      function (m) {
-        var addedNodes = [],
-          removedNodes = [];
-
-        m.forEach(
-          (record) =>
-            record.addedNodes.length & addedNodes.push(...record.addedNodes)
-        );
-
-        m.forEach(
-          (record) =>
-            record.removedNodes.length &
-            removedNodes.push(...record.removedNodes)
-        );
-
-        console.clear();
-        console.log("Added:", addedNodes, "Removed:", removedNodes);
-      }
-    );*/
-  });
-
+  AddWFID();
+  UsefulLinks();
   //AutoFillWF();
 })();

@@ -1,11 +1,11 @@
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "background" && msg.subject === "checkMothersite") {
-    CheckMothersite();
+    checkMothersite();
   }
 });
 
-function CheckMothersite() {
-  let links = document.querySelectorAll("[href]");
+window.checkMothersite = function () {
+  const links = document.querySelectorAll("[href]");
 
   let mothersiteLinks = 0;
   links.forEach((element) => {
@@ -23,4 +23,4 @@ function CheckMothersite() {
     message: `MOTHERSITE LINKS ON THIS PAGE - ${mothersiteLinks}`,
     time: 5000,
   });
-}
+};

@@ -17,33 +17,13 @@ async function toEnvironment(tab, url, env, newTab) {
     ifSameEnv: false,
 
     isMarketInBeta() {
-      if (marketsInBeta.some((link) => this.market.includes(link))) {
-        this.beta = "-beta";
-        return true;
-      } else {
-        this.beta = "";
-        return false;
-      }
+      const betaBool = IsMarketInBeta(this.market);
+      this.beta = betaBool ? "-beta" : "";
+      return betaBool;
     },
 
     fixMarket() {
-      const marketsFixAuthor = ["gb", "gl"];
-      const marketsFixPerf = ["uk", "mothersite"];
-
-      let idx = marketsFixAuthor.indexOf(this.market);
-      if (idx >= 0) {
-        this.market = marketsFixPerf[idx];
-        return this.market;
-      }
-
-      idx = marketsFixPerf.indexOf(this.market);
-      if (idx >= 0) {
-        this.market = marketsFixAuthor[idx];
-        return this.market;
-      }
-
-      console.log("fixed market is " + this.market);
-      return this.market;
+      return fixMarket(this.market);
     },
 
     fixLocalLanguage() {
@@ -105,14 +85,14 @@ async function toEnvironment(tab, url, env, newTab) {
 
     fixUrlPart() {
       const regexFixSWAuthor =
-        /(?:\S+)?(site-wide-content|home)(\S+?(?=\.html)|\S+)(?:\S+)?/gm;
+        /(?:\S+)?(site-wide-content\/|home\/)(\S+?(?=\.html)|\S+)(?:\S+)?/gm;
 
       if (
         this.urlPart.replace(regexFixSWAuthor, "$1") === "site-wide-content"
       ) {
-        this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/content$2");
+        this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/content/$2");
       } else {
-        this.urlPart = this.urlPart.replace(regexFixSWAuthor, "$2");
+        this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/$2");
       }
 
       console.log("fixed url is " + this.urlPart);
@@ -131,6 +111,7 @@ async function toEnvironment(tab, url, env, newTab) {
 
       const parser = new URL(url);
       data.urlPart = parser.pathname + parser.search + parser.hash;
+      console.log(data.urlPart);
 
       // Live
       if (url.match(regexLive)) {
@@ -186,8 +167,6 @@ async function toEnvironment(tab, url, env, newTab) {
       if (data.market === "") {
         reject(new Error("Market is not set!"));
       }
-
-      //window.close();
 
       switch (env) {
         case "live":
@@ -318,7 +297,6 @@ function highlightHeading(tab) {
   });
 }
 
-// TODO: implement mothersite link checker
 function checkMothersite(tab) {
   browser.tabs.sendMessage(tab.id, {
     from: "background",
@@ -334,8 +312,8 @@ async function copyAllLinks() {
     currentWindow: true,
   });
 
-  for (let index = 0; index < tabs.length; index++) {
-    const tab = tabs[index];
+  for (const element of tabs) {
+    const tab = element;
     highlightedPageLinks += tab.url + "\n\n";
   }
 
@@ -383,21 +361,10 @@ browser.runtime.onInstalled.addListener(function () {
   });
 });
 
-const menusOnClick = async function (info) {
-  const tabs = await browser.tabs.query({
-    active: true,
-    currentWindow: true,
-  });
-  const tab = tabs[0];
-
+const menusOnClick = function (info) {
   switch (info.menuItemId) {
     case "camelCase":
-      browser.tabs.sendMessage(tab.id, {
-        from: "background",
-        subject: "convertCase",
-        text: jsConvert.toCamelCase(info.selectionText),
-      });
-      console.log(jsConvert.toCamelCase(info.selectionText));
+      console.log(jsConvert.toCamelCase("param-case"));
       break;
     default:
       console.log("Standard context menu item clicked.");

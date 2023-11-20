@@ -11,7 +11,7 @@ window.showMessage = function (message, time) {
   if (time !== Number.MAX_VALUE) {
     setTimeout(() => {
       statusBar.style.display = "none";
-      status.className = "";
+      statusBar.className = "";
     }, time);
   }
 };

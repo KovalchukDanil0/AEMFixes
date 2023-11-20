@@ -1,5 +1,5 @@
 const regexWorkflow =
-  /(?:.+)?wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/workflow\/packages\/ESM\/\w\w(?:(?:_)?\w\w)?(?:\/\w\w\w\w)?\/(.+)\.html(?:.+)?/gm;
+  /(?:.+)?wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/workflow\/packages\/ESM\/(\w\w)(?:_)?(\w\w)?(?:\/\w\w(\w\w))?\/(.+)\.html(?:.+)?/gm;
 const regexWCMWorkflows =
   /wwwperf\.brandeuauthorlb\.ford\.com\/miscadmin#\/etc\/workflow\/packages\/ESM\//gm;
 const regexInbox = /wwwperf\.brandeuauthorlb\.ford\.com\/inbox/gm;
@@ -31,6 +31,29 @@ const marketsInBeta = [
   "pl",
   "dk",
 ];
+const IsMarketInBeta = function (market) {
+  return !!marketsInBeta.some((link) => market.includes(link));
+};
+
+const fixMarket = function (market) {
+  console.log(market);
+
+  const marketsFixAuthor = ["gb", "gl"];
+  const marketsFixPerf = ["uk", "mothersite"];
+
+  let idx = marketsFixAuthor.indexOf(market);
+  if (idx >= 0) {
+    return marketsFixPerf[idx];
+  }
+
+  idx = marketsFixPerf.indexOf(market);
+  if (idx >= 0) {
+    return marketsFixAuthor[idx];
+  }
+
+  console.log("fixed market is " + market);
+  return market;
+};
 
 const regexJira = /jira\.uhub\.biz\/browse\//gm;
 

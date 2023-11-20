@@ -40,9 +40,9 @@ const headings = {
 const keyContainerId = "hheContainer";
 const keyId = "hheKey";
 const styleTagId = "hheStyleTag";
-const r = (node) => node && node.remove();
-var headingsHighlighted = false;
-function HighlightHeading() {
+const r = (node) => node?.remove();
+let headingsHighlighted = false;
+window.highlightHeading = function () {
   //var HHMenuText;
   if (!headingsHighlighted) {
     headingsHighlighted = true;
@@ -64,7 +64,7 @@ function HighlightHeading() {
   }
 
   function initialiseHeadings() {
-    for (let h in headings) {
+    for (const h in headings) {
       headings[h].elements = [...document.body.querySelectorAll(h)];
       headings[h].count = headings[h].elements.length;
     }
@@ -144,10 +144,10 @@ function HighlightHeading() {
     r(document.querySelector(`#${styleTagId}`));
     document.body.classList.remove(className);
   }
-}
+};
 
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "background" && msg.subject === "highlightHeading") {
-    HighlightHeading();
+    highlightHeading();
   }
 });
