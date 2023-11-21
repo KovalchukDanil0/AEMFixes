@@ -13,7 +13,12 @@ window.ReplaceByRandElmArray = function (elm, replaceArray) {
   return string;
 };
 
-window.RandomProgrammerMemes = function () {
+window.RandomProgrammerMemes = async function () {
+  const savedData = await loadSavedData();
+  if (!savedData.enableFunErr) {
+    return;
+  }
+
   if (document.title !== "404") {
     return;
   }
@@ -100,7 +105,39 @@ window.generateRandom = function (maxLimit) {
   return rand;
 };
 
-(async function () {
+window.checkMothersite = function (from) {
+  const links = document.querySelectorAll("[href]");
+
+  let mothersiteLinks = 0;
+  links.forEach((element) => {
+    if (element.href.includes("mothersite")) {
+      element.style.backgroundColor = "blue";
+      element.style.filter = "invert(100%)";
+
+      mothersiteLinks += 1;
+    }
+  });
+
+  const messageText = `MOTHERSITE LINKS ON THIS PAGE - ${mothersiteLinks}`;
+  if (from === "content" && mothersiteLinks > 0) {
+    alert(messageText);
+  } else {
+    browser.runtime.sendMessage({
+      from: "background",
+      subject: "showMessage",
+      message: messageText,
+      time: 5000,
+    });
+  }
+};
+
+browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
+  if (msg.from === "background" && msg.subject === "checkMothersite") {
+    checkMothersite(msg.from);
+  }
+});
+
+(function () {
   /*var regexFixShortLink =
     /((?:.+)?wwwperf\.)(brandeulb\.ford\.com(?:\/)?(?:editor\.html|cf#)?\/)(content\/(?:.+)?)/gm;
   if (window.location.href.match(regexFixShortLink)) {
@@ -114,10 +151,8 @@ window.generateRandom = function (maxLimit) {
     return;
   }*/
 
-  const savedData = await loadSavedData();
-  if (savedData.enableFunErr) {
-    RandomProgrammerMemes();
-  }
+  RandomProgrammerMemes();
+  checkMothersite("content");
 
   /*if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {

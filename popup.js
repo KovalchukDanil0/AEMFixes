@@ -74,7 +74,6 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
     tab
   );
   buttonOnClick("#buttonCopyAllLinks", "copyAllLinks", false, true);
-  buttonOnClick("#buttonCheckMothersite", "checkMothersite", false, true, tab);
 
   const ifJira = tab.url.match(regexJira);
   if (ifJira) {
@@ -92,10 +91,21 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
     return;
   }
 
-  /*let ifLive = url.match(regexLive);
-  let ifPerf = url.replace(regexPerfProd, "$1") == "perf";
-  let ifProd = url.replace(regexPerfProd, "$1") == "prod";
-  let ifPerfProd = url.match(regexPerfProd);*/
+  /*let ifPerf = url.replace(regexPerfProd, "$1") == "perf";
+  let ifProd = url.replace(regexPerfProd, "$1") == "prod";*/
+
+  const ifLive = tab.url.match(regexLive);
+  const ifPerfProd = tab.url.match(regexPerfProd);
+
+  if (ifLive || ifPerfProd) {
+    buttonOnClick(
+      "#buttonCheckMothersite",
+      "checkMothersite",
+      false,
+      true,
+      tab
+    );
+  }
 
   const ifAuthor = tab.url.match(regexAuthor);
 
