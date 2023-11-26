@@ -1,13 +1,19 @@
 browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.from === "popup" && msg.subject === "getAlias") {
     (async () => {
+      const urlPart =
+        /(?:[\s\S]*)?Your real URL will be : \.\.\. \/(home|site-wide-content)(\S+)?(?:[\s\S]*)/gm;
+
       let realUrl = await waitForElm(
         "#accelerator-page > div.info-banner > div:nth-child(1)"
       );
-      realUrl = realUrl.textContent.replace(
-        /(?:[\s\S]*)?Your real URL will be : \.\.\. (\S+)?(?:[\s\S]*)?/gm,
-        "$1"
-      );
+
+      let content = "";
+      if (realUrl.textContent.replace(urlPart, "$1") === "site-wide-content") {
+        content = "/content";
+      }
+      realUrl = realUrl.textContent.replace(urlPart, content + "$2");
+
       sendResponse(realUrl);
     })();
 
@@ -21,7 +27,8 @@ browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 window.catErrors = function () {
   let errorText = document.querySelector("body > header > title");
   const errorImage =
-    '<img style="display: block;-webkit-user-select: none; display: block; margin-left: auto; margin-right: auto; width: 50%;" src="https://cataas.com/cat/says/';
+    '<img style="display: block;-webkit-user-select: none; display: block; margin-left: auto; margin-right: auto; width: 50%;" src="https://cataas.com/cat/gif">';
+  const errorStyle = 'style="text-align: center; color: red; font-size: 50px;"';
   if (
     errorText != null &&
     errorText.textContent === "AEM Permissions Required"
@@ -29,7 +36,7 @@ window.catErrors = function () {
     document.body.innerHTML = "";
     document.body.insertAdjacentHTML(
       "afterbegin",
-      errorImage + '404%20error - Not Found">'
+      errorImage + `<p ${errorStyle}>404 ERROR - Not Found</p>`
     );
     return;
   }
@@ -40,7 +47,7 @@ window.catErrors = function () {
       document.body.innerHTML = "";
       document.body.insertAdjacentHTML(
         "afterbegin",
-        errorImage + '403%20error - Forbidden">'
+        errorImage + `<p ${errorStyle}>403 ERROR - Forbidden</p>`
       );
       return;
     }
@@ -48,7 +55,7 @@ window.catErrors = function () {
       document.body.innerHTML = "";
       document.body.insertAdjacentHTML(
         "afterbegin",
-        errorImage + '503%20error - Bad Gateway">'
+        errorImage + `<p ${errorStyle}>503 ERROR - Bad Gateway</p>`
       );
       return;
     }

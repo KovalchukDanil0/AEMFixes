@@ -1,8 +1,9 @@
 window.createWF = function (WFTitle, WFName) {
   if (WFTitle === "" || WFName === "") {
-    throw new Error(
+    console.warn(
       "WFTitle or WFName are not defined, workflows opened manually"
     );
+    return;
   }
 
   waitForElm(

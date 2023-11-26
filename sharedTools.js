@@ -18,6 +18,9 @@ const regexPerfProd =
   /(?:.+)?www(perf|prod)(?:-beta)?-(\w\w)(\w\w)?\.brandeulb\.ford\.com(?:.+)?/gm;
 const regexAuthor =
   /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(\w\w)_\w\w\/(?:.+)?)(?:\.html|\/)(?:.+)?/gm;
+
+const regexJira = /jira\.uhub\.biz\/browse\//gm;
+
 const marketsInBeta = [
   "uk",
   "de",
@@ -31,31 +34,121 @@ const marketsInBeta = [
   "pl",
   "dk",
 ];
-const IsMarketInBeta = function (market) {
-  return !!marketsInBeta.some((link) => market.includes(link));
+
+// doesn't have ch
+const marketsHomeNew = ["ie", "fi", "be", "cz", "hu", "gr", "ro", "lu"];
+
+const AEMLink = {
+  env: "",
+  market: "",
+  localLanguage: "",
+  beta: "",
+  betaBool: "",
+  urlPart: "",
+  ifSameEnv: false,
+
+  isMarketInBeta(someMarket) {
+    if (someMarket === undefined) {
+      someMarket = this.market;
+    }
+    this.betaBool = !!marketsInBeta.some((link) => someMarket.includes(link));
+    this.beta = this.betaBool ? "-beta" : "";
+    return this.betaBool;
+  },
+
+  isMarketHasHomeNew() {
+    return !!marketsHomeNew.some((mar) => this.market.includes(mar));
+  },
+
+  fixMarket() {
+    const marketsFixAuthor = ["gb", "en", "da", "gl"];
+    const marketsFixPerf = ["uk", "uk", "dk", "mothersite"];
+
+    let idx = marketsFixAuthor.indexOf(this.market);
+    if (idx >= 0) {
+      return marketsFixPerf[idx];
+    }
+
+    idx = marketsFixPerf.indexOf(this.market);
+    if (idx >= 0) {
+      return marketsFixAuthor[idx];
+    }
+
+    console.log("fixed market is " + this.market);
+    return this.market;
+  },
+
+  fixLocalLanguage() {
+    if (this.env === "editor.html" || this.env === "cf#") {
+      if (this.localLanguage === "") {
+        this.localLanguage = this.market;
+      }
+
+      switch (this.market) {
+        case "uk":
+        case "ie":
+          this.localLanguage = "en";
+          break;
+        case "lu":
+          this.localLanguage = "fr";
+          break;
+        case "at":
+          this.localLanguage = "de";
+          break;
+        case "dk":
+          this.localLanguage = "da";
+          break;
+        case "cz":
+          this.localLanguage = "cs";
+          break;
+        case "gr":
+          this.localLanguage = "el";
+          break;
+        default: {
+          console.warn(`This market ${this.market} doesn't exist`);
+        }
+      }
+    } else {
+      switch (this.market) {
+        case "cz":
+        case "gr":
+        case "lu":
+        case "ie":
+        case "at":
+        case "dk":
+          this.localLanguage = "";
+          break;
+        case "uk":
+          this.localLanguage = "co";
+          break;
+        default: {
+          console.warn(`This market ${this.market} doesn't exist`);
+        }
+      }
+
+      if (this.localLanguage === this.market) {
+        this.localLanguage = "";
+      }
+    }
+
+    console.log("fixed localLanguage is " + this.localLanguage);
+    return this.localLanguage;
+  },
+
+  fixUrlPart() {
+    const regexFixSWAuthor =
+      /\S+?(site-wide-content|home-new|home)((?:\S+)?(?=\.html)|\S+)(?:\S+)?/gm;
+
+    if (this.urlPart.replace(regexFixSWAuthor, "$1") === "site-wide-content") {
+      this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/content$2");
+    } else {
+      this.urlPart = this.urlPart.replace(regexFixSWAuthor, "$2");
+    }
+
+    console.log("fixed url is " + this.urlPart);
+    return this.urlPart;
+  },
 };
-
-const fixMarket = function (market) {
-  console.log(market);
-
-  const marketsFixAuthor = ["gb", "gl"];
-  const marketsFixPerf = ["uk", "mothersite"];
-
-  let idx = marketsFixAuthor.indexOf(market);
-  if (idx >= 0) {
-    return marketsFixPerf[idx];
-  }
-
-  idx = marketsFixPerf.indexOf(market);
-  if (idx >= 0) {
-    return marketsFixAuthor[idx];
-  }
-
-  console.log("fixed market is " + market);
-  return market;
-};
-
-const regexJira = /jira\.uhub\.biz\/browse\//gm;
 
 String.prototype.isEmpty = function () {
   return this.trim().length === 0;

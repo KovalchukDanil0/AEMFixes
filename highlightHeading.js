@@ -43,18 +43,13 @@ const styleTagId = "hheStyleTag";
 const r = (node) => node?.remove();
 let headingsHighlighted = false;
 window.highlightHeading = function () {
-  //var HHMenuText;
   if (!headingsHighlighted) {
     headingsHighlighted = true;
-    //HHMenuText = "UNHIGHLIGHT HEADINGS";
     init();
   } else {
     headingsHighlighted = false;
-    //HHMenuText = "HIGHLIGHT HEADINGS";
     resetDOM();
   }
-
-  //AddMenus("highlightHeadings", HHMenuText);
 
   function init() {
     document.body.classList.add(className);
@@ -133,11 +128,11 @@ window.highlightHeading = function () {
       .join("");
   }
 
-  function hasExecuted() {
+  /*function hasExecuted() {
     const styles = document.querySelector(`#${styleTagId}`);
     const key = document.querySelector(`#${keyId}`);
     return Boolean(styles || key);
-  }
+  }*/
 
   function resetDOM() {
     r(document.querySelector(`#${keyContainerId}`));

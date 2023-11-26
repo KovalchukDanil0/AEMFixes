@@ -47,6 +47,51 @@ window.ticketNumber = function () {
 
 window.textToWFPath = function (market, localLanguage, title) {
   let fullPath;
+
+  const WFPathFromTitle = function () {
+    const regexWFTitle = /^(?:NWP_)?(\w\w)(\w\w)?(?:.+)?/gm;
+
+    market = title.replace(regexWFTitle, "$1");
+    localLanguage = title.replace(regexWFTitle, "$2");
+
+    if (localLanguage === "") {
+      fullPath = market + market;
+    } else {
+      fullPath = `${market}/${market}${localLanguage}`;
+    }
+  };
+
+  const belgium = function () {
+    switch (localLanguage) {
+      case "Dutch":
+        fullPath += `/${fullPath}NL`;
+        break;
+      case "French":
+        fullPath += `/${fullPath}FR`;
+        break;
+      default:
+        WFPathFromTitle();
+        break;
+    }
+  };
+
+  const switzerland = function () {
+    switch (localLanguage) {
+      case "German":
+        fullPath += `/${fullPath}DE`;
+        break;
+      case "French":
+        fullPath += `/${fullPath}FR`;
+        break;
+      case "Italian":
+        fullPath += `/${fullPath}IT`;
+        break;
+      default:
+        WFPathFromTitle(title);
+        break;
+    }
+  };
+
   switch (market) {
     case "Ford of Germany":
       fullPath = "DEDE";
@@ -92,17 +137,7 @@ window.textToWFPath = function (market, localLanguage, title) {
       break;
     case "Ford of Belgium":
       fullPath = "BE";
-      switch (localLanguage) {
-        case "Dutch":
-          fullPath += `/${fullPath}NL`;
-          break;
-        case "French":
-          fullPath += `/${fullPath}FR`;
-          break;
-        default:
-          fullPath = WFPathFromTitle(title);
-          break;
-      }
+      belgium();
       break;
     case "Ford of Hungary":
       fullPath = "HUHU";
@@ -112,20 +147,7 @@ window.textToWFPath = function (market, localLanguage, title) {
       break;
     case "Ford of Switzerland":
       fullPath = "CH";
-      switch (localLanguage) {
-        case "German":
-          fullPath += `/${fullPath}DE`;
-          break;
-        case "French":
-          fullPath += `/${fullPath}FR`;
-          break;
-        case "Italian":
-          fullPath += `/${fullPath}IT`;
-          break;
-        default:
-          fullPath = WFPathFromTitle(title);
-          break;
-      }
+      switzerland();
       break;
     case "Ford of Romania":
       fullPath = "RORO";
@@ -134,7 +156,7 @@ window.textToWFPath = function (market, localLanguage, title) {
       fullPath = "LULU";
       break;
     default:
-      fullPath = WFPathFromTitle(title);
+      WFPathFromTitle(title);
       break;
     // FOE
     // FMNY
@@ -143,19 +165,6 @@ window.textToWFPath = function (market, localLanguage, title) {
   }
 
   return fullPath;
-};
-
-window.WFPathFromTitle = function (title) {
-  const regexWFTitle = /^(?:NWP_)?(\w\w)(\w\w)?(?:.+)?/gm;
-
-  const market = title.replace(regexWFTitle, "$1");
-  const localLanguage = title.replace(regexWFTitle, "$2");
-
-  if (localLanguage === "") {
-    return market + market;
-  } else {
-    return `${market}/${market}${localLanguage}`;
-  }
 };
 
 window.AEMToolsCreateWF = function () {

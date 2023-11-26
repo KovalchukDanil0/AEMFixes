@@ -9,96 +9,9 @@ try {
 }
 
 async function toEnvironment(tab, url, env, newTab) {
-  const data = {
-    market: "",
-    localLanguage: "",
-    beta: "",
-    urlPart: "",
-    ifSameEnv: false,
-
-    isMarketInBeta() {
-      const betaBool = IsMarketInBeta(this.market);
-      this.beta = betaBool ? "-beta" : "";
-      return betaBool;
-    },
-
-    fixMarket() {
-      return fixMarket(this.market);
-    },
-
-    fixLocalLanguage() {
-      if (env === "editor.html" || env === "cf#") {
-        if (this.localLanguage === "") {
-          this.localLanguage = this.market;
-        }
-
-        switch (this.market) {
-          case "uk":
-          case "ie":
-            this.localLanguage = "en";
-            break;
-          case "lu":
-            this.localLanguage = "fr";
-            break;
-          case "at":
-            this.localLanguage = "de";
-            break;
-          case "dk":
-            this.localLanguage = "da";
-            break;
-          case "cz":
-            this.localLanguage = "cs";
-            break;
-          case "gr":
-            this.localLanguage = "el";
-            break;
-          default: {
-            console.warn(`This market ${this.market} doesn't exist`);
-          }
-        }
-      } else {
-        switch (this.market) {
-          case "cz":
-          case "gr":
-          case "lu":
-          case "ie":
-          case "at":
-          case "dk":
-            this.localLanguage = "";
-            break;
-          case "uk":
-            this.localLanguage = "co";
-            break;
-          default: {
-            console.warn(`This market ${this.market} doesn't exist`);
-          }
-        }
-
-        if (this.localLanguage === this.market) {
-          this.localLanguage = "";
-        }
-      }
-
-      console.log("fixed localLanguage is " + this.localLanguage);
-      return this.localLanguage;
-    },
-
-    fixUrlPart() {
-      const regexFixSWAuthor =
-        /(?:\S+)?(site-wide-content\/|home\/)(\S+?(?=\.html)|\S+)(?:\S+)?/gm;
-
-      if (
-        this.urlPart.replace(regexFixSWAuthor, "$1") === "site-wide-content"
-      ) {
-        this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/content/$2");
-      } else {
-        this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/$2");
-      }
-
-      console.log("fixed url is " + this.urlPart);
-      return this.urlPart;
-    },
-  };
+  const data = AEMLink;
+  data.env = env;
+  console.log(data.env);
 
   return new Promise((resolve, reject) => {
     (async () => {
@@ -111,25 +24,25 @@ async function toEnvironment(tab, url, env, newTab) {
 
       const parser = new URL(url);
       data.urlPart = parser.pathname + parser.search + parser.hash;
-      console.log(data.urlPart);
+      if (data.urlPart === "/") {
+        data.urlPart = "";
+      }
 
       // Live
       if (url.match(regexLive)) {
-        if (url.match(/www\.ford\.\w\w\.\w\w/gm)) {
-          data.market = url.replace(regexLive, "$3");
-          data.localLanguage = url.replace(regexLive, "$2");
-        } else {
+        if (url.replace(regexLive, "$3") === "") {
           data.market = url.replace(regexLive, "$2");
           data.localLanguage = url.replace(regexLive, "$1");
+        } else {
+          data.market = url.replace(regexLive, "$3");
+          data.localLanguage = url.replace(regexLive, "$2");
         }
 
         data.isMarketInBeta();
       }
       // Perf & Prod
       else if (url.match(regexPerfProd)) {
-        if (
-          url.match(/www(?:perf|prod)(?:-beta)?-couk\.brandeulb\.ford\.com/gm)
-        ) {
+        if (url.replace(regexPerfProd, "$3") === "uk") {
           data.market = url.replace(regexPerfProd, "$3");
           data.localLanguage = url.replace(regexPerfProd, "$2");
         } else {
@@ -215,7 +128,11 @@ async function toEnvironment(tab, url, env, newTab) {
     async function makeAuthor() {
       let wrongLink = `/content/guxeu${data.beta}/${
         data.market
-      }/${data.fixLocalLanguage()}_${data.fixMarket()}/home${data.urlPart}`;
+      }/${data.fixLocalLanguage()}_${data.fixMarket()}/${
+        data.isMarketHasHomeNew() && data.urlPart === "" ? "home-new" : "home"
+      }${data.urlPart}`;
+
+      console.log(data.urlPart);
 
       const regexFixSiteWide =
         /((?:\S+)?\/content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w)(\/home\/)(content)?(\S+)?/gm;

@@ -99,41 +99,59 @@ window.UsefulLinks = async function () {
   );
   const ULinkContainer = container.cloneNode(false);
 
-  const market = url.replace(regexWorkflow, "$1").toLowerCase();
-  const beta = IsMarketInBeta(fixMarket(market));
+  const data = AEMLink;
 
-  const localLanguage = url.replace(regexWorkflow, "$2$3").toLowerCase();
+  data.market = url.replace(regexWorkflow, "$1").toLowerCase();
+  data.isMarketInBeta(data.fixMarket());
+  data.localLanguage = url.replace(regexWorkflow, "$2$3").toLowerCase();
 
-  const env = "cf#";
-  const marketPath = `/content/guxeu${
-    beta ? "-beta" : ""
-  }/${localLanguage}/${market}_${localLanguage}`;
+  const wrongMarkets = ["dk", "cs", "el"];
+  const ifWrongMarket = function () {
+    return !!wrongMarkets.some((link) => data.market.includes(link));
+  };
+  if (ifWrongMarket()) {
+    [data.market, data.localLanguage] = [data.localLanguage, data.market];
+  }
+
+  data.env = "cf#";
+
+  const marketPath = `/content/guxeu${data.beta}/${data.fixMarket()}/${
+    data.betaBool && data.market !== "at"
+      ? data.market
+      : data.fixLocalLanguage()
+  }_${
+    data.betaBool && data.market !== "at" ? data.localLanguage : data.market
+  }`;
+
+  if (!data.betaBool) {
+    addDisclosure(true);
+  }
 
   const betaButAcc = ["es", "it"];
-  if (betaButAcc.some((mar) => market.includes(mar))) {
+  if (betaButAcc.some((mar) => data.market.includes(mar))) {
     addDisclosure(true);
   } else {
     addDisclosure();
   }
 
-  if (!beta) {
-    addDisclosure(true);
-  }
-
   function addDisclosure(acc = false) {
-    const a = document.createElement("a");
-
     const disclosureLibrary = `/site-wide-content/${
       acc ? "acc-" : ""
     }disclosure-library.html`;
-    const linkText = document.createTextNode(marketPath + disclosureLibrary);
-    a.appendChild(linkText);
+
+    const fullPath = `${marketPath}${disclosureLibrary}`;
+
+    const a = document.createElement("a");
+    a.href = fullPath;
     a.target = "_blank";
-    a.href = `/${env}${marketPath}${disclosureLibrary}`;
+
+    const linkText = document.createTextNode(fullPath);
+    a.appendChild(linkText);
+
     ULinkContainer.appendChild(a);
 
-    const linebreak = document.createElement("br");
-    a.appendChild(linebreak);
+    const lineBreak = document.createElement("br");
+    a.appendChild(lineBreak);
 
     container.parentNode.insertBefore(ULinkContainer, container);
   }

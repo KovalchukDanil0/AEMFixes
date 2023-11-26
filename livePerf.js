@@ -1,3 +1,5 @@
+const url = window.location.href;
+
 window.ReplaceByRandElmArray = function (elm, replaceArray) {
   let string = elm.textContent;
   string = string.replace(/\S+/gm, function () {
@@ -106,6 +108,10 @@ window.generateRandom = function (maxLimit) {
 };
 
 window.checkMothersite = function (from) {
+  if (url.replace(regexAuthor, "$3") === "mothersite") {
+    return;
+  }
+
   const links = document.querySelectorAll("[href]");
 
   let mothersiteLinks = 0;
@@ -120,6 +126,7 @@ window.checkMothersite = function (from) {
 
   const messageText = `MOTHERSITE LINKS ON THIS PAGE - ${mothersiteLinks}`;
   if (from === "content" && mothersiteLinks > 0) {
+    // TODO: replace wih popup
     alert(messageText);
   } else {
     browser.runtime.sendMessage({
