@@ -24,7 +24,12 @@ browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   return false;
 });
 
-window.catErrors = function () {
+window.catErrors = async function () {
+  const savedData = await loadSavedData();
+  if (!savedData.enableFunErr) {
+    return;
+  }
+
   let errorText = document.querySelector("body > header > title");
   const errorImage =
     '<img style="display: block;-webkit-user-select: none; display: block; margin-left: auto; margin-right: auto; width: 50%;" src="https://cataas.com/cat/gif">';
@@ -86,11 +91,6 @@ window.fixAuthorLink = function () {
   }
 };
 
-(async function () {
-  const savedData = await loadSavedData();
-  if (savedData.enableFunErr) {
-    catErrors();
-  }
-
+(function () {
   fixAuthorLink();
 })();
