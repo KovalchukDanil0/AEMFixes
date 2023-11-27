@@ -1,4 +1,4 @@
-(function () {
+/*(function () {
   waitForElm(
     "body > div > div > div.find-replace-links.ng-scope > div.content.first > div.root-path-selection > button.find-links"
   ).then((findLinksButton) => {
@@ -10,3 +10,4 @@
     });
   });
 })();
+*/

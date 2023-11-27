@@ -102,25 +102,30 @@ window.UsefulLinks = async function () {
   const data = AEMLink;
 
   data.market = url.replace(regexWorkflow, "$1").toLowerCase();
-  data.isMarketInBeta(data.fixMarket());
   data.localLanguage = url.replace(regexWorkflow, "$2$3").toLowerCase();
 
-  const wrongMarkets = ["dk", "cs", "el"];
+  const wrongMarkets = ["da", "cs", "el"];
   const ifWrongMarket = function () {
-    return !!wrongMarkets.some((link) => data.market.includes(link));
+    return !!wrongMarkets.some((mar) => data.market.includes(mar));
   };
   if (ifWrongMarket()) {
     [data.market, data.localLanguage] = [data.localLanguage, data.market];
   }
 
+  data.isMarketInBeta();
   data.env = "cf#";
 
+  const swapLocalLangMarkets = ["at", "dk"];
+  const ifSwapLocalLangMarkets = function () {
+    return !swapLocalLangMarkets.some((mar) => data.market.includes(mar));
+  };
+
   const marketPath = `/content/guxeu${data.beta}/${data.fixMarket()}/${
-    data.betaBool && data.market !== "at"
+    data.betaBool && ifSwapLocalLangMarkets()
       ? data.market
       : data.fixLocalLanguage()
   }_${
-    data.betaBool && data.market !== "at" ? data.localLanguage : data.market
+    data.betaBool && ifSwapLocalLangMarkets() ? data.localLanguage : data.market
   }`;
 
   if (!data.betaBool) {

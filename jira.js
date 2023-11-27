@@ -87,7 +87,7 @@ window.textToWFPath = function (market, localLanguage, title) {
         fullPath += `/${fullPath}IT`;
         break;
       default:
-        WFPathFromTitle(title);
+        WFPathFromTitle();
         break;
     }
   };
@@ -156,7 +156,7 @@ window.textToWFPath = function (market, localLanguage, title) {
       fullPath = "LULU";
       break;
     default:
-      WFPathFromTitle(title);
+      WFPathFromTitle();
       break;
     // FOE
     // FMNY

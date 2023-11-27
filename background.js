@@ -11,7 +11,6 @@ try {
 async function toEnvironment(tab, url, env, newTab) {
   const data = AEMLink;
   data.env = env;
-  console.log(data.env);
 
   return new Promise((resolve, reject) => {
     (async () => {
@@ -54,11 +53,21 @@ async function toEnvironment(tab, url, env, newTab) {
       }
       // Author
       else if (url.match(regexAuthor)) {
+        if (env === "cf#" || env === "editor.html") {
+          data.ifSameEnv = true;
+        }
+        if (data.ifSameEnv) {
+          const regexFastAuthor = /com\/(?:(editor\.html|cf#)\/)?content/gm;
+          url = url.replace(regexFastAuthor, `com/${env}/content`);
+
+          ifOpenNewTab(url);
+          return;
+        }
+
         data.market = url.replace(regexAuthor, "$3");
         data.localLanguage = url.replace(regexAuthor, "$4");
 
         data.fixLocalLanguage();
-        data.ifSameEnv = true;
 
         if (data.isMarketInBeta()) {
           data.urlPart = null;
@@ -132,7 +141,7 @@ async function toEnvironment(tab, url, env, newTab) {
         data.isMarketHasHomeNew() && data.urlPart === "" ? "home-new" : "home"
       }${data.urlPart}`;
 
-      console.log(data.urlPart);
+      console.log(wrongLink);
 
       const regexFixSiteWide =
         /((?:\S+)?\/content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w)(\/home\/)(content)?(\S+)?/gm;
@@ -143,7 +152,7 @@ async function toEnvironment(tab, url, env, newTab) {
         );
       }
 
-      if (data.beta === "-beta" && data.urlPart !== "" && !data.ifSameEnv) {
+      if (data.beta === "-beta" && data.urlPart !== "") {
         const response = await fetch(
           "https://wwwperf.brandeuauthorlb.ford.com/bin/guxacc/tools/customslingresresolver?page-path=" +
             wrongLink,
@@ -238,6 +247,7 @@ async function copyAllLinks() {
     from: "background",
     subject: "writeToClipboard",
     text: highlightedPageLinks,
+    showMessage: true,
   });
 }
 
@@ -272,19 +282,35 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
 
 browser.runtime.onInstalled.addListener(function () {
   browser.contextMenus.create({
-    title: "toCamelCase",
-    contexts: ["selection"],
-    id: "camelCase",
+    title: "Copy image content",
+    contexts: ["link"],
+    id: "copyImageContent",
   });
 });
 
-const menusOnClick = function (info) {
+const menusOnClick = async function (info) {
   switch (info.menuItemId) {
-    case "camelCase":
-      console.log(jsConvert.toCamelCase("param-case"));
+    case "copyImageContent": {
+      const regexImagePicker =
+        /(?:.+)?(\/content\/dam\/guxeu.+\.(?:jpg|png|jpeg))\.renditions\.(?:original|medium|small|extra-small)\.jpeg/gm;
+      const imagePath = info.srcUrl.replace(regexImagePicker, "$1");
+
+      const tabs = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+
+      browser.tabs.sendMessage(tabs[0].id, {
+        from: "background",
+        subject: "writeToClipboard",
+        text: imagePath,
+        showMessage: false,
+      });
+
       break;
+    }
     default:
-      console.log("Standard context menu item clicked.");
+      console.warn("Standard context menu item clicked.");
   }
 };
 

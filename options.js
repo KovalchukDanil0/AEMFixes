@@ -1,5 +1,5 @@
 // Saves options to browser.storage
-const saveOptions = async () => {
+const saveOptions = async function () {
   const disableCreateWF = document.getElementById("disCreateWF").checked;
   const enableFunErr = document.getElementById("enableFunErr").checked;
 
@@ -20,7 +20,7 @@ const saveOptions = async () => {
 
 // Restores select box and checkbox state using the preferences
 // stored in browser.storage.
-const restoreOptions = async () => {
+const restoreOptions = async function () {
   const items = await loadSavedData();
   document.getElementById("disCreateWF").checked = items.disableCreateWF;
   document.getElementById("enableFunErr").checked = items.enableFunErr;

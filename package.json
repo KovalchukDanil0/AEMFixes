@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "browserify": "^17.0.0",
     "bulma": "^0.9.4",
     "jquery": "^3.7.1",
     "js-convert-case": "^4.2.0"

@@ -61,8 +61,8 @@ const AEMLink = {
   },
 
   fixMarket() {
-    const marketsFixAuthor = ["gb", "en", "da", "gl"];
-    const marketsFixPerf = ["uk", "uk", "dk", "mothersite"];
+    const marketsFixAuthor = ["gb", "en", "gl"];
+    const marketsFixPerf = ["uk", "uk", "mothersite"];
 
     let idx = marketsFixAuthor.indexOf(this.market);
     if (idx >= 0) {
@@ -219,11 +219,13 @@ browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "background" && msg.subject === "writeToClipboard") {
     navigator.clipboard.writeText(msg.text);
 
-    browser.runtime.sendMessage({
-      from: "background",
-      subject: "showMessage",
-      message: `LINKS COPIED TO CLIPBOARD:\n ${msg.text}`,
-      time: 5000,
-    });
+    if (msg.sendMessage) {
+      browser.runtime.sendMessage({
+        from: "background",
+        subject: "showMessage",
+        message: `LINKS COPIED TO CLIPBOARD:\n ${msg.text}`,
+        time: 5000,
+      });
+    }
   }
 });
