@@ -1,3 +1,8 @@
+const url =
+  window.location !== window.parent.location
+    ? document.referrer
+    : document.location.href;
+
 browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.from === "popup" && msg.subject === "getAlias") {
     (async () => {
@@ -68,29 +73,62 @@ window.catErrors = async function () {
 };
 
 window.fixAuthorLink = function () {
-  const parentUrl = parent.window.location.href;
-  let url = window.location.href;
+  let newUrl;
 
   if (!url.includes(".html")) {
-    url = url.replace(/.$/, ".html");
+    newUrl = url.replace(/.$/, ".html");
 
     if (
-      !parentUrl.includes("editor.html") &&
-      !parentUrl.includes("cf#") &&
-      !parentUrl.includes("?wcmmode=disabled") &&
-      !parentUrl.includes("damadmin#")
+      !url.includes("editor.html") &&
+      !url.includes("cf#") &&
+      !url.includes("?wcmmode=disabled") &&
+      !url.includes("damadmin#")
     ) {
-      url = url.replace(
+      newUrl = url.replace(
         /(.+wwwperf\.brandeuauthorlb\.ford\.com)?(\/)(.+)?/,
         "$1/editor.html/$3"
       );
 
-      window.open(url, "_parent");
+      window.open(newUrl, "_parent");
       return;
     }
   }
 };
 
+window.WFFinder = async function () {
+  /*const env = "body";
+  if (authorClassic(url)) {
+    env;
+  }*/
+
+  const classic = authorClassic(url);
+
+  const warningBar = await waitForElm(
+    `${classic ? "body" : "#accelerator-page"} > div.workflows-warning-bar`
+  );
+
+  const regexRemoveCommas = /.+(ESM-\d\d\d\d\d\d?).+/gm;
+  const blockingTicket = warningBar
+    .querySelector("i:nth-child(3)")
+    .textContent.replace(regexRemoveCommas, "$1");
+
+  const a = document.createElement("a");
+
+  const fullPath = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicket}`;
+
+  a.href = fullPath;
+  a.target = "_blank";
+
+  const linkText = document.createTextNode(
+    `blocking parent ticket is ${fullPath}`
+  );
+  a.appendChild(linkText);
+
+  warningBar.appendChild(a);
+};
+
 (function () {
-  fixAuthorLink();
+  //fixAuthorLink();
+  catErrors();
+  WFFinder();
 })();

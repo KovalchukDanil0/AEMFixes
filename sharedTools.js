@@ -19,6 +19,13 @@ const regexPerfProd =
 const regexAuthor =
   /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(\w\w)_\w\w\/(?:.+)?)(?:\.html|\/)(?:.+)?/gm;
 
+const authorClassic = function (url) {
+  return url.replace(regexAuthor, "$1") === "cf#";
+};
+const authorTouch = function (url) {
+  return url.replace(regexAuthor, "$1") === "editor.html";
+};
+
 const regexJira = /jira\.uhub\.biz\/browse\//gm;
 
 const marketsInBeta = [
@@ -74,7 +81,7 @@ const AEMLink = {
       return marketsFixAuthor[idx];
     }
 
-    console.log("fixed market is " + this.market);
+    console.log(`fixed market is ${this.market}`);
     return this.market;
   },
 

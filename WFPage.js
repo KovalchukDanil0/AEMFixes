@@ -92,7 +92,6 @@ window.NewWFDesign = function () {
   // add "WFPage.css"
 };
 
-// body > div.wrapper-conf > div > div.content-conf.workflow-package-page > div.configSection > div > div:nth-child(2)
 window.UsefulLinks = async function () {
   const container = await waitForElm(
     "body > div.wrapper-conf > div > div.content-conf.workflow-package-page > div.configSection > div > div:nth-child(2)"
@@ -147,7 +146,7 @@ window.UsefulLinks = async function () {
     const fullPath = `${marketPath}${disclosureLibrary}`;
 
     const a = document.createElement("a");
-    a.href = fullPath;
+    a.href = `/${data.env}${fullPath}`;
     a.target = "_blank";
 
     const linkText = document.createTextNode(fullPath);

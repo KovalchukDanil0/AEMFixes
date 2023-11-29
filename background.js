@@ -8,7 +8,7 @@ try {
   throw new Error(e);
 }
 
-async function toEnvironment(tab, url, env, newTab) {
+const toEnvironment = async function (tab, url, env, newTab) {
   const data = AEMLink;
   data.env = env;
 
@@ -141,8 +141,6 @@ async function toEnvironment(tab, url, env, newTab) {
         data.isMarketHasHomeNew() && data.urlPart === "" ? "home-new" : "home"
       }${data.urlPart}`;
 
-      console.log(wrongLink);
-
       const regexFixSiteWide =
         /((?:\S+)?\/content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w)(\/home\/)(content)?(\S+)?/gm;
       if (wrongLink.replace(regexFixSiteWide, "$3") === "content") {
@@ -189,9 +187,9 @@ async function toEnvironment(tab, url, env, newTab) {
       resolve();
     }
   });
-}
+};
 
-async function openPropertiesTouchUI() {
+const openPropertiesTouchUI = async function () {
   const tabs = await browser.tabs.query({
     active: true,
     currentWindow: true,
@@ -207,30 +205,30 @@ async function openPropertiesTouchUI() {
     url: newUrl,
     index: tab.index + 1,
   });
-}
+};
 
-function showAltText(tab) {
+const showAltText = function (tab) {
   browser.tabs.sendMessage(tab.id, {
     from: "background",
     subject: "showAltTexts",
   });
-}
+};
 
-function highlightHeading(tab) {
+const highlightHeading = function (tab) {
   browser.tabs.sendMessage(tab.id, {
     from: "background",
     subject: "highlightHeading",
   });
-}
+};
 
-function checkMothersite(tab) {
+const checkMothersite = function (tab) {
   browser.tabs.sendMessage(tab.id, {
     from: "background",
     subject: "checkMothersite",
   });
-}
+};
 
-async function copyAllLinks() {
+const copyAllLinks = async function () {
   let highlightedPageLinks;
 
   const tabs = await browser.tabs.query({
@@ -249,9 +247,9 @@ async function copyAllLinks() {
     text: highlightedPageLinks,
     showMessage: true,
   });
-}
+};
 
-async function executeOnEachTab(func, newTab, ...args) {
+const executeOnEachTab = async function (func, newTab, ...args) {
   const tabs = await browser.tabs.query({
     highlighted: true,
     currentWindow: true,
@@ -266,11 +264,32 @@ async function executeOnEachTab(func, newTab, ...args) {
     message: "ALL GOOD!!!",
     time: Number.MAX_VALUE,
   });
-}
+};
 
 browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
   if (msg.from === "popup" && msg.subject === "buttonClick") {
-    msg.func = this[msg.func];
+    switch (msg.func) {
+      case "toEnvironment":
+        msg.func = toEnvironment;
+        break;
+      case "openPropertiesTouchUI":
+        msg.func = openPropertiesTouchUI;
+        break;
+      case "showAltText":
+        msg.func = showAltText;
+        break;
+      case "highlightHeading":
+        msg.func = highlightHeading;
+        break;
+      case "checkMothersite":
+        msg.func = checkMothersite;
+        break;
+      case "copyAllLinks":
+        msg.func = copyAllLinks;
+        break;
+      default:
+        throw new Error(`${msg.func} function doesn't exist`);
+    }
 
     if (!msg.once) {
       executeOnEachTab(msg.func, msg.newTab, ...msg.args);
@@ -292,7 +311,7 @@ const menusOnClick = async function (info) {
   switch (info.menuItemId) {
     case "copyImageContent": {
       const regexImagePicker =
-        /(?:.+)?(\/content\/dam\/guxeu.+\.(?:jpg|png|jpeg))\.renditions\.(?:original|medium|small|extra-small)\.jpeg/gm;
+        /(?:.+)?(\/content\/dam\/guxeu.+\.(?:jpg|png|jpeg))\.renditions\.(?:extra-large|large|original|medium|small|extra-small)\.jpeg/gm;
       const imagePath = info.srcUrl.replace(regexImagePicker, "$1");
 
       const tabs = await browser.tabs.query({
