@@ -139,7 +139,7 @@ window.checkMothersite = function (from) {
 };
 
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
-  if (msg.from === "background" && msg.subject === "checkMothersite") {
+  if (msg.from === "popup" && msg.subject === "checkMothersite") {
     checkMothersite(msg.from);
   }
 });

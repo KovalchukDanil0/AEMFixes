@@ -20,21 +20,25 @@ window.buttonOnClick = function (selector, func, showLoading, once, ...args) {
   const button = document.querySelector(selector);
   button.disabled = false;
 
-  button.addEventListener("click", async function () {
+  button.addEventListener("click", function () {
     if (showLoading) {
       button.classList.add("is-loading");
     }
 
-    await browser.runtime.sendMessage({
-      once,
-      func,
-      args,
-      from: "popup",
-      subject: "buttonClick",
-      newTab: false,
-    });
+    if (typeof func === "function") {
+      func(...args);
+    } else {
+      browser.runtime.sendMessage({
+        once,
+        func,
+        args,
+        from: "popup",
+        subject: "buttonClick",
+        newTab: false,
+      });
+    }
   });
-  button.addEventListener("auxclick", async function (e) {
+  button.addEventListener("auxclick", function (e) {
     if (e.button !== 1) {
       return;
     }
@@ -43,14 +47,46 @@ window.buttonOnClick = function (selector, func, showLoading, once, ...args) {
       button.classList.add("is-loading");
     }
 
-    await browser.runtime.sendMessage({
-      once,
-      func,
-      args,
-      from: "popup",
-      subject: "buttonClick",
-      newTab: true,
-    });
+    if (typeof func === "function") {
+      func(...args);
+    } else {
+      browser.runtime.sendMessage({
+        once,
+        func,
+        args,
+        from: "popup",
+        subject: "buttonClick",
+        newTab: true,
+      });
+    }
+  });
+};
+
+window.createWF = function (tab) {
+  browser.tabs.sendMessage(tab.id, {
+    from: "popup",
+    subject: "createWF",
+  });
+};
+
+window.checkMothersite = function (tab) {
+  browser.tabs.sendMessage(tab.id, {
+    from: "popup",
+    subject: "checkMothersite",
+  });
+};
+
+window.showAltText = function (tab) {
+  browser.tabs.sendMessage(tab.id, {
+    from: "popup",
+    subject: "showAltTexts",
+  });
+};
+
+window.highlightHeading = function (tab) {
+  browser.tabs.sendMessage(tab.id, {
+    from: "popup",
+    subject: "highlightHeading",
   });
 };
 
@@ -65,29 +101,13 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
 
   const tab = tabs[0];
 
-  buttonOnClick("#buttonShowAltTexts", "showAltText", false, true, tab);
-  buttonOnClick(
-    "#buttonHighlightHeading",
-    "highlightHeading",
-    false,
-    true,
-    tab
-  );
+  buttonOnClick("#buttonShowAltTexts", showAltText, false, true, tab);
+  buttonOnClick("#buttonHighlightHeading", highlightHeading, false, true, tab);
   buttonOnClick("#buttonCopyAllLinks", "copyAllLinks", false, true);
 
   const ifJira = tab.url.match(regexJira);
   if (ifJira) {
-    buttonOnClick(
-      "#buttonCreateWF",
-      function () {
-        browser.tabs.sendMessage(tab.id, {
-          from: "popup",
-          subject: "createWF",
-        });
-      },
-      false,
-      false
-    );
+    buttonOnClick("#buttonCreateWF", createWF, false, false, tab);
     return;
   }
 
@@ -98,13 +118,7 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
   const ifPerfProd = tab.url.match(regexPerfProd);
 
   if (ifLive || ifPerfProd) {
-    buttonOnClick(
-      "#buttonCheckMothersite",
-      "checkMothersite",
-      false,
-      true,
-      tab
-    );
+    buttonOnClick("#buttonCheckMothersite", checkMothersite, false, true, tab);
   }
 
   const ifAuthor = tab.url.match(regexAuthor);
@@ -122,5 +136,7 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
       false,
       true
     );
+
+    buttonOnClick("#buttonOpenInTree", "openInTree", false, true, tab);
   }
 })();

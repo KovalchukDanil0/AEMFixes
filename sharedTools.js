@@ -7,6 +7,8 @@ const regexResourceResolver =
   /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxacc\/tools\/resource-resolvertool/gm;
 const regexFindAndReplaceLinks =
   /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxfoe\/tools\/find-replace-links/gm;
+const regexAEMTree =
+  /(.+wwwperf\.brandeuauthorlb\.ford\.com\/siteadmin#)(\/content.+)/gm;
 const regexLogInForm =
   /corpqa\.sts\.ford\.com\/adfs\/ls|corp\.sts\.ford\.com\/adfs\/oauth2\/authorize/gm;
 
@@ -16,9 +18,9 @@ const regexLive =
   /(?:.+)?(?:secure|www)(?:\.(\w\w))?\.ford\.(\w\w)(?:\.(\w\w))?(?:.+)?/gm;
 const regexPerfProd =
   /(?:.+)?www(perf|prod)(?:-beta)?-(\w\w)(\w\w)?\.brandeulb\.ford\.com(?:.+)?/gm;
+
 const regexAuthor =
   /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(\w\w)_\w\w\/(?:.+)?)(?:\.html|\/)(?:.+)?/gm;
-
 const authorClassic = function (url) {
   return url.replace(regexAuthor, "$1") === "cf#";
 };

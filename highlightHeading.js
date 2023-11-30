@@ -142,7 +142,7 @@ window.highlightHeading = function () {
 };
 
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
-  if (msg.from === "background" && msg.subject === "highlightHeading") {
+  if (msg.from === "popup" && msg.subject === "highlightHeading") {
     highlightHeading();
   }
 });

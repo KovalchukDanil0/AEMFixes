@@ -37,7 +37,7 @@ window.ShowAltTexts = function () {
 };
 
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
-  if (msg.from === "background" && msg.subject === "showAltTexts") {
+  if (msg.from === "popup" && msg.subject === "showAltTexts") {
     ShowAltTexts();
   }
 });

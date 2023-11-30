@@ -1,7 +1,7 @@
 const url =
   window.location !== window.parent.location
-    ? document.referrer
-    : document.location.href;
+    ? window.parent.location.href + window.parent.location.hash
+    : window.location.href;
 
 browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.from === "popup" && msg.subject === "getAlias") {
@@ -95,12 +95,7 @@ window.fixAuthorLink = function () {
   }
 };
 
-window.WFFinder = async function () {
-  /*const env = "body";
-  if (authorClassic(url)) {
-    env;
-  }*/
-
+window.ticketFinder = async function () {
   const classic = authorClassic(url);
 
   const warningBar = await waitForElm(
@@ -114,7 +109,7 @@ window.WFFinder = async function () {
 
   const a = document.createElement("a");
 
-  const fullPath = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicket}`;
+  const fullPath = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicket}#view-subtasks`;
 
   a.href = fullPath;
   a.target = "_blank";
@@ -130,5 +125,5 @@ window.WFFinder = async function () {
 (function () {
   //fixAuthorLink();
   catErrors();
-  WFFinder();
+  ticketFinder();
 })();

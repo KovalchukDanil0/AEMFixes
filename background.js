@@ -207,27 +207,6 @@ const openPropertiesTouchUI = async function () {
   });
 };
 
-const showAltText = function (tab) {
-  browser.tabs.sendMessage(tab.id, {
-    from: "background",
-    subject: "showAltTexts",
-  });
-};
-
-const highlightHeading = function (tab) {
-  browser.tabs.sendMessage(tab.id, {
-    from: "background",
-    subject: "highlightHeading",
-  });
-};
-
-const checkMothersite = function (tab) {
-  browser.tabs.sendMessage(tab.id, {
-    from: "background",
-    subject: "checkMothersite",
-  });
-};
-
 const copyAllLinks = async function () {
   let highlightedPageLinks;
 
@@ -247,6 +226,31 @@ const copyAllLinks = async function () {
     text: highlightedPageLinks,
     showMessage: true,
   });
+};
+
+const openInTree = async function (authorTab) {
+  const tabs = await browser.tabs.query({ currentWindow: true });
+
+  const authorUrl = authorTab.url.replace(regexAuthor, "$2");
+  const newUrl =
+    "https://wwwperf.brandeuauthorlb.ford.com/siteadmin#" + authorUrl;
+
+  let foundExisting = false;
+  tabs.forEach((tab) => {
+    if (tab.url.match(regexAEMTree)) {
+      browser.tabs.highlight({ tabs: tab.index });
+      browser.tabs.update(tab.id, {
+        url: newUrl,
+      });
+
+      foundExisting = true;
+      return;
+    }
+  });
+
+  if (!foundExisting) {
+    browser.tabs.create({ url: newUrl, index: authorTab.index + 1 });
+  }
 };
 
 const executeOnEachTab = async function (func, newTab, ...args) {
@@ -275,17 +279,14 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
       case "openPropertiesTouchUI":
         msg.func = openPropertiesTouchUI;
         break;
-      case "showAltText":
-        msg.func = showAltText;
-        break;
       case "highlightHeading":
         msg.func = highlightHeading;
         break;
-      case "checkMothersite":
-        msg.func = checkMothersite;
-        break;
       case "copyAllLinks":
         msg.func = copyAllLinks;
+        break;
+      case "openInTree":
+        msg.func = openInTree;
         break;
       default:
         throw new Error(`${msg.func} function doesn't exist`);
