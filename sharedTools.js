@@ -224,11 +224,23 @@ const loadSavedData = async function () {
   });
 };
 
+const copyTextToClipboard = function (text) {
+  const copyFrom = document.createElement("textarea");
+  copyFrom.textContent = text;
+  document.body.appendChild(copyFrom);
+
+  copyFrom.select();
+  document.execCommand("copy");
+
+  copyFrom.blur();
+  document.body.removeChild(copyFrom);
+};
+
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "background" && msg.subject === "writeToClipboard") {
-    navigator.clipboard.writeText(msg.text);
+    copyTextToClipboard(msg.text);
 
-    if (msg.sendMessage) {
+    if (msg.showMessage) {
       browser.runtime.sendMessage({
         from: "background",
         subject: "showMessage",

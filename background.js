@@ -208,7 +208,7 @@ const openPropertiesTouchUI = async function () {
 };
 
 const copyAllLinks = async function () {
-  let highlightedPageLinks;
+  let highlightedPageLinks = "";
 
   const tabs = await browser.tabs.query({
     highlighted: true,
