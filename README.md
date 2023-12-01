@@ -1,6 +1,5 @@
 # Quality of Life changes for AEM, this includes:
-Automatically creating WF from Jira;
-
+Automatically creating WF from Jira;  
 Fast transition between environments, so you can jump from Live directly to Author;  
 Open Touch properties without page reload needed;  
 Open author in AEM tree in a millisecond!!!;  
