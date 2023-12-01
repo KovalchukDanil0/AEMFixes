@@ -52,13 +52,6 @@
     },
     {
       "matches": [
-        "https://wwwperf.brandeuauthorlb.ford.com/etc/guxacc/tools/resource-resolver-tool.html"
-      ],
-      "all_frames": true,
-      "js": ["resourceResolver.js"]
-    },
-    {
-      "matches": [
         "https://wwwperf.brandeuauthorlb.ford.com/etc/guxfoe/tools/find-replace-links.html"
       ],
       "all_frames": true,

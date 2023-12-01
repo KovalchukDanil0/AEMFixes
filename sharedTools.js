@@ -8,7 +8,9 @@ const regexResourceResolver =
 const regexFindAndReplaceLinks =
   /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxfoe\/tools\/find-replace-links/gm;
 const regexAEMTree =
-  /(.+wwwperf\.brandeuauthorlb\.ford\.com\/siteadmin#)(\/content.+)/gm;
+  /(.+wwwperf\.brandeuauthorlb\.ford\.com\/siteadmin#)\/content.+/gm;
+const regexDAMTree =
+  /(.+wwwperf\.brandeuauthorlb\.ford\.com\/damadmin#)\/content.+/gm;
 const regexLogInForm =
   /corpqa\.sts\.ford\.com\/adfs\/ls|corp\.sts\.ford\.com\/adfs\/oauth2\/authorize/gm;
 
@@ -20,7 +22,8 @@ const regexPerfProd =
   /(?:.+)?www(perf|prod)(?:-beta)?-(\w\w)(\w\w)?\.brandeulb\.ford\.com(?:.+)?/gm;
 
 const regexAuthor =
-  /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(\w\w)_\w\w\/(?:.+)?)(?:\.html|\/)(?:.+)?/gm;
+  /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(?:(\w\w)_\w\w|configuration)\/(?:.+)?)(?:\.html|\/)(?:.+)?/gm;
+
 const authorClassic = function (url) {
   return url.replace(regexAuthor, "$1") === "cf#";
 };
@@ -52,9 +55,14 @@ const AEMLink = {
   market: "",
   localLanguage: "",
   beta: "",
-  betaBool: "",
+  betaBool: false,
   urlPart: "",
-  ifSameEnv: false,
+
+  constructor(url) {
+    if (url.match(regexAuthor)) {
+      this.market = url.replace(regexAuthor, "$3");
+    }
+  },
 
   isMarketInBeta(someMarket) {
     if (someMarket === undefined) {
@@ -83,7 +91,6 @@ const AEMLink = {
       return marketsFixAuthor[idx];
     }
 
-    console.log(`fixed market is ${this.market}`);
     return this.market;
   },
 
@@ -113,9 +120,8 @@ const AEMLink = {
         case "gr":
           this.localLanguage = "el";
           break;
-        default: {
-          console.warn(`This market ${this.market} doesn't exist`);
-        }
+        default:
+          break;
       }
     } else {
       switch (this.market) {
@@ -130,9 +136,8 @@ const AEMLink = {
         case "uk":
           this.localLanguage = "co";
           break;
-        default: {
-          console.warn(`This market ${this.market} doesn't exist`);
-        }
+        default:
+          break;
       }
 
       if (this.localLanguage === this.market) {
@@ -140,7 +145,6 @@ const AEMLink = {
       }
     }
 
-    console.log("fixed localLanguage is " + this.localLanguage);
     return this.localLanguage;
   },
 
@@ -154,7 +158,6 @@ const AEMLink = {
       this.urlPart = this.urlPart.replace(regexFixSWAuthor, "$2");
     }
 
-    console.log("fixed url is " + this.urlPart);
     return this.urlPart;
   },
 };

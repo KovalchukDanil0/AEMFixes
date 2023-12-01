@@ -17,21 +17,28 @@ String.prototype.addBetaToLink = function () {
   return this.replace(regexDetermineBeta, "$1/editor.html$2");
 };
 
+// ! NOT USE, NOT WORKING AT ALL, VERY UNSTABLE!!!
 window.AutoFillWF = function () {
   waitForElm("#CQ > div.cq-editrollover-insert-container").then(
     (createComponent) => {
       createComponent.dblclick();
 
+      const somethingShared =
+        "#CQ > div.x-window-plain.x-form-label-left > div > form > div.x-window.cq-insertdialog.cq-insertdialog-filters_47_42.x-window-plain.x-resizable-pinned > div.x-window-bwrap";
+
       waitForElm(
-        "#CQ > div.x-window-plain.x-form-label-left > div > form > div.x-window.cq-insertdialog.cq-insertdialog-filters_47_42.x-window-plain.x-resizable-pinned > div.x-window-bwrap > div.x-window-ml > div > div > div > div > div > div > div > div.x-panel-bwrap > div > div > table.x-btn.x-btn-noicon.cq-cmpt-Content_32Promotion_32Page"
+        somethingShared +
+          " > div.x-window-ml > div > div > div > div > div > div > div > div.x-panel-bwrap > div > div > table.x-btn.x-btn-noicon.cq-cmpt-Content_32Promotion_32Page"
       ).then((promPage) => {
         promPage.click();
 
         waitForElm(
-          "#CQ > div.x-window-plain.x-form-label-left > div > form > div.x-window.cq-insertdialog.cq-insertdialog-filters_47_42.x-window-plain.x-resizable-pinned > div.x-window-bwrap > div.x-window-ml > div > div > div > div > div > div > div > div.x-panel-bwrap > div > div > table.x-btn.x-btn-noicon.cq-cmpt-Content_32Promotion_32Page.x-btn-selected"
+          somethingShared +
+            " > div.x-window-ml > div > div > div > div > div > div > div > div.x-panel-bwrap > div > div > table.x-btn.x-btn-noicon.cq-cmpt-Content_32Promotion_32Page.x-btn-selected"
         ).then(() => {
           let OKButton = document.querySelector(
-            "#CQ > div.x-window-plain.x-form-label-left > div > form > div.x-window.cq-insertdialog.cq-insertdialog-filters_47_42.x-window-plain.x-resizable-pinned > div.x-window-bwrap > div.x-window-bl > div > div > div > div.x-panel-fbar.x-small-editor.x-toolbar-layout-ct > table > tbody > tr > td.x-toolbar-right > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(1) > table"
+            somethingShared +
+              " > div.x-window-bl > div > div > div > div.x-panel-fbar.x-small-editor.x-toolbar-layout-ct > table > tbody > tr > td.x-toolbar-right > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(1) > table"
           );
           OKButton.click();
 
@@ -41,15 +48,19 @@ window.AutoFillWF = function () {
             setTimeout(function () {
               pagePlaceholder.dblclick();
 
+              const somethingShared2 =
+                "#CQ > div:nth-child(7) > div > form > div.x-window.x-window-plain.x-resizable-pinned > div.x-window-bwrap";
               waitForElm(
-                "#CQ > div:nth-child(7) > div > form > div.x-window.x-window-plain.x-resizable-pinned > div.x-window-bwrap > div.x-window-ml > div > div > div > div > div.x-tab-panel-bwrap > div > div > div > div > div:nth-child(1) > div.x-form-element > div > input"
+                somethingShared2 +
+                  " > div.x-window-ml > div > div > div > div > div.x-tab-panel-bwrap > div > div > div > div > div:nth-child(1) > div.x-form-element > div > input"
               ).then((pagePathForm) => {
                 setTimeout(function () {
                   pagePathForm.value =
                     "/content/guxeu/fi/fi_fi/home/hyotyajoneuvot/e-transit";
 
                   OKButton = document.querySelector(
-                    "#CQ > div:nth-child(7) > div > form > div.x-window.x-window-plain.x-resizable-pinned > div.x-window-bwrap > div.x-window-bl > div > div > div > div.x-panel-fbar.x-small-editor.x-toolbar-layout-ct > table > tbody > tr > td.x-toolbar-right > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(1) > table"
+                    somethingShared2 +
+                      " > div.x-window-bl > div > div > div > div.x-panel-fbar.x-small-editor.x-toolbar-layout-ct > table > tbody > tr > td.x-toolbar-right > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(1) > table"
                   );
                   OKButton.click();
 
@@ -66,22 +77,18 @@ window.AutoFillWF = function () {
   );
 };
 
-window.waitForWorkflowTitleInput = function () {
-  return waitForElm("#workflow-title-input");
-};
-
 // \/etc\/workflow\/packages\/ESM\/FRFR\/ESM-157004(-\w+)?\.html
 
-window.AddWFID = function () {
-  waitForWorkflowTitleInput().then((form) => {
-    const WorkflowID = WFID();
+window.AddWFID = async function () {
+  const form = await waitForElm("#workflow-title-input");
 
-    form.value = WorkflowID;
-    getLinksInWF().forEach((data) => (data.href = data.href.addBetaToLink()));
+  const WorkflowID = WFID();
 
-    const requestButton = document.querySelector("#start-request-workflow");
-    requestButton.removeAttribute("disabled");
-  });
+  form.value = WorkflowID;
+  getLinksInWF().forEach((data) => (data.href = data.href.addBetaToLink()));
+
+  const requestButton = document.querySelector("#start-request-workflow");
+  requestButton.removeAttribute("disabled");
 };
 
 window.NewWFDesign = function () {
@@ -161,7 +168,7 @@ window.UsefulLinks = async function () {
   }
 };
 
-(function WorkflowFixes() {
+(function Main() {
   //NewWFDesign();
   AddWFID();
   UsefulLinks();

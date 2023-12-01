@@ -8,6 +8,8 @@ try {
   throw new Error(e);
 }
 
+const editor = "editor.html";
+
 const toEnvironment = async function (tab, url, env, newTab) {
   const data = AEMLink;
   data.env = env;
@@ -53,10 +55,7 @@ const toEnvironment = async function (tab, url, env, newTab) {
       }
       // Author
       else if (url.match(regexAuthor)) {
-        if (env === "cf#" || env === "editor.html") {
-          data.ifSameEnv = true;
-        }
-        if (data.ifSameEnv) {
+        if (env === "cf#" || env === editor) {
           const regexFastAuthor = /com\/(?:(editor\.html|cf#)\/)?content/gm;
           url = url.replace(regexFastAuthor, `com/${env}/content`);
 
@@ -98,7 +97,7 @@ const toEnvironment = async function (tab, url, env, newTab) {
         case "prod":
           makePerf();
           break;
-        case "editor.html":
+        case editor:
         case "cf#":
           makeAuthor();
           break;
@@ -228,17 +227,16 @@ const copyAllLinks = async function () {
   });
 };
 
-const openInTree = async function (authorTab) {
-  const tabs = await browser.tabs.query({ currentWindow: true });
+const changeContentInTab = async function (regexToMatch, urlPart, content) {
+  let tabs = await browser.tabs.query({ currentWindow: true });
 
-  const authorUrl = authorTab.url.replace(regexAuthor, "$2");
-  const newUrl =
-    "https://wwwperf.brandeuauthorlb.ford.com/siteadmin#" + authorUrl;
+  const newUrl = urlPart + content;
 
   let foundExisting = false;
   tabs.forEach((tab) => {
-    if (tab.url.match(regexAEMTree)) {
+    if (tab.url.match(regexToMatch)) {
       browser.tabs.highlight({ tabs: tab.index });
+
       browser.tabs.update(tab.id, {
         url: newUrl,
       });
@@ -249,8 +247,23 @@ const openInTree = async function (authorTab) {
   });
 
   if (!foundExisting) {
-    browser.tabs.create({ url: newUrl, index: authorTab.index + 1 });
+    tabs = await browser.tabs.query({
+      currentWindow: true,
+      active: true,
+    });
+    const tab = tabs[0];
+
+    browser.tabs.create({ url: newUrl, index: tab.index + 1 });
   }
+};
+
+const openInTree = function (authorTab) {
+  const authorUrl = authorTab.url.replace(regexAuthor, "$2");
+  changeContentInTab(
+    regexAEMTree,
+    "https://wwwperf.brandeuauthorlb.ford.com/siteadmin#",
+    authorUrl
+  );
 };
 
 const executeOnEachTab = async function (func, newTab, ...args) {
@@ -302,35 +315,91 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
 
 browser.runtime.onInstalled.addListener(function () {
   browser.contextMenus.create({
-    title: "Copy image content",
+    title: "Open content in DAM",
+    contexts: ["image"],
+    id: "openInDAM",
+  });
+
+  const parent = browser.contextMenus.create({
+    title: "To Environment",
     contexts: ["link"],
-    id: "copyImageContent",
+    id: "toEnvironment",
+  });
+
+  browser.contextMenus.create({
+    title: "To Live",
+    contexts: ["link"],
+    parentId: parent,
+    id: "toLive",
+  });
+
+  browser.contextMenus.create({
+    title: "To Perf",
+    contexts: ["link"],
+    parentId: parent,
+    id: "toPerf",
+  });
+
+  browser.contextMenus.create({
+    title: "To Prod",
+    contexts: ["link"],
+    parentId: parent,
+    id: "toProd",
+  });
+
+  browser.contextMenus.create({
+    title: "To Touch",
+    contexts: ["link"],
+    parentId: parent,
+    id: "toTouch",
+  });
+
+  browser.contextMenus.create({
+    title: "To Classic",
+    contexts: ["link"],
+    parentId: parent,
+    id: "toClassic",
   });
 });
 
 const menusOnClick = async function (info) {
+  const tabs = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  const tab = tabs[0];
+
   switch (info.menuItemId) {
-    case "copyImageContent": {
+    case "openInDAM": {
       const regexImagePicker =
-        /(?:.+)?(\/content\/dam\/guxeu.+\.(?:jpg|png|jpeg))\.renditions\.(?:extra-large|large|original|medium|small|extra-small)\.jpeg/gm;
+        /(?:.+)?(\/content\/dam\/guxeu.+\.(?:jpg|png|jpeg))(?:\.renditions\.(?:extra-large|large|original|medium|small|extra-small)\.jpeg)?/gm;
       const imagePath = info.srcUrl.replace(regexImagePicker, "$1");
 
-      const tabs = await browser.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
-
-      browser.tabs.sendMessage(tabs[0].id, {
-        from: "background",
-        subject: "writeToClipboard",
-        text: imagePath,
-        showMessage: false,
-      });
+      changeContentInTab(
+        regexDAMTree,
+        "https://wwwperf.brandeuauthorlb.ford.com/damadmin#",
+        imagePath
+      );
 
       break;
     }
+    case "toLive":
+      toEnvironment(tab, info.linkUrl, "live", true);
+      break;
+    case "toPerf":
+      toEnvironment(tab, info.linkUrl, "perf", true);
+      break;
+    case "toProd":
+      toEnvironment(tab, info.linkUrl, "prod", true);
+      break;
+    case "toTouch":
+      toEnvironment(tab, info.linkUrl, editor, true);
+      break;
+    case "toClassic":
+      toEnvironment(tab, info.linkUrl, "cf#", true);
+      break;
     default:
-      console.warn("Standard context menu item clicked.");
+      break;
   }
 };
 

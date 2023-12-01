@@ -5,17 +5,17 @@ window.blurAll = function () {
   document.body.removeChild(tmp);
 };
 
-(function AutoLogIn() {
+window.autoLogIn = function () {
   const timeout = 500;
 
   waitForElm("#input28").then((oktaForm) => {
-    const intervaID = setInterval(function () {
+    const intervalID = setInterval(function () {
       if (oktaForm.value.isEmpty()) {
         return;
       } else {
         document.activeElement.blur();
       }
-      clearInterval(intervaID);
+      clearInterval(intervalID);
 
       const checkbox = document.querySelector("#input36");
       checkbox.click();
@@ -38,16 +38,20 @@ window.blurAll = function () {
   });
 
   waitForElm("#userNameInput").then((logInForm) => {
-    const intervaID = setInterval(function () {
+    const intervalID = setInterval(function () {
       if (logInForm.value.isEmpty()) {
         return;
       } else {
         document.activeElement.blur();
       }
-      clearInterval(intervaID);
+      clearInterval(intervalID);
 
       const logInButton = document.querySelector("#submitButton");
       logInButton.click();
     }, timeout);
   });
+};
+
+(function Main() {
+  autoLogIn();
 })();

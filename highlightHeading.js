@@ -53,12 +53,12 @@ window.highlightHeading = function () {
 
   function init() {
     document.body.classList.add(className);
-    initialiseHeadings();
+    initializeHeadings();
     appendKeyToDOM();
     insertBadgeStyles();
   }
 
-  function initialiseHeadings() {
+  function initializeHeadings() {
     for (const h in headings) {
       headings[h].elements = [...document.body.querySelectorAll(h)];
       headings[h].count = headings[h].elements.length;

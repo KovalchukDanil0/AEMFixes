@@ -15,7 +15,7 @@ window.ReplaceByRandElmArray = function (elm, replaceArray) {
   return string;
 };
 
-window.RandomProgrammerMemes = async function () {
+window.randomProgrammerMemes = async function () {
   const savedData = await loadSavedData();
   if (!savedData.enableFunErr) {
     return;
@@ -34,9 +34,9 @@ window.RandomProgrammerMemes = async function () {
   request.send();
 
   request.onload = () => {
-    const sucess = 200;
+    const success = 200;
 
-    if (request.status === sucess) {
+    if (request.status === success) {
       const data = JSON.parse(request.response);
       const count = Object.keys(data).length;
 
@@ -144,7 +144,7 @@ browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   }
 });
 
-(function () {
+(function Main() {
   /*var regexFixShortLink =
     /((?:.+)?wwwperf\.)(brandeulb\.ford\.com(?:\/)?(?:editor\.html|cf#)?\/)(content\/(?:.+)?)/gm;
   if (window.location.href.match(regexFixShortLink)) {
@@ -155,10 +155,10 @@ browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
       ),
       "_parent"
     );
-    return;
+    return; 
   }*/
 
-  RandomProgrammerMemes();
+  randomProgrammerMemes();
   checkMothersite("content");
 
   /*if ("serviceWorker" in navigator) {

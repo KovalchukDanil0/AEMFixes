@@ -17,7 +17,8 @@ window.createWFButton = function () {
 
   button.textContent = "Create WF";
 
-  return button;
+  buttonsContainer().appendChild(button);
+  button.addEventListener("click", AEMToolsCreateWF);
 };
 
 window.selectorTextNoSpaces = function (selector) {
@@ -167,19 +168,17 @@ window.textToWFPath = function (market, localLanguage, title) {
   return fullPath;
 };
 
-window.AEMToolsCreateWF = function () {
+window.AEMToolsCreateWF = async function () {
   const title = ticketTitle();
 
-  browser.storage.local
-    .set({ WFTitle: title, WFName: ticketNumber() })
-    .then(() => {
-      const WFPath = textToWFPath(ticketMarket(), ticketLocalLanguage(), title);
+  await browser.storage.local.set({ WFTitle: title, WFName: ticketNumber() });
 
-      window.open(
-        "https://wwwperf.brandeuauthorlb.ford.com/miscadmin#/etc/workflow/packages/ESM/" +
-          WFPath
-      );
-    });
+  const WFPath = textToWFPath(ticketMarket(), ticketLocalLanguage(), title);
+
+  window.open(
+    "https://wwwperf.brandeuauthorlb.ford.com/miscadmin#/etc/workflow/packages/ESM/" +
+      WFPath
+  );
 };
 
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
@@ -204,12 +203,11 @@ window.FixSorting = function () {
   }
 };
 
-(async function Jira() {
+(async function Main() {
   const savedData = await loadSavedData();
 
   if (!savedData.disableCreateWF) {
-    const WFButton = buttonsContainer().appendChild(createWFButton());
-    WFButton.addEventListener("click", AEMToolsCreateWF);
+    createWFButton();
   }
 
   FixSorting();

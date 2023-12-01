@@ -96,10 +96,14 @@ window.fixAuthorLink = function () {
 };
 
 window.ticketFinder = async function () {
-  const classic = authorClassic(url);
+  const data = AEMLink;
+  data.constructor(url);
+  data.isMarketInBeta();
 
   const warningBar = await waitForElm(
-    `${classic ? "body" : "#accelerator-page"} > div.workflows-warning-bar`
+    `${
+      data.betaBool ? "body" : "#accelerator-page"
+    } > div.workflows-warning-bar`
   );
 
   const regexRemoveCommas = /.+(ESM-\d\d\d\d\d\d?).+/gm;
@@ -122,7 +126,7 @@ window.ticketFinder = async function () {
   warningBar.appendChild(a);
 };
 
-(function () {
+(function Main() {
   //fixAuthorLink();
   catErrors();
   ticketFinder();

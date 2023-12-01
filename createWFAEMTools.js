@@ -1,41 +1,54 @@
-window.createWF = function (WFTitle, WFName) {
+window.createWF = async function (WFTitle, WFName) {
   if (WFTitle === "" || WFName === "") {
-    console.warn(
-      "WFTitle or WFName are not defined, workflows opened manually"
-    );
     return;
   }
 
-  waitForElm(
-    "#cq-gen75 > div.x-grid3-row.x-grid3-row-first > table > tbody > tr > td.x-grid3-col.x-grid3-cell.x-grid3-td-title > div"
-  ).then(() => {
-    const button = document.getElementById("cq-gen91");
-    button.click();
+  const panelContent = "#cq-miscadmin-grid > div";
 
-    waitForElm("#ext-comp-1079").then((form) => {
-      form.value = WFTitle;
+  await waitForElm(
+    panelContent +
+      " > div.x-panel-body.x-panel-body-noheader > div > div.x-grid3-viewport > div.x-grid3-scroller > div > div.x-grid3-row.x-grid3-row-first > table > tbody > tr > td.x-grid3-col.x-grid3-cell.x-grid3-td-title > div"
+  );
 
-      form = document.querySelector("#ext-comp-1080");
-      form.value = WFName;
-    });
+  const button = document.querySelector(
+    panelContent +
+      " > div.x-panel-tbar.x-panel-tbar-noheader > div > table > tbody > tr > td.x-toolbar-left > table > tbody > tr > td:nth-child(3) > table > tbody > tr:nth-child(2) > td.x-btn-mc > em > button"
+  );
+  button.click();
 
-    waitForElm("#ext-comp-1076 > div:nth-child(3)").then((promotionButton) => {
-      promotionButton.click();
-    });
-  });
+  const createPageOverlay =
+    "#CQ > div.x-window-plain.x-form-label-left > div > form > div.x-window.x-window-plain.x-resizable-pinned > div.x-window-bwrap > div.x-window-ml > div > div > div > div > div > div";
+
+  let form = await waitForElm(
+    createPageOverlay + " > div:nth-child(1) > div.x-form-element > input"
+  );
+
+  form.value = WFTitle;
+
+  form = document.querySelector(
+    createPageOverlay + " > div:nth-child(2) > div.x-form-element > input"
+  );
+  form.value = WFName;
+
+  const promotionButton = await waitForElm(
+    createPageOverlay +
+      " > div.x-panel.cq-template-view.x-panel-noborder > div > div > div > div.template-item:nth-child(3)"
+  );
+
+  promotionButton.click();
 };
 
-browser.storage.local
-  .get({
+(async function Main() {
+  const result = await browser.storage.local.get({
     WFTitle: "",
     WFName: "",
-  })
-  .then((result) => {
-    const WFTitle = result["WFTitle"];
-    const WFName = result["WFName"];
-
-    createWF(WFTitle, WFName);
-
-    browser.storage.local.set({ WFTitle: "" });
-    browser.storage.local.set({ WFName: "" });
   });
+
+  const WFTitle = result["WFTitle"];
+  const WFName = result["WFName"];
+
+  createWF(WFTitle, WFName);
+
+  browser.storage.local.set({ WFTitle: "" });
+  browser.storage.local.set({ WFName: "" });
+})();

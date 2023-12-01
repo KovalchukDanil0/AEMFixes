@@ -96,7 +96,7 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
   }
 });
 
-(async function ButtonsEvents() {
+(async function Main() {
   const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 
   const tab = tabs[0];
