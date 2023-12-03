@@ -10,7 +10,7 @@ const regexFindAndReplaceLinks =
 const regexAEMTree =
   /(.+wwwperf\.brandeuauthorlb\.ford\.com\/siteadmin#)\/content.+/gm;
 const regexDAMTree =
-  /(.+wwwperf\.brandeuauthorlb\.ford\.com\/damadmin#)\/content.+/gm;
+  /(.+wwwperf\.brandeuauthorlb\.ford\.com\/damadmin#)(\/content\/dam\/guxeu(?:-beta)?\/(?:\w\w|rhd)\/(?:\w\w_\w\w|central)\/(?:(mavs)\/)?(?:.+)?)/gm;
 const regexLogInForm =
   /corpqa\.sts\.ford\.com\/adfs\/ls|corp\.sts\.ford\.com\/adfs\/oauth2\/authorize/gm;
 

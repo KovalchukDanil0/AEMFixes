@@ -35,6 +35,10 @@
       "js": ["jira.js"]
     },
     {
+      "matches": ["https://wwwperf.brandeuauthorlb.ford.com/damadmin"],
+      "js": ["damAdmin.js"]
+    },
+    {
       "matches": ["https://wwwperf.brandeuauthorlb.ford.com/miscadmin"],
       "js": ["createWFAEMTools.js"]
     },
