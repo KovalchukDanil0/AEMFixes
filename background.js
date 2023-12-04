@@ -283,7 +283,63 @@ const executeOnEachTab = async function (func, newTab, ...args) {
   });
 };
 
-browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
+let vehicleConfig = "";
+(async function getHAR() {
+  /* Keep track of the active tab in each window */
+  const activeTabs = {};
+
+  browser.tabs.onActivated.addListener(function (details) {
+    activeTabs[details.windowId] = details.tabId;
+  });
+
+  /* Clear the corresponding entry, whenever a window is closed */
+  browser.windows.onRemoved.addListener(function (winId) {
+    delete activeTabs[winId];
+  });
+
+  /* Listen for web-requests and filter them */
+  browser.webRequest.onBeforeRequest.addListener(
+    function (details) {
+      if (details.tabId === -1) {
+        // console.log("Skipping request from non-tabbed context...");
+        return;
+      }
+
+      const notInteresting = Object.keys(activeTabs).every(function (key) {
+        if (activeTabs[key] === details.tabId) {
+          /* We are interested in this request */
+          const url = details.url;
+
+          const regexVechicleCode = /(?:SL1|KMI|TDR)\?locale=\w\w_\w\w/gm;
+          if (url.match(regexVechicleCode)) {
+            vehicleConfig = url;
+          }
+
+          return false;
+        } else {
+          return true;
+        }
+      });
+
+      if (notInteresting) {
+        /* We are not interested in this request */
+        // console.log("Just ignore this one:", details);
+      }
+    },
+    { urls: ["<all_urls>"] }
+  );
+
+  /* Get the active tabs in all currently open windows */
+  const activeTab = await browser.tabs.query({
+    active: true,
+  });
+
+  activeTab.forEach(function (tab) {
+    activeTabs[tab.windowId] = tab.id;
+  });
+})();
+
+browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
   if (msg.from === "popup" && msg.subject === "buttonClick") {
     switch (msg.func) {
       case "toEnvironment":
@@ -310,6 +366,19 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
     } else {
       msg.func(...msg.args);
     }
+  }
+
+  if (msg.from === "context" && msg.subject === "getHAR") {
+    const intervalID = setInterval(function () {
+      if (vehicleConfig === "") {
+        return;
+      }
+
+      sendResponse(vehicleConfig);
+      clearInterval(intervalID);
+    }, 1000);
+
+    return true;
   }
 });
 

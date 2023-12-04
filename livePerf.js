@@ -16,11 +16,6 @@ window.ReplaceByRandElmArray = function (elm, replaceArray) {
 };
 
 window.randomProgrammerMemes = async function () {
-  const savedData = await loadSavedData();
-  if (!savedData.enableFunErr) {
-    return;
-  }
-
   if (document.title !== "404") {
     return;
   }
@@ -138,44 +133,92 @@ window.checkMothersite = function (from) {
   }
 };
 
+window.getCarByName = function (data, value) {
+  return data.filter((el) => el.desc === value)[0];
+};
+
+window.findVehicleCode = async function () {
+  /*const regexOverlayWithCode =
+    /(?:wizard-overlays|next-steps|seuraavaksi)\/(?:kmi|sl1|tdr|request-a-test-drive|varaa-koeajo)/gm;
+  if (!url.match(regexOverlayWithCode)) {
+    return;
+  }*/
+
+  const config = await browser.runtime.sendMessage({
+    from: "context",
+    subject: "getHAR",
+  });
+
+  if (config === "") {
+    return;
+  }
+
+  console.log(config);
+
+  const response = await fetch(config, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const vehicleConfig = await response.json();
+
+  const arrayQuerySel = [
+    "#gux3 > div > div.box-content.cq-dd-image > div > div > div > div.wizard.initialized-wizard.ng-scope > div.ng-scope > div > div.steps-wrapper.full-view > div.wizard-vehicle-selector.ng-scope > div.vehicle-list > figure > div > figcaption > a",
+    "#gux3 > div > div.ng-scope > div > div.steps-wrapper.full-view > div.wizard-vehicle-selector.ng-scope > div.vehicle-list > figure > div > figcaption > a",
+    "#gux3 > div > div > div > div.ng-scope > div > div.steps-wrapper.full-view > div.wizard-vehicle-selector.ng-scope > div.vehicle-list > figure > div > figcaption > a",
+  ];
+
+  let index = -1;
+  let allCars = null;
+  while (index <= arrayQuerySel.length) {
+    index += 1;
+    allCars = document.querySelectorAll(arrayQuerySel[index]);
+
+    console.log(allCars);
+
+    if (allCars?.length !== 0) {
+      break;
+    }
+  }
+
+  allCars.forEach((car) => {
+    const carName = car.textContent.replace(regexRemoveSpaces, "");
+    console.log(carName);
+
+    const carObj = getCarByName(vehicleConfig.data[0].eventItem, carName);
+
+    const wersDerivCode = carObj.wersDerivCode;
+
+    let fullCode = carObj.wersCode;
+    if (wersDerivCode !== "") {
+      fullCode += `-${wersDerivCode}`;
+    }
+
+    const a = document.createElement("a");
+    a.textContent = fullCode;
+    a.href = `?vehicleCode=${fullCode}`;
+
+    car.parentElement.appendChild(a);
+  });
+};
+
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "popup" && msg.subject === "checkMothersite") {
     checkMothersite(msg.from);
   }
 });
 
-(function Main() {
-  /*var regexFixShortLink =
-    /((?:.+)?wwwperf\.)(brandeulb\.ford\.com(?:\/)?(?:editor\.html|cf#)?\/)(content\/(?:.+)?)/gm;
-  if (window.location.href.match(regexFixShortLink)) {
-    window.open(
-      window.location.href.replace(
-        regexFixShortLink,
-        "$1brandeuauthorlb.ford.com/editor.html/$3"
-      ),
-      "_parent"
-    );
-    return; 
-  }*/
+(async function Main() {
+  const savedData = await loadSavedData();
 
-  randomProgrammerMemes();
-  checkMothersite("content");
+  if (!savedData.disMothersiteCheck) {
+    checkMothersite("content");
+  }
 
-  /*if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function () {
-      navigator.serviceWorker.register("/akam-sw.js").then(
-        function (registration) {
-          // Registration was successful
-          alert(
-            "ServiceWorker registration successful with scope: ",
-            registration.scope
-          );
-        },
-        function (err) {
-          // registration failed :(
-          alert("ServiceWorker registration failed: ", err);
-        }
-      );
-    });
-  }*/
+  if (savedData.enableFunErr) {
+    randomProgrammerMemes();
+  }
+
+  findVehicleCode();
 })();

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ford All You Need Options</title>
 
     <link rel="stylesheet" href="options.css" />
-    <link rel="stylesheet" href="cyberpunk.css" />
     <link rel="stylesheet" href="node_modules/bulma/css/bulma.css" />
   </head>
   <body>
@@ -21,8 +22,26 @@
       <div class="field">
         <div class="control">
           <label class="checkbox has-text-white">
+            <input id="disMothersiteCheck" type="checkbox" />
+            Disable mothersite links checker
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="control">
+          <label class="checkbox has-text-white">
             <input id="enableFunErr" type="checkbox" />
             Enable funny Error Replacement
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="control">
+          <label class="checkbox has-text-white">
+            <input id="enableFiltreFix" type="checkbox" />
+            Enable attachments filters fix in Jira
           </label>
         </div>
       </div>

@@ -1,5 +1,3 @@
-const regexRemoveSpaces = /^\s+|\s+$|\s+(?=\s)/gm;
-
 const buttonsContainer = function () {
   return document.querySelector(
     "#stalker > div > div.command-bar > div > div > div > div.aui-toolbar2-primary"
@@ -206,9 +204,11 @@ window.FixSorting = function () {
 (async function Main() {
   const savedData = await loadSavedData();
 
-  if (!savedData.disableCreateWF) {
+  if (!savedData.disCreateWF) {
     createWFButton();
   }
 
-  FixSorting();
+  if (savedData.enableFiltreFix) {
+    FixSorting();
+  }
 })();

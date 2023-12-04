@@ -33,6 +33,8 @@ const authorTouch = function (url) {
 
 const regexJira = /jira\.uhub\.biz\/browse\//gm;
 
+const regexRemoveSpaces = /^\s+|\s+$|\s+(?=\s)/gm;
+
 const marketsInBeta = [
   "uk",
   "de",
@@ -61,6 +63,17 @@ const AEMLink = {
   constructor(url) {
     if (url.match(regexAuthor)) {
       this.market = url.replace(regexAuthor, "$3");
+    }
+    if (url.match(regexLive)) {
+      if (url.replace(regexLive, "$3") === "") {
+        this.market = url.replace(regexLive, "$2");
+        this.localLanguage = url.replace(regexLive, "$1");
+      } else {
+        this.market = url.replace(regexLive, "$3");
+        this.localLanguage = url.replace(regexLive, "$2");
+      }
+
+      this.isMarketInBeta();
     }
   },
 
@@ -221,10 +234,8 @@ const waitForElm = function (selector) {
 };
 
 const loadSavedData = async function () {
-  return browser.storage.sync.get({
-    disableCreateWF: false,
-    enableFunErr: false,
-  });
+  const savedData = await browser.storage.sync.get("savedData");
+  return savedData.savedData;
 };
 
 const copyTextToClipboard = function (text) {
