@@ -163,10 +163,12 @@ window.findVehicleCode = async function () {
   });
   const vehicleConfig = await response.json();
 
+  const carCommonPath =
+    "div.ng-scope > div > div.steps-wrapper.full-view > div.wizard-vehicle-selector.ng-scope > div.vehicle-list > figure > div > figcaption > a";
   const arrayQuerySel = [
-    "#gux3 > div > div.box-content.cq-dd-image > div > div > div > div.wizard.initialized-wizard.ng-scope > div.ng-scope > div > div.steps-wrapper.full-view > div.wizard-vehicle-selector.ng-scope > div.vehicle-list > figure > div > figcaption > a",
-    "#gux3 > div > div.ng-scope > div > div.steps-wrapper.full-view > div.wizard-vehicle-selector.ng-scope > div.vehicle-list > figure > div > figcaption > a",
-    "#gux3 > div > div > div > div.ng-scope > div > div.steps-wrapper.full-view > div.wizard-vehicle-selector.ng-scope > div.vehicle-list > figure > div > figcaption > a",
+    `#gux3 > div > div.box-content.cq-dd-image > div > div > div > div.wizard.initialized-wizard.ng-scope > ${carCommonPath}`,
+    `#gux3 > div > ${carCommonPath}`,
+    `#gux3 > div > div > div > ${carCommonPath}`,
   ];
 
   let index = -1;
@@ -184,9 +186,15 @@ window.findVehicleCode = async function () {
 
   allCars.forEach((car) => {
     const carName = car.textContent.replace(regexRemoveSpaces, "");
-    console.log(carName);
-
     const carObj = getCarByName(vehicleConfig.data[0].eventItem, carName);
+
+    const wersCode = carObj?.wersCode;
+    if (carObj == null && (wersCode === "" || wersCode == null)) {
+      const p = document.createElement("p");
+      p.textContent = "NO DATA";
+      car.parentElement.appendChild(p);
+      return;
+    }
 
     const wersDerivCode = carObj.wersDerivCode;
 
