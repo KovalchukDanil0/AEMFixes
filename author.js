@@ -72,6 +72,7 @@ window.catErrors = async function () {
   }
 };
 
+// ! NOT WORKING
 window.fixAuthorLink = function () {
   let newUrl;
 
@@ -79,14 +80,14 @@ window.fixAuthorLink = function () {
     newUrl = url.replace(/.$/, ".html");
 
     if (
-      !url.includes("editor.html") &&
-      !url.includes("cf#") &&
+      !url.includes(touch) &&
+      !url.includes(classic) &&
       !url.includes("?wcmmode=disabled") &&
       !url.includes("damadmin#")
     ) {
       newUrl = url.replace(
         /(.+wwwperf\.brandeuauthorlb\.ford\.com)?(\/)(.+)?/,
-        "$1/editor.html/$3"
+        `$1/${touch}/$3`
       );
 
       window.open(newUrl, "_parent");
@@ -101,9 +102,7 @@ window.ticketFinder = async function () {
   data.isMarketInBeta();
 
   const warningBar = await waitForElm(
-    `${
-      data.betaBool ? "body" : "#accelerator-page"
-    } > div.workflows-warning-bar`
+    `${GUX3() ? "#accelerator-page" : "#global-ux"} > div.workflows-warning-bar`
   );
 
   const regexRemoveCommas = /.+(ESM-\d\d\d\d\d\d?).+/gm;
@@ -115,13 +114,16 @@ window.ticketFinder = async function () {
 
   const fullPath = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicket}#view-subtasks`;
 
-  a.href = fullPath;
-  a.target = "_blank";
-
   const linkText = document.createTextNode(
     `blocking parent ticket is ${fullPath}`
   );
   a.appendChild(linkText);
+
+  a.addEventListener("click", async function () {
+    alert(data.market);
+    await browser.storage.local.set({ SearchSubTask: data.market });
+    window.open(fullPath, "_blank");
+  });
 
   warningBar.appendChild(a);
 };

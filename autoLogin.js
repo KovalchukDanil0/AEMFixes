@@ -5,12 +5,16 @@ window.blurAll = function () {
   document.body.removeChild(tmp);
 };
 
+window.isEmpty = function (str) {
+  return str.trim().length === 0;
+};
+
 window.autoLogIn = function () {
   const timeout = 500;
 
   waitForElm("#input28").then((oktaForm) => {
     const intervalID = setInterval(function () {
-      if (oktaForm.value.isEmpty()) {
+      if (isEmpty(oktaForm.value)) {
         return;
       } else {
         document.activeElement.blur();
@@ -39,7 +43,7 @@ window.autoLogIn = function () {
 
   waitForElm("#userNameInput").then((logInForm) => {
     const intervalID = setInterval(function () {
-      if (logInForm.value.isEmpty()) {
+      if (isEmpty(logInForm.value)) {
         return;
       } else {
         document.activeElement.blur();

@@ -189,10 +189,11 @@ window.findVehicleCode = async function () {
     const carObj = getCarByName(vehicleConfig.data[0].eventItem, carName);
 
     const wersCode = carObj?.wersCode;
-    if (carObj == null && (wersCode === "" || wersCode == null)) {
+    if (carObj == null || wersCode === "" || wersCode == null) {
       const p = document.createElement("p");
       p.textContent = "NO DATA";
       car.parentElement.appendChild(p);
+
       return;
     }
 

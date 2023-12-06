@@ -24,11 +24,24 @@ const regexPerfProd =
 const regexAuthor =
   /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(?:(\w\w)_\w\w|configuration)\/(?:.+)?)(?:\.html|\/)(?:.+)?/gm;
 
+const touch = "editor.html";
+const classic = "cf#";
+
 const authorClassic = function (url) {
-  return url.replace(regexAuthor, "$1") === "cf#";
+  return url.replace(regexAuthor, "$1") === classic;
 };
 const authorTouch = function (url) {
-  return url.replace(regexAuthor, "$1") === "editor.html";
+  return url.replace(regexAuthor, "$1") === touch;
+};
+
+const GUX3 = function () {
+  const page = document.getElementById("accelerator-page");
+  return page !== null;
+};
+
+const GUX1 = function () {
+  const page = document.getElementById("global-ux");
+  return page !== null;
 };
 
 const regexJira = /jira\.uhub\.biz\/browse\//gm;
@@ -61,9 +74,7 @@ const AEMLink = {
   urlPart: "",
 
   constructor(url) {
-    if (url.match(regexAuthor)) {
-      this.market = url.replace(regexAuthor, "$3");
-    }
+    // Live
     if (url.match(regexLive)) {
       if (url.replace(regexLive, "$3") === "") {
         this.market = url.replace(regexLive, "$2");
@@ -75,12 +86,45 @@ const AEMLink = {
 
       this.isMarketInBeta();
     }
+    // Perf & Prod
+    else if (url.match(regexPerfProd)) {
+      if (url.replace(regexPerfProd, "$3") === "uk") {
+        this.market = url.replace(regexPerfProd, "$3");
+        this.localLanguage = url.replace(regexPerfProd, "$2");
+      } else {
+        this.market = url.replace(regexPerfProd, "$2");
+        this.localLanguage = url.replace(regexPerfProd, "$3");
+      }
+
+      this.isMarketInBeta();
+    }
+    // Author
+    else if (url.match(regexAuthor)) {
+      if (this.env === classic || this.env === touch) {
+        const regexFastAuthor = /com\/(?:(editor\.html|cf#)\/)?content/gm;
+        url = url.replace(regexFastAuthor, `com/${this.env}/content`);
+
+        return url;
+      }
+
+      this.market = url.replace(regexAuthor, "$3");
+      this.localLanguage = url.replace(regexAuthor, "$4");
+
+      this.fixLocalLanguage();
+
+      if (this.isMarketInBeta()) {
+        return "editor-beta";
+      }
+    } else {
+      throw new Error("Link doesn't math any of the env");
+    }
   },
 
   isMarketInBeta(someMarket) {
     if (someMarket === undefined) {
       someMarket = this.market;
     }
+
     this.betaBool = !!marketsInBeta.some((link) => someMarket.includes(link));
     this.beta = this.betaBool ? "-beta" : "";
     return this.betaBool;
@@ -108,7 +152,7 @@ const AEMLink = {
   },
 
   fixLocalLanguage() {
-    if (this.env === "editor.html" || this.env === "cf#") {
+    if (this.env === touch || this.env === classic) {
       if (this.localLanguage === "") {
         this.localLanguage = this.market;
       }
@@ -165,6 +209,8 @@ const AEMLink = {
     const regexFixSWAuthor =
       /\S+?(site-wide-content|home-new|home)((?:\S+)?(?=\.html)|\S+)(?:\S+)?/gm;
 
+    console.log(this.urlPart);
+
     if (this.urlPart.replace(regexFixSWAuthor, "$1") === "site-wide-content") {
       this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/content$2");
     } else {
@@ -173,10 +219,6 @@ const AEMLink = {
 
     return this.urlPart;
   },
-};
-
-String.prototype.isEmpty = function () {
-  return this.trim().length === 0;
 };
 
 const ifWorkflow = function (url) {

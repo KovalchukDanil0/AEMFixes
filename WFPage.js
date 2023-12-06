@@ -12,9 +12,9 @@ window.insertAfter = function (newNode, existingNode) {
   existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
 };
 
-String.prototype.addBetaToLink = function () {
+window.addBetaToLink = function (link) {
   const regexDetermineBeta = /(.+)?(\/content\/guxeu(?:-beta)?\/(?:.+)?)/gm;
-  return this.replace(regexDetermineBeta, "$1/editor.html$2");
+  return link.replace(regexDetermineBeta, `$1/${touch}$2`);
 };
 
 // ! NOT USE, NOT WORKING AT ALL, VERY UNSTABLE!!!
@@ -85,7 +85,7 @@ window.AddWFID = async function () {
   const WorkflowID = WFID();
 
   form.value = WorkflowID;
-  getLinksInWF().forEach((data) => (data.href = data.href.addBetaToLink()));
+  getLinksInWF().forEach((data) => (data.href = addBetaToLink(data.href)));
 
   const requestButton = document.querySelector("#start-request-workflow");
   requestButton.removeAttribute("disabled");
@@ -119,7 +119,7 @@ window.UsefulLinks = async function () {
   }
 
   data.isMarketInBeta();
-  data.env = "cf#";
+  data.env = classic;
 
   const swapLocalLangMarkets = ["at", "dk"];
   const ifSwapLocalLangMarkets = function () {

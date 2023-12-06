@@ -8,8 +8,6 @@ try {
   throw new Error(e);
 }
 
-const editor = "editor.html";
-
 const toEnvironment = async function (tab, url, env, newTab) {
   const data = AEMLink;
   data.env = env;
@@ -29,56 +27,17 @@ const toEnvironment = async function (tab, url, env, newTab) {
         data.urlPart = "";
       }
 
-      // Live
-      if (url.match(regexLive)) {
-        if (url.replace(regexLive, "$3") === "") {
-          data.market = url.replace(regexLive, "$2");
-          data.localLanguage = url.replace(regexLive, "$1");
-        } else {
-          data.market = url.replace(regexLive, "$3");
-          data.localLanguage = url.replace(regexLive, "$2");
-        }
+      const envStatus = data.constructor(url);
 
-        data.isMarketInBeta();
-      }
-      // Perf & Prod
-      else if (url.match(regexPerfProd)) {
-        if (url.replace(regexPerfProd, "$3") === "uk") {
-          data.market = url.replace(regexPerfProd, "$3");
-          data.localLanguage = url.replace(regexPerfProd, "$2");
-        } else {
-          data.market = url.replace(regexPerfProd, "$2");
-          data.localLanguage = url.replace(regexPerfProd, "$3");
-        }
-
-        data.isMarketInBeta();
-      }
-      // Author
-      else if (url.match(regexAuthor)) {
-        if (env === "cf#" || env === editor) {
-          const regexFastAuthor = /com\/(?:(editor\.html|cf#)\/)?content/gm;
-          url = url.replace(regexFastAuthor, `com/${env}/content`);
-
-          ifOpenNewTab(url);
-          return;
-        }
-
-        data.market = url.replace(regexAuthor, "$3");
-        data.localLanguage = url.replace(regexAuthor, "$4");
-
-        data.fixLocalLanguage();
-
-        if (data.isMarketInBeta()) {
-          data.urlPart = null;
-          data.urlPart = await browser.tabs.sendMessage(tab.id, {
-            from: "popup",
-            subject: "getAlias",
-          });
-        }
-
+      if (envStatus === "editor-beta") {
+        data.urlPart = await browser.tabs.sendMessage(tab.id, {
+          from: "popup",
+          subject: "getAlias",
+        });
         data.fixUrlPart();
       } else {
-        throw new Error("Link doesn't math any of the env");
+        ifOpenNewTab(envStatus);
+        return;
       }
 
       determineEnv();
@@ -89,7 +48,7 @@ const toEnvironment = async function (tab, url, env, newTab) {
         reject(new Error("Market is not set!"));
       }
 
-      switch (env) {
+      switch (data.env) {
         case "live":
           makeLive();
           break;
@@ -97,8 +56,8 @@ const toEnvironment = async function (tab, url, env, newTab) {
         case "prod":
           makePerf();
           break;
-        case editor:
-        case "cf#":
+        case touch:
+        case classic:
           makeAuthor();
           break;
         default:
@@ -301,7 +260,7 @@ let vehicleConfig = "";
   browser.webRequest.onBeforeRequest.addListener(
     function (details) {
       if (details.tabId === -1) {
-        // console.log("Skipping request from non-tabbed context...");
+        // Skipping request from non-tabbed context...
         return;
       }
 
@@ -310,8 +269,8 @@ let vehicleConfig = "";
           /* We are interested in this request */
           const url = details.url;
 
-          const regexVechicleCode = /(?:SL1|KMI|TDR)\?locale=\w\w_\w\w/gm;
-          if (url.match(regexVechicleCode)) {
+          const regexVehicleCode = /(?:SL1|KMI|TDR)\?locale=\w\w_\w\w/gm;
+          if (url.match(regexVehicleCode)) {
             vehicleConfig = url;
           }
 
@@ -323,7 +282,7 @@ let vehicleConfig = "";
 
       if (notInteresting) {
         /* We are not interested in this request */
-        // console.log("Just ignore this one:", details);
+        // Just ignore this one
       }
     },
     { urls: ["<all_urls>"] }
@@ -441,7 +400,7 @@ const menusOnClick = async function (info) {
   switch (info.menuItemId) {
     case "openInDAM": {
       const regexImagePicker =
-        /(?:.+)?(\/content\/dam\/guxeu.+\.(?:jpg|png|jpeg))(?:\.renditions\.(?:extra-large|large|original|medium|small|extra-small)\.jpeg)?/gm;
+        /(?:.+)?(\/content\/dam\/guxeu.+?\.(?:jpeg|jpg|png))(?:\.renditions\..+)?/gm;
       const imagePath = info.srcUrl.replace(regexImagePicker, "$1");
 
       changeContentInTab(
@@ -462,10 +421,10 @@ const menusOnClick = async function (info) {
       toEnvironment(tab, info.linkUrl, "prod", true);
       break;
     case "toTouch":
-      toEnvironment(tab, info.linkUrl, editor, true);
+      toEnvironment(tab, info.linkUrl, touch, true);
       break;
     case "toClassic":
-      toEnvironment(tab, info.linkUrl, "cf#", true);
+      toEnvironment(tab, info.linkUrl, classic, true);
       break;
     default:
       break;

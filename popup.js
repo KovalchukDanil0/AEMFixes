@@ -126,8 +126,8 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
   buttonOnClick("#buttonToLive", "toEnvironment", true, false, "live");
   buttonOnClick("#buttonToPerf", "toEnvironment", true, false, "perf");
   buttonOnClick("#buttonToProd", "toEnvironment", true, false, "prod");
-  buttonOnClick("#buttonToClassic", "toEnvironment", true, false, "cf#");
-  buttonOnClick("#buttonToTouch", "toEnvironment", true, false, "editor.html");
+  buttonOnClick("#buttonToClassic", "toEnvironment", true, false, classic);
+  buttonOnClick("#buttonToTouch", "toEnvironment", true, false, touch);
 
   if (ifAuthor) {
     buttonOnClick(

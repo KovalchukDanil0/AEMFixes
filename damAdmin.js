@@ -7,7 +7,7 @@ window.addEventListener(
     if (mav === "mavs") {
       const linkPart = url.replace(regexDAMTree, "$2");
       window.open(
-        "https://wwwperf.brandeuauthorlb.ford.com/editor.html" + linkPart
+        `https://wwwperf.brandeuauthorlb.ford.com/${touch}` + linkPart
       );
     }
   },

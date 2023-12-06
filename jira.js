@@ -1,3 +1,5 @@
+const regexWFTitle = /^(?:NWP_)?(\w\w)(\w\w)?(?:.+)?/gm;
+
 const buttonsContainer = function () {
   return document.querySelector(
     "#stalker > div > div.command-bar > div > div > div > div.aui-toolbar2-primary"
@@ -44,13 +46,15 @@ window.ticketNumber = function () {
     .match(/ESM-\w+/gm);
 };
 
+window.marketFromTitle = function (title) {
+  return title.replace(regexWFTitle, "$1");
+};
+
 window.textToWFPath = function (market, localLanguage, title) {
   let fullPath;
 
   const WFPathFromTitle = function () {
-    const regexWFTitle = /^(?:NWP_)?(\w\w)(\w\w)?(?:.+)?/gm;
-
-    market = title.replace(regexWFTitle, "$1");
+    market = marketFromTitle();
     localLanguage = title.replace(regexWFTitle, "$2");
 
     if (localLanguage === "") {
@@ -201,6 +205,39 @@ window.FixSorting = function () {
   }
 };
 
+window.openSubTask = async function () {
+  const ticketMarketToFound = await browser.storage.local.get({
+    SearchSubTask: "",
+  });
+
+  if (ticketMarketToFound["SearchSubTask"] === "") {
+    return;
+  }
+
+  const allSubTasks = document.querySelectorAll(
+    "#view-subtasks > div.mod-content > div > issuetable-web-component > table > tbody > tr > td.stsummary > a"
+  );
+
+  let linkToOpen = null;
+  if (allSubTasks.length === 1) {
+    linkToOpen = allSubTasks[0].href;
+  } else {
+    allSubTasks.forEach((subTask) => {
+      const title = subTask.textContent;
+      const market = marketFromTitle(title);
+
+      if (ticketMarketToFound === market.toLowerCase()) {
+        linkToOpen = subTask.href;
+      }
+    });
+  }
+
+  if (linkToOpen !== null) {
+    await browser.storage.local.set({ SearchSubTask: "" });
+    window.open(linkToOpen, "_self");
+  }
+};
+
 (async function Main() {
   const savedData = await loadSavedData();
 
@@ -211,4 +248,6 @@ window.FixSorting = function () {
   if (savedData.enableFiltreFix) {
     FixSorting();
   }
+
+  openSubTask();
 })();
