@@ -9,11 +9,13 @@ try {
 }
 
 const toEnvironment = async function (tab, url, env, newTab) {
-  const data = AEMLink;
-  data.env = env;
+  const data = new AEMLink(url, env);
+  await data.getAuthorRealUrl(tab);
+
+  console.log(data);
 
   return new Promise((resolve, reject) => {
-    (async () => {
+    (async function Main() {
       browser.runtime.sendMessage({
         from: "background",
         subject: "showMessage",
@@ -21,31 +23,20 @@ const toEnvironment = async function (tab, url, env, newTab) {
         time: Number.MAX_VALUE,
       });
 
-      const parser = new URL(url);
-      data.urlPart = parser.pathname + parser.search + parser.hash;
-      if (data.urlPart === "/") {
-        data.urlPart = "";
-      }
-
-      const envStatus = data.constructor(url);
-
-      if (envStatus === "editor-beta") {
-        data.urlPart = await browser.tabs.sendMessage(tab.id, {
-          from: "popup",
-          subject: "getAlias",
-        });
-        data.fixUrlPart();
-      } else {
-        ifOpenNewTab(envStatus);
-        return;
-      }
-
       determineEnv();
     })();
 
     function determineEnv() {
       if (data.market === "") {
-        reject(new Error("Market is not set!"));
+        if (data.fastAuthor) {
+          const regexFastAuthor = /com\/(?:(editor\.html|cf#)\/)?content/gm;
+          url = url.replace(regexFastAuthor, `com/${this.env}/content`);
+
+          ifOpenNewTab(url);
+          return;
+        } else {
+          reject(new Error("Market is not set!"));
+        }
       }
 
       switch (data.env) {
@@ -231,7 +222,9 @@ const executeOnEachTab = async function (func, newTab, ...args) {
     currentWindow: true,
   });
   for (const tab of tabs) {
-    await func(tab, tab.url, ...args, newTab);
+    const regexDeleteEnv = /\/(?:editor\.html|cf#)/gm;
+    const tabUrl = tab.url.replace(regexDeleteEnv, "");
+    await func(tab, tabUrl, ...args, newTab);
   }
 
   browser.runtime.sendMessage({
@@ -242,7 +235,7 @@ const executeOnEachTab = async function (func, newTab, ...args) {
   });
 };
 
-let vehicleConfig = "";
+let vehicleConfig = null;
 (async function getHAR() {
   /* Keep track of the active tab in each window */
   const activeTabs = {};
@@ -329,7 +322,7 @@ browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
 
   if (msg.from === "context" && msg.subject === "getHAR") {
     const intervalID = setInterval(function () {
-      if (vehicleConfig === "") {
+      if (vehicleConfig === null) {
         return;
       }
 

@@ -48,93 +48,60 @@ const regexJira = /jira\.uhub\.biz\/browse\//gm;
 
 const regexRemoveSpaces = /^\s+|\s+$|\s+(?=\s)/gm;
 
-const marketsInBeta = [
-  "uk",
-  "de",
-  "es",
-  "fr",
-  "nl",
-  "it",
-  "no",
-  "at",
-  "pt",
-  "pl",
-  "dk",
-];
+const AEMLink = function (url, toEnv = null) {
+  this.env = "";
+  this.market = "";
+  this.localLanguage = "";
+  this.beta = "";
+  this.betaBool = false;
+  this.urlPart = "";
+  this.authorBeta = false;
+  this.fastAuthor = false;
 
-// doesn't have ch
-const marketsHomeNew = ["ie", "fi", "be", "cz", "hu", "gr", "ro", "lu"];
+  this.marketsInBeta = [
+    "uk",
+    "de",
+    "es",
+    "fr",
+    "nl",
+    "it",
+    "no",
+    "at",
+    "pt",
+    "pl",
+    "dk",
+  ];
 
-const AEMLink = {
-  env: "",
-  market: "",
-  localLanguage: "",
-  beta: "",
-  betaBool: false,
-  urlPart: "",
+  // doesn't have ch
+  this.marketsHomeNew = ["ie", "fi", "be", "cz", "hu", "gr", "ro", "lu"];
 
-  constructor(url) {
-    // Live
-    if (url.match(regexLive)) {
-      if (url.replace(regexLive, "$3") === "") {
-        this.market = url.replace(regexLive, "$2");
-        this.localLanguage = url.replace(regexLive, "$1");
-      } else {
-        this.market = url.replace(regexLive, "$3");
-        this.localLanguage = url.replace(regexLive, "$2");
-      }
-
-      this.isMarketInBeta();
-    }
-    // Perf & Prod
-    else if (url.match(regexPerfProd)) {
-      if (url.replace(regexPerfProd, "$3") === "uk") {
-        this.market = url.replace(regexPerfProd, "$3");
-        this.localLanguage = url.replace(regexPerfProd, "$2");
-      } else {
-        this.market = url.replace(regexPerfProd, "$2");
-        this.localLanguage = url.replace(regexPerfProd, "$3");
-      }
-
-      this.isMarketInBeta();
-    }
-    // Author
-    else if (url.match(regexAuthor)) {
-      if (this.env === classic || this.env === touch) {
-        const regexFastAuthor = /com\/(?:(editor\.html|cf#)\/)?content/gm;
-        url = url.replace(regexFastAuthor, `com/${this.env}/content`);
-
-        return url;
-      }
-
-      this.market = url.replace(regexAuthor, "$3");
-      this.localLanguage = url.replace(regexAuthor, "$4");
-
-      this.fixLocalLanguage();
-
-      if (this.isMarketInBeta()) {
-        return "editor-beta";
-      }
-    } else {
-      throw new Error("Link doesn't math any of the env");
-    }
-  },
-
-  isMarketInBeta(someMarket) {
-    if (someMarket === undefined) {
-      someMarket = this.market;
+  this.isMarketInBeta = function (someMarket = null) {
+    const returnNotThis = someMarket !== null;
+    if (returnNotThis) {
+      this.market = someMarket;
     }
 
-    this.betaBool = !!marketsInBeta.some((link) => someMarket.includes(link));
+    this.betaBool = !!this.marketsInBeta.some((link) =>
+      this.market.includes(link)
+    );
     this.beta = this.betaBool ? "-beta" : "";
-    return this.betaBool;
-  },
 
-  isMarketHasHomeNew() {
-    return !!marketsHomeNew.some((mar) => this.market.includes(mar));
-  },
+    if (returnNotThis) {
+      return this.betaBool;
+    }
 
-  fixMarket() {
+    return this;
+  };
+
+  this.isMarketHasHomeNew = function () {
+    return !!this.marketsHomeNew.some((mar) => this.market.includes(mar));
+  };
+
+  this.fixMarket = function (someMarket = null) {
+    if (someMarket !== null) {
+      this.market = someMarket;
+    }
+
     const marketsFixAuthor = ["gb", "en", "gl"];
     const marketsFixPerf = ["uk", "uk", "mothersite"];
 
@@ -149,9 +116,13 @@ const AEMLink = {
     }
 
     return this.market;
-  },
+  };
 
-  fixLocalLanguage() {
+  this.fixLocalLanguage = function (someLocalLang = null) {
+    if (someLocalLang !== null) {
+      this.localLanguage = someLocalLang;
+    }
+
     if (this.env === touch || this.env === classic) {
       if (this.localLanguage === "") {
         this.localLanguage = this.market;
@@ -203,13 +174,15 @@ const AEMLink = {
     }
 
     return this.localLanguage;
-  },
+  };
 
-  fixUrlPart() {
+  this.fixUrlPart = function (someUrlPart = null) {
+    if (someUrlPart !== null) {
+      this.urlPart = someUrlPart;
+    }
+
     const regexFixSWAuthor =
       /\S+?(site-wide-content|home-new|home)((?:\S+)?(?=\.html)|\S+)(?:\S+)?/gm;
-
-    console.log(this.urlPart);
 
     if (this.urlPart.replace(regexFixSWAuthor, "$1") === "site-wide-content") {
       this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/content$2");
@@ -218,7 +191,96 @@ const AEMLink = {
     }
 
     return this.urlPart;
-  },
+  };
+
+  this.getAuthorRealUrl = async function (tab) {
+    if (!this.authorBeta) {
+      return this.urlPart;
+    }
+
+    // TODO: fix headers sometimes not given correctly
+
+    console.log(url);
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "request",
+      },
+    });
+    const html = await response.text();
+
+    const callback = await browser.tabs.sendMessage(tab.id, {
+      from: "background",
+      subject: "DOMParser",
+      selector: 'head > meta[name="og:url"]',
+      property: "content",
+      html,
+    });
+
+    this.urlPart = this.fixUrlPart(callback);
+    return this.urlPart;
+  };
+
+  if (new.target) {
+    if (toEnv !== null) {
+      this.env = toEnv;
+    }
+
+    const parser = new URL(url);
+    this.urlPart = parser.pathname + parser.search + parser.hash;
+    if (this.urlPart === "/") {
+      this.urlPart = "";
+    }
+
+    let isAuthor = false;
+
+    // Live
+    if (url.match(regexLive)) {
+      if (url.replace(regexLive, "$3") === "") {
+        this.market = url.replace(regexLive, "$2");
+        this.localLanguage = url.replace(regexLive, "$1");
+      } else {
+        this.market = url.replace(regexLive, "$3");
+        this.localLanguage = url.replace(regexLive, "$2");
+      }
+    }
+    // Perf & Prod
+    else if (url.match(regexPerfProd)) {
+      if (url.replace(regexPerfProd, "$3") === "uk") {
+        this.market = url.replace(regexPerfProd, "$3");
+        this.localLanguage = url.replace(regexPerfProd, "$2");
+      } else {
+        this.market = url.replace(regexPerfProd, "$2");
+        this.localLanguage = url.replace(regexPerfProd, "$3");
+      }
+    }
+    // Author
+    else if (url.match(regexAuthor)) {
+      if (this.env === classic || this.env === touch) {
+        this.fastAuthor = true;
+        return this;
+      }
+
+      this.market = url.replace(regexAuthor, "$3");
+      this.localLanguage = this.fixLocalLanguage(
+        url.replace(regexAuthor, "$4")
+      );
+
+      isAuthor = true;
+    } else {
+      throw new Error("Link doesn't math any of the env");
+    }
+
+    this.isMarketInBeta();
+    if (isAuthor) {
+      if (this.betaBool) {
+        this.authorBeta = true;
+      } else {
+        this.fixUrlPart();
+      }
+    }
+
+    return this;
+  }
 };
 
 const ifWorkflow = function (url) {
@@ -280,6 +342,12 @@ const loadSavedData = async function () {
   return savedData.savedData;
 };
 
+const isFunction = function (functionToCheck) {
+  return (
+    functionToCheck && {}.toString.call(functionToCheck) === "[object Function]"
+  );
+};
+
 const copyTextToClipboard = function (text) {
   const copyFrom = document.createElement("textarea");
   copyFrom.textContent = text;
@@ -292,17 +360,29 @@ const copyTextToClipboard = function (text) {
   document.body.removeChild(copyFrom);
 };
 
-browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
-  if (msg.from === "background" && msg.subject === "writeToClipboard") {
-    copyTextToClipboard(msg.text);
+browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  if (msg.from === "background") {
+    if (msg.subject === "DOMParser") {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(msg.html, "text/html");
+      const elm = doc.querySelector(msg.selector);
 
-    if (msg.showMessage) {
-      browser.runtime.sendMessage({
-        from: "background",
-        subject: "showMessage",
-        message: `LINKS COPIED TO CLIPBOARD:\n ${msg.text}`,
-        time: 5000,
-      });
+      console.log(doc);
+
+      sendResponse(elm[msg.property]);
+    }
+
+    if (msg.subject === "writeToClipboard") {
+      copyTextToClipboard(msg.text);
+
+      if (msg.showMessage) {
+        browser.runtime.sendMessage({
+          from: "background",
+          subject: "showMessage",
+          message: `LINKS COPIED TO CLIPBOARD:\n ${msg.text}`,
+          time: 5000,
+        });
+      }
     }
   }
 });

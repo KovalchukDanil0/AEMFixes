@@ -32,56 +32,44 @@ window.randomProgrammerMemes = async function () {
     const success = 200;
 
     if (request.status === success) {
-      const data = JSON.parse(request.response);
-      const count = Object.keys(data).length;
+      const jsonData = JSON.parse(request.response);
+      const count = Object.keys(jsonData).length;
 
       //Extracting data
-      const memeImage = data[generateRandom(count - 1)].path;
+      const memeImage = jsonData[generateRandom(count - 1)].path;
 
-      const arrayQuerySel = [
-        "#accelerator-page > div.content > div > div.box-content.cq-dd-image > div > div.billboard.billboard-image-sets-height > div > div.billboard-inner",
-        "#global-ux > div.content.clearfix > div:nth-child(1) > div.billboard.section > div > div.billboard-inner",
-      ];
+      const data = new AEMLink(url);
+      console.log(data.fixMarket());
+      console.log(data);
 
-      let index = -1;
       let billboardContainer = null;
-      while (index <= arrayQuerySel.length) {
-        index += 1;
-        billboardContainer = document.querySelector(arrayQuerySel[index]);
-
-        if (billboardContainer != null) {
-          break;
-        }
-      }
-
       let billboardImages = [];
       let billboardText;
-      switch (index) {
-        case 0:
-          billboardImages = document.querySelectorAll(
-            arrayQuerySel[index] + " > div > picture > source"
-          );
 
-          billboardText = document.querySelector(
-            arrayQuerySel[index] + " > div.billboard-paragraph"
-          );
-          billboardText.remove();
+      if (data.betaBool) {
+        billboardContainer =
+          "#accelerator-page > div.content > div > div.box-content.cq-dd-image > div > div.billboard.billboard-image-sets-height > div > div.billboard-inner";
 
-          break;
-        case 1:
-          billboardImages = document.querySelectorAll(
-            arrayQuerySel[index] + " > div > div > picture > source"
-          );
+        billboardImages = document.querySelectorAll(
+          billboardContainer + " > div > picture > source"
+        );
 
-          billboardText = document.querySelector(
-            arrayQuerySel[index] + " > div.billboard-paragraph"
-          );
-          billboardText.remove();
+        billboardText = document.querySelector(
+          billboardContainer + " > div.billboard-paragraph"
+        );
+        billboardText.remove();
+      } else {
+        billboardContainer =
+          "#global-ux > div.content.clearfix > div:nth-child(1) > div.billboard.section > div > div.billboard-inner";
 
-          break;
-        default: {
-          throw new Error("No such Error page");
-        }
+        billboardImages = document.querySelectorAll(
+          billboardContainer + " > div > div > picture > source"
+        );
+
+        billboardText = document.querySelector(
+          billboardContainer + " > div.billboard-paragraph"
+        );
+        billboardText.remove();
       }
 
       billboardImages.forEach((image) => {
@@ -138,22 +126,20 @@ window.getCarByName = function (data, value) {
 };
 
 window.findVehicleCode = async function () {
-  /*const regexOverlayWithCode =
-    /(?:wizard-overlays|next-steps|seuraavaksi)\/(?:kmi|sl1|tdr|request-a-test-drive|varaa-koeajo)/gm;
-  if (!url.match(regexOverlayWithCode)) {
+  const wizardVehicleSelector = document.querySelector(
+    ".wizard-vehicle-selector"
+  );
+  if (wizardVehicleSelector === null) {
     return;
-  }*/
+  }
 
   const config = await browser.runtime.sendMessage({
     from: "context",
     subject: "getHAR",
   });
-
-  if (config === "") {
+  if (config === null) {
     return;
   }
-
-  console.log(config);
 
   const response = await fetch(config, {
     method: "GET",
@@ -163,26 +149,9 @@ window.findVehicleCode = async function () {
   });
   const vehicleConfig = await response.json();
 
-  const carCommonPath =
-    "div.ng-scope > div > div.steps-wrapper.full-view > div.wizard-vehicle-selector.ng-scope > div.vehicle-list > figure > div > figcaption > a";
-  const arrayQuerySel = [
-    `#gux3 > div > div.box-content.cq-dd-image > div > div > div > div.wizard.initialized-wizard.ng-scope > ${carCommonPath}`,
-    `#gux3 > div > ${carCommonPath}`,
-    `#gux3 > div > div > div > ${carCommonPath}`,
-  ];
-
-  let index = -1;
-  let allCars = null;
-  while (index <= arrayQuerySel.length) {
-    index += 1;
-    allCars = document.querySelectorAll(arrayQuerySel[index]);
-
-    console.log(allCars);
-
-    if (allCars?.length !== 0) {
-      break;
-    }
-  }
+  const allCars = wizardVehicleSelector.querySelectorAll(
+    "div.vehicle-list > figure > div > figcaption > a"
+  );
 
   allCars.forEach((car) => {
     const carName = car.textContent.replace(regexRemoveSpaces, "");

@@ -4,7 +4,7 @@ const url =
     : window.location.href;
 
 browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  if (msg.from === "popup" && msg.subject === "getAlias") {
+  if (msg.from === "background" && msg.subject === "getAlias") {
     (async () => {
       const urlPart =
         /(?:[\s\S]*)?Your real URL will be : \.\.\. \/(home|site-wide-content)(\S+)?(?:[\s\S]*)/gm;
@@ -97,9 +97,7 @@ window.fixAuthorLink = function () {
 };
 
 window.ticketFinder = async function () {
-  const data = AEMLink;
-  data.constructor(url);
-  data.isMarketInBeta();
+  const data = AEMLink(url);
 
   const warningBar = await waitForElm(
     `${GUX3() ? "#accelerator-page" : "#global-ux"} > div.workflows-warning-bar`
