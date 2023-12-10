@@ -12,6 +12,8 @@ const toEnvironment = async function (tab, url, env, newTab) {
   const data = new AEMLink(url, env);
   await data.getAuthorRealUrl(tab);
 
+  // TODO: make headers to be taken from page without fetch on author pages
+
   console.log(data);
 
   return new Promise((resolve, reject) => {

@@ -1,12 +1,11 @@
 {
   "dependencies": {
     "bulma": "^0.9.4",
-    "dom-parser": "^1.1.5",
     "jquery": "^3.7.1",
-    "js-convert-case": "^4.2.0",
-    "jsdom": "^23.0.1"
+    "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
-    "webextension-polyfill": "^0.10.0"
+    "@types/jquery": "^3.5.29",
+    "@types/webextension-polyfill": "^0.10.7"
   }
 }
