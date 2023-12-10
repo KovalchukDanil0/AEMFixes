@@ -91,7 +91,7 @@ window.highlightHeading = function (tab) {
 };
 
 browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
-  if (msg.from === "background" && msg.subject === "showMessage") {
+  if (msg.from === "context" && msg.subject === "showMessage") {
     showMessage(msg.message, msg.time);
   }
 });

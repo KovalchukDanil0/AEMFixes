@@ -1,20 +1,15 @@
 try {
   importScripts(
     "./node_modules/webextension-polyfill/dist/browser-polyfill.js",
-    "./sharedTools.js",
-    "./node_modules/js-convert-case/dist/js-convert-case.js"
+    "./sharedTools.js"
   );
 } catch (e) {
   throw new Error(e);
 }
 
 const toEnvironment = async function (tab, url, env, newTab) {
-  const data = new AEMLink(url, env);
+  const data = new AEMLink(env, url);
   await data.getAuthorRealUrl(tab);
-
-  // TODO: make headers to be taken from page without fetch on author pages
-
-  console.log(data);
 
   return new Promise((resolve, reject) => {
     (async function Main() {
@@ -32,7 +27,7 @@ const toEnvironment = async function (tab, url, env, newTab) {
       if (data.market === "") {
         if (data.fastAuthor) {
           const regexFastAuthor = /com\/(?:(editor\.html|cf#)\/)?content/gm;
-          url = url.replace(regexFastAuthor, `com/${this.env}/content`);
+          url = url.replace(regexFastAuthor, `com/${data.env}/content`);
 
           ifOpenNewTab(url);
           return;
@@ -224,9 +219,7 @@ const executeOnEachTab = async function (func, newTab, ...args) {
     currentWindow: true,
   });
   for (const tab of tabs) {
-    const regexDeleteEnv = /\/(?:editor\.html|cf#)/gm;
-    const tabUrl = tab.url.replace(regexDeleteEnv, "");
-    await func(tab, tabUrl, ...args, newTab);
+    await func(tab, tab.url, ...args, newTab);
   }
 
   browser.runtime.sendMessage({
@@ -386,11 +379,7 @@ browser.runtime.onInstalled.addListener(function () {
 });
 
 const menusOnClick = async function (info) {
-  const tabs = await browser.tabs.query({
-    active: true,
-    currentWindow: true,
-  });
-  const tab = tabs[0];
+  const tab = await getCurrentTab();
 
   switch (info.menuItemId) {
     case "openInDAM": {

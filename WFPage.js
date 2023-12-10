@@ -105,34 +105,31 @@ window.UsefulLinks = async function () {
   );
   const ULinkContainer = container.cloneNode(false);
 
-  const data = AEMLink;
+  const data = new AEMLink(classic);
 
-  data.market = url.replace(regexWorkflow, "$1").toLowerCase();
+  data.market = data.fixMarket(url.replace(regexWorkflow, "$1").toLowerCase());
   data.localLanguage = url.replace(regexWorkflow, "$2$3").toLowerCase();
 
   const wrongMarkets = ["da", "cs", "el"];
-  const ifWrongMarket = function () {
-    return !!wrongMarkets.some((mar) => data.market.includes(mar));
-  };
-  if (ifWrongMarket()) {
+  const ifWrongMarket = !!wrongMarkets.some((mar) => data.market.includes(mar));
+
+  if (ifWrongMarket) {
     [data.market, data.localLanguage] = [data.localLanguage, data.market];
   }
 
   data.isMarketInBeta();
-  data.env = classic;
+  console.log(data);
 
-  const swapLocalLangMarkets = ["at", "dk"];
-  const ifSwapLocalLangMarkets = function () {
-    return !swapLocalLangMarkets.some((mar) => data.market.includes(mar));
-  };
+  /*const swapLocalLangMarkets = ["at", "dk"];
+  const ifSwapLocalLangMarkets = !swapLocalLangMarkets.some((mar) =>
+    data.market.includes(mar)
+  );*/
 
-  const marketPath = `/content/guxeu${data.beta}/${data.fixMarket()}/${
-    data.betaBool && ifSwapLocalLangMarkets()
-      ? data.market
-      : data.fixLocalLanguage()
-  }_${
-    data.betaBool && ifSwapLocalLangMarkets() ? data.localLanguage : data.market
-  }`;
+  // TODO: check how does this behave on other markets
+
+  const marketPath = `/content/guxeu${data.beta}/${
+    data.market
+  }/${data.fixLocalLanguage()}_${data.fixMarket()}`;
 
   if (!data.betaBool) {
     addDisclosure(true);

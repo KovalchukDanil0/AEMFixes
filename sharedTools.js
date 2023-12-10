@@ -48,7 +48,7 @@ const regexJira = /jira\.uhub\.biz\/browse\//gm;
 
 const regexRemoveSpaces = /^\s+|\s+$|\s+(?=\s)/gm;
 
-const AEMLink = function (url, toEnv = null) {
+const AEMLink = function (toEnv, url = null) {
   this.env = "";
   this.market = "";
   this.localLanguage = "";
@@ -198,31 +198,39 @@ const AEMLink = function (url, toEnv = null) {
       return this.urlPart;
     }
 
-    // TODO: fix headers sometimes not given correctly
+    let html = null;
+    const currTabUrl = (await getCurrentTab()).url;
+    if (!currTabUrl.match(regexAuthor)) {
+      const regexDeleteEnv = /\/(?:editor\.html|cf#)/gm;
+      const toEnvUrl = url.replace(regexDeleteEnv, "");
 
-    console.log(url);
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": "request",
-      },
-    });
-    const html = await response.text();
+      const response = await fetch(toEnvUrl, {
+        headers: {
+          "User-Agent": "request",
+        },
+        timeout: 5000,
+      });
+      html = await response.text();
+    }
 
     const callback = await browser.tabs.sendMessage(tab.id, {
       from: "background",
-      subject: "DOMParser",
-      selector: 'head > meta[name="og:url"]',
-      property: "content",
+      subject: "getRealUrl",
       html,
     });
-
     this.urlPart = this.fixUrlPart(callback);
+
     return this.urlPart;
   };
 
   if (new.target) {
-    if (toEnv !== null) {
-      this.env = toEnv;
+    if (toEnv === null) {
+      throw new Error("env is not defined!");
+    }
+    this.env = toEnv;
+
+    if (url === null) {
+      return;
     }
 
     const parser = new URL(url);
@@ -280,6 +288,8 @@ const AEMLink = function (url, toEnv = null) {
     }
 
     return this;
+  } else {
+    throw new Error("AEMLink should only be used with new!");
   }
 };
 
@@ -317,20 +327,24 @@ const getElementByXpath = function (path) {
   ).singleNodeValue;
 };
 
-const waitForElm = function (selector) {
+const waitForElm = function (selector, doc = null) {
+  if (doc === null) {
+    doc = document;
+  }
+
   return new Promise((resolve) => {
-    if (document.querySelector(selector)) {
-      return resolve(document.querySelector(selector));
+    if (doc.querySelector(selector)) {
+      return resolve(doc.querySelector(selector));
     }
 
     const observer = new MutationObserver(() => {
-      if (document.querySelector(selector)) {
-        resolve(document.querySelector(selector));
+      if (doc.querySelector(selector)) {
+        resolve(doc.querySelector(selector));
         observer.disconnect();
       }
     });
 
-    observer.observe(document.body, {
+    observer.observe(doc.body, {
       childList: true,
       subtree: true,
     });
@@ -360,29 +374,10 @@ const copyTextToClipboard = function (text) {
   document.body.removeChild(copyFrom);
 };
 
-browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  if (msg.from === "background") {
-    if (msg.subject === "DOMParser") {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(msg.html, "text/html");
-      const elm = doc.querySelector(msg.selector);
-
-      console.log(doc);
-
-      sendResponse(elm[msg.property]);
-    }
-
-    if (msg.subject === "writeToClipboard") {
-      copyTextToClipboard(msg.text);
-
-      if (msg.showMessage) {
-        browser.runtime.sendMessage({
-          from: "background",
-          subject: "showMessage",
-          message: `LINKS COPIED TO CLIPBOARD:\n ${msg.text}`,
-          time: 5000,
-        });
-      }
-    }
-  }
-});
+const getCurrentTab = async function () {
+  const tabs = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  return tabs[0];
+};

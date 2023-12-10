@@ -28,6 +28,7 @@
       "js": [
         "./node_modules/webextension-polyfill/dist/browser-polyfill.js",
         "sharedTools.js",
+        "sharedListeners.js",
         "showAltTexts.js",
         "highlightHeading.js"
       ]
