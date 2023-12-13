@@ -13,3 +13,5 @@ Also more small changes such as DL showing in WL and blocking ticket appearing a
 AAnd my favorite part - replace boring 404 errors with funny kittens GIFs.
 
 and much more that I forgot.
+
+![alt text]([http://url/to/img.png](https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg)https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg)
