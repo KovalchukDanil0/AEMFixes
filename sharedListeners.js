@@ -1,5 +1,17 @@
+const copyTextToClipboard = function (text) {
+  const copyFrom = document.createElement("textarea");
+  copyFrom.textContent = text;
+  document.body.appendChild(copyFrom);
+
+  copyFrom.select();
+  document.execCommand("copy");
+
+  copyFrom.blur();
+  document.body.removeChild(copyFrom);
+};
+
 browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  if (msg.from !== "background") {
+  if (msg.from === "context") {
     return;
   }
 

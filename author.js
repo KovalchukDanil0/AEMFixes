@@ -125,8 +125,13 @@ window.ticketFinder = async function () {
   warningBar.appendChild(a);
 };
 
-(function Main() {
+(async function Main() {
+  const savedData = await loadSavedData();
+
+  if (savedData.enableFunErr) {
+    catErrors();
+  }
+
   //fixAuthorLink();
-  catErrors();
   ticketFinder();
 })();

@@ -362,18 +362,6 @@ const isFunction = function (functionToCheck) {
   );
 };
 
-const copyTextToClipboard = function (text) {
-  const copyFrom = document.createElement("textarea");
-  copyFrom.textContent = text;
-  document.body.appendChild(copyFrom);
-
-  copyFrom.select();
-  document.execCommand("copy");
-
-  copyFrom.blur();
-  document.body.removeChild(copyFrom);
-};
-
 const getCurrentTab = async function () {
   const tabs = await browser.tabs.query({
     active: true,
