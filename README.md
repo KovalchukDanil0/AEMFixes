@@ -14,4 +14,4 @@ AAnd my favorite part - replace boring 404 errors with funny kittens GIFs.
 
 and much more that I forgot.
 
-![alt text]([http://url/to/img.png](https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg)https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg)
+![alt text]([https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true](https://github.com/KovalchukDanil0/AEMFixes/blob/main/images/steampunk.jpg)https://github.com/KovalchukDanil0/AEMFixes/blob/main/images/steampunk.jpg)
