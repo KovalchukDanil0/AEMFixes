@@ -24,8 +24,9 @@ input:
 2. https://wwwperf-beta-couk.brandeulb.ford.com/cars/focus
 3. https://wwwperf.brandeuauthorlb.ford.com/editor.html/content/guxeu/be/fr_be/home/tous-modeles/mustang-mach-e.html
 4. https://www.ford.it/content/overlays/wizard-overlays/tdr  
+
 output (clicking to classic, with the shift held down):
-  
+
 1. https://wwwperf.brandeuauthorlb.ford.com/cf#/content/guxeu-beta/de/de_de/home/cars/kuga-dse.html
 2. https://wwwperf.brandeuauthorlb.ford.com/cf#/content/guxeu-beta/uk/en_gb/home/cars/new-focus.html
 3. https://wwwperf.brandeuauthorlb.ford.com/cf#/content/guxeu/be/fr_be/home/tous-modeles/mustang-mach-e.html
