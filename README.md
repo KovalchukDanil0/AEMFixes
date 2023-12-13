@@ -7,6 +7,9 @@ This project is designed to automate boring work like copying text or displaying
 "Break the AEM" image
 
 ## Features
+***some functions require their parameters to be enabled in options page***  
+![Options Button](tutorial/OptionsButton.png)  
+![Options Page](tutorial/OptionsPage.png)  
 
 ### Jira page
 - Automatically creating WF by creating simple button, in Jira ticket page, matching the interface:  
@@ -26,22 +29,39 @@ output (clicking to classic, with the shift held down):
 2. https://wwwperf.brandeuauthorlb.ford.com/cf#/content/guxeu-beta/uk/en_gb/home/cars/new-focus.html
 3. https://wwwperf.brandeuauthorlb.ford.com/cf#/content/guxeu/be/fr_be/home/tous-modeles/mustang-mach-e.html
 4. https://wwwperf.brandeuauthorlb.ford.com/cf#/content/guxeu-beta/it/it_it/site-wide-content/overlays/wizard-overlays/tdr.html
+- support auto-login (not using personal data)  
 ### Author page
 - Open Touch properties in a new tab without page reload needed:  
 ![Open Touch Properties](tutorial/OpenTouchProperties.png)  
-- Open author in AEM tree in a millisecond!!! Opens an already open page, if it exists:  
-![Open In AEM Tree](tutorial/OpenInAEMTree.png)  
+- Open author in DAM tree in a millisecond!!! Opens an already open page, if it exists:  
+![Open In DAM Tree](tutorial/OpenInDAMTree.png)  
 - Showing blocked ticket with link to it's parent ticket:  
-![Blocking Ticket](tutorial/BlockingTicket.png)  
-### Live&Author pages
+![Blocking Ticket](tutorial/BlockingTicket.png)
+- My favorite part is replacing borring error with kitten gif (if option enabled):  
+![Author Kitten 404](tutorial/AuthorKitten404.png)
+### Live&Perf pages
 - Auto-check mothersite links on page (hi Find&Replace);
-![Check Mothersite](tutorial/CheckMothersite.png)  
-- Get all alt text on a page (appeared at bottom);  
-- Highlight heading that support different headings count;  
-- Copy all highlighted links (with greater power comes greater responsibility);
-
-Also more small changes such as DL showing in WL and blocking ticket appearing at the top of a page.
-
-AAnd my favorite part - replace boring 404 errors with funny kittens GIFs.
+![Check Mothersite](tutorial/CheckMothersite.png)
+- most useful - car config is showing directly on page (working on all pages dynamically):  
+![Vechicle Code PV](tutorial/VechicleCodePV.png)  
+even working with CV on button hit:  
+![Vechicle Code CV](tutorial/VechicleCodeCV.png)
+### Workflow page
+- Auto pastle WF title from link  
+- Insert some userful links (DL, Market config, etc...) !early beta!  
+- Fixing all links in it to be in Touch UI  
+![WF Page](tutorial/WFPage.png)  
+### DAM Tree
+- if you link is MAV opening it in new window in touch UI  
+![DAM Tree Mav](tutorial/DAMTreeMav.png)
+### Context menu
+- Open image directly in DAM
+- Even faster transition between environments  
+![Context Menu](tutorial/ContextMenu.png)  
+### All other pages
+- Copy all highlighted links (with greater power comes greater responsibility)  
+![Copy All Links](tutorial/CopyAllLinks.png)  
+- Highlight headings  
+![Highlight Headings](tutorial/HighlightHeadings.png)  
 
 and much more that I forgot.
