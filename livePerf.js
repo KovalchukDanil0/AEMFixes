@@ -117,7 +117,7 @@ window.checkMothersite = function (from) {
     alert(messageText);
   } else {
     browser.runtime.sendMessage({
-      from: "background",
+      from: "context",
       subject: "showMessage",
       message: messageText,
       time: 5000,
