@@ -8,10 +8,13 @@ This project is designed to automate boring work like copying text or displaying
 
 ## Features
 
+### Jira page
 - Automatically creating WF by creating simple button, in Jira ticket page, matching the interface:  
 ![jira WF Button](tutorial/jiraWFButton.png)
 ![AEM Tools Create WF](tutorial/AEMToolsCreateWF.png)
-- Fast transition between environments, so you can jump from Live directly to Author (you can highlight multiple links pressing Shift):  
+- Auto fix attachment filters
+### Almost all AEM and ford.xx pages
+- Fast transition between environments, so you can jump from Live directly to Author (you can highlight multiple tabs pressing Shift):  
 ![Env Transition](tutorial/EnvTransition.png)  
 input:
 1. https://www.ford.de/fahrzeuge/ford-kuga
@@ -23,9 +26,16 @@ output (clicking to classic, with the shift held down):
 2. https://wwwperf.brandeuauthorlb.ford.com/cf#/content/guxeu-beta/uk/en_gb/home/cars/new-focus.html
 3. https://wwwperf.brandeuauthorlb.ford.com/cf#/content/guxeu/be/fr_be/home/tous-modeles/mustang-mach-e.html
 4. https://wwwperf.brandeuauthorlb.ford.com/cf#/content/guxeu-beta/it/it_it/site-wide-content/overlays/wizard-overlays/tdr.html
-- Open Touch properties without page reload needed;  
-- Open author in AEM tree in a millisecond!!!;  
-- Auto-check mothersite links on page (hi Find&Replace);  
+### Author page
+- Open Touch properties in a new tab without page reload needed:  
+![Open Touch Properties](tutorial/OpenTouchProperties.png)  
+- Open author in AEM tree in a millisecond!!! Opens an already open page, if it exists:  
+![Open In AEM Tree](tutorial/OpenInAEMTree.png)  
+- Showing blocked ticket with link to it's parent ticket:  
+![Blocking Ticket](tutorial/BlockingTicket.png)  
+### Live&Author pages
+- Auto-check mothersite links on page (hi Find&Replace);
+![Check Mothersite](tutorial/CheckMothersite.png)  
 - Get all alt text on a page (appeared at bottom);  
 - Highlight heading that support different headings count;  
 - Copy all highlighted links (with greater power comes greater responsibility);
