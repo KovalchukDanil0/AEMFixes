@@ -12,10 +12,10 @@ This project is designed to automate boring work like copying text or displaying
 ![Options Page](tutorial/OptionsPage.png)  
 
 ### Jira page
-- Automatically creating WF by creating simple button, in Jira ticket page, matching the interface:  
-![jira WF Button](tutorial/jiraWFButton.png)
-![AEM Tools Create WF](tutorial/AEMToolsCreateWF.png)
-- Auto fix attachment filters
+- Automatically creating WF by creating simple button, in Jira ticket page, matching the interface (can disable):  
+![jira WF Button](tutorial/jiraWFButton.png)  
+![AEM Tools Create WF](tutorial/AEMToolsCreateWF.png)  
+- Auto fix attachment filters (if option enabled)  
 ### Almost all AEM and ford.xx pages
 - Fast transition between environments, so you can jump from Live directly to Author (you can highlight multiple tabs pressing Shift):  
 ![Env Transition](tutorial/EnvTransition.png)  
@@ -40,12 +40,13 @@ output (clicking to classic, with the shift held down):
 - My favorite part is replacing borring error with kitten gif (if option enabled):  
 ![Author Kitten 404](tutorial/AuthorKitten404.png)
 ### Live&Perf pages
-- Auto-check mothersite links on page (hi Find&Replace);
+- Auto-check mothersite links on page (hi Find&Replace) (can disable);
 ![Check Mothersite](tutorial/CheckMothersite.png)
 - most useful - car config is showing directly on page (working on all pages dynamically):  
 ![Vechicle Code PV](tutorial/VechicleCodePV.png)  
 even working with CV on button hit:  
 ![Vechicle Code CV](tutorial/VechicleCodeCV.png)
+- Random programmer memes if page doesn't exist (if option enabled)  
 ### Workflow page
 - Auto pastle WF title from link  
 - Insert some userful links (DL, Market config, etc...) !early beta!  
