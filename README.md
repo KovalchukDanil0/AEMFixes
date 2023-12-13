@@ -14,4 +14,4 @@ AAnd my favorite part - replace boring 404 errors with funny kittens GIFs.
 
 and much more that I forgot.
 
-![alt text](/blob/main/images/armageddon.png)
+![alt text](images/armageddon.png)
