@@ -1,20 +1,7 @@
 const url = document.location.href;
 
-window.getLinksInWF = function () {
-  return document.querySelectorAll(".content-conf > .configSection > div a");
-};
-
-window.WFID = function () {
-  return url.replace(regexWorkflow, "$4");
-};
-
 window.insertAfter = function (newNode, existingNode) {
   existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
-};
-
-window.addBetaToLink = function (link) {
-  const regexDetermineBeta = /(.+)?(\/content\/guxeu(?:-beta)?\/(?:.+)?)/gm;
-  return link.replace(regexDetermineBeta, `$1/${touch}$2`);
 };
 
 // ! NOT USE, NOT WORKING AT ALL, VERY UNSTABLE!!!
@@ -79,7 +66,27 @@ window.AutoFillWF = function () {
 
 // \/etc\/workflow\/packages\/ESM\/FRFR\/ESM-157004(-\w+)?\.html
 
+// TODO: new nodes text changing bugged
 window.AddWFID = async function () {
+  const sectionSelector = ".page.section > .configSection > div a";
+
+  function getLinksInWF() {
+    return document.querySelectorAll(sectionSelector);
+  }
+
+  function getLinkInSection(node) {
+    return node.querySelector(sectionSelector);
+  }
+
+  function WFID() {
+    return url.replace(regexWorkflow, "$4");
+  }
+
+  window.addBetaToLink = function (link) {
+    const regexDetermineBeta = /(.+)?(\/content\/guxeu(?:-beta)?\/(?:.+)?)/gm;
+    return link.replace(regexDetermineBeta, `$1/${touch}$2`);
+  };
+
   const form = await waitForElm("#workflow-title-input");
 
   const WorkflowID = WFID();
@@ -89,6 +96,59 @@ window.AddWFID = async function () {
 
   const requestButton = document.querySelector("#start-request-workflow");
   requestButton.removeAttribute("disabled");
+
+  const wfContainer = await waitForElm(
+    "body > div.wrapper-conf > div > div > div > div > div.cq-element-filters"
+  );
+
+  function applySelector(selector, records) {
+    // We can't create a NodeList; let's use a Set
+    const result = new Set();
+    // Loop through the records...
+    for (const { addedNodes } of records) {
+      for (const node of addedNodes) {
+        // If it's an element...
+        if (node.nodeType === 1) {
+          // Add it if it's a match
+          if (node.matches(selector)) {
+            result.add(node);
+          }
+          // Add any children
+          addAll(result, node.querySelectorAll(selector));
+        }
+      }
+    }
+    return [...result]; // Result is an array, or just return the set
+  }
+
+  const observer = new MutationObserver(function (mutations) {
+    for (let i = 0, len = mutations.length; i < len; i++) {
+      const added = mutations[i].addedNodes;
+      for (let j = 0, lenAdded = added.length; j < lenAdded; j++) {
+        const node = added[j];
+
+        console.log(node);
+
+        editNode(node);
+      }
+    }
+  });
+
+  function editNode(node) {
+    const treeWalker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    let textNode;
+
+    while ((textNode = treeWalker.nextNode())) {
+      console.log(getLinkInSection(textNode));
+    }
+  }
+
+  observer.observe(wfContainer, {
+    childList: true,
+    subtree: true,
+    attributes: false,
+    characterData: false,
+  });
 };
 
 window.NewWFDesign = function () {
@@ -118,7 +178,6 @@ window.UsefulLinks = async function () {
   }
 
   data.isMarketInBeta();
-  console.log(data);
 
   /*const swapLocalLangMarkets = ["at", "dk"];
   const ifSwapLocalLangMarkets = !swapLocalLangMarkets.some((mar) =>
@@ -127,9 +186,8 @@ window.UsefulLinks = async function () {
 
   // TODO: check how does this behave on other markets
 
-  const marketPath = `/content/guxeu${data.beta}/${
-    data.market
-  }/${data.fixLocalLanguage()}_${data.fixMarket()}`;
+  const marketPath = `/content/guxeu${data.beta}/${data.market}`;
+  const marketLocalLangPart = `/${data.fixLocalLanguage()}_${data.fixMarket()}`;
 
   if (!data.betaBool) {
     addDisclosure(true);
@@ -142,12 +200,26 @@ window.UsefulLinks = async function () {
     addDisclosure();
   }
 
+  addMarketConfig();
+
   function addDisclosure(acc = false) {
     const disclosureLibrary = `/site-wide-content/${
       acc ? "acc-" : ""
-    }disclosure-library.html`;
+    }disclosure-library`;
 
-    const fullPath = `${marketPath}${disclosureLibrary}`;
+    const fullPath = marketPath + marketLocalLangPart + disclosureLibrary;
+    addElem(fullPath);
+  }
+
+  function addMarketConfig() {
+    const marketConfigPath = "/configuration/market-configuration";
+
+    const fullPath = marketPath + marketConfigPath;
+    addElem(fullPath);
+  }
+
+  function addElem(fullPath) {
+    fullPath += ".html";
 
     const a = document.createElement("a");
     a.href = `/${data.env}${fullPath}`;

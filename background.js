@@ -26,8 +26,20 @@ const toEnvironment = async function (tab, url, env, newTab) {
     function determineEnv() {
       if (data.market === "") {
         if (data.fastAuthor) {
-          const regexFastAuthor = /com\/(?:(editor\.html|cf#)\/)?content/gm;
-          url = url.replace(regexFastAuthor, `com/${data.env}/content`);
+          const regexFastAuthor =
+            /(.+wwwperf\.brandeu(author)?)(lb\.ford\.com\/)((?:editor\.html|cf#)\/)?(content(?:.+?(html)|.+)?)/gm;
+
+          const notContainsaAuthor =
+            url.replace(regexFastAuthor, "$2") !== "author";
+          const notContainsaHtml =
+            url.replace(regexFastAuthor, "$6") !== "html";
+
+          url = url.replace(
+            regexFastAuthor,
+            `$1${notContainsaAuthor ? "author" : ""}$3${data.env + "/"}$5${
+              notContainsaHtml ? ".html" : ""
+            }`
+          );
 
           ifOpenNewTab(url);
           return;

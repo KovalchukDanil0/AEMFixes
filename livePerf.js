@@ -1,6 +1,10 @@
 const url = window.location.href;
 
-window.ReplaceByRandElmArray = function (elm, replaceArray) {
+let wizardVehicleSelector;
+let vehicleConfig;
+let lastVehicleIndex = -1;
+
+/*window.ReplaceByRandElmArray = function (elm, replaceArray) {
   let string = elm.textContent;
   string = string.replace(/\S+/gm, function () {
     let replacedString =
@@ -13,7 +17,7 @@ window.ReplaceByRandElmArray = function (elm, replaceArray) {
   });
 
   return string;
-};
+};*/
 
 window.randomProgrammerMemes = async function () {
   if (document.title !== "404") {
@@ -125,29 +129,48 @@ window.getCarByName = function (data, value) {
   return data.filter((el) => el.desc === value)[0];
 };
 
-window.findVehicleCode = async function () {
-  const wizardVehicleSelector = document.querySelector(
-    ".wizard-vehicle-selector"
-  );
-  if (wizardVehicleSelector === null) {
+window.vehicleCodeInit = async function () {
+  wizardVehicleSelector = document.querySelector(".wizard-vehicle-selector");
+  if (wizardVehicleSelector !== null) {
+    await waitForElm(
+      "div.category-buttons > div.category-buttons-container > button.ng-binding.ng-scope"
+    );
+    const buttons = wizardVehicleSelector.querySelectorAll(
+      "div.category-buttons > div.category-buttons-container > button.ng-binding.ng-scope"
+    );
+
+    for (let index = 0; index < buttons.length; index++) {
+      const but = buttons[index];
+      but.addEventListener("click", () => findVehicleCode(index));
+    }
+
+    findVehicleCode();
+  }
+};
+
+window.findVehicleCode = async function (idx = 0) {
+  if (lastVehicleIndex === idx) {
     return;
   }
+  lastVehicleIndex = idx;
 
-  const config = await browser.runtime.sendMessage({
-    from: "context",
-    subject: "getHAR",
-  });
-  if (config === null) {
-    return;
+  if (vehicleConfig === null || vehicleConfig === undefined) {
+    const config = await browser.runtime.sendMessage({
+      from: "context",
+      subject: "getHAR",
+    });
+    if (config === null) {
+      return;
+    }
+
+    const response = await fetch(config, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    vehicleConfig = await response.json();
   }
-
-  const response = await fetch(config, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
-  });
-  const vehicleConfig = await response.json();
 
   const allCars = wizardVehicleSelector.querySelectorAll(
     "div.vehicle-list > figure > div > figcaption > a"
@@ -155,7 +178,7 @@ window.findVehicleCode = async function () {
 
   allCars.forEach((car) => {
     const carName = car.textContent.replace(regexRemoveSpaces, "");
-    const carObj = getCarByName(vehicleConfig.data[0].eventItem, carName);
+    const carObj = getCarByName(vehicleConfig.data[idx].eventItem, carName);
 
     const wersCode = carObj?.wersCode;
     if (carObj == null || wersCode === "" || wersCode == null) {
@@ -198,5 +221,5 @@ browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
     randomProgrammerMemes();
   }
 
-  findVehicleCode();
+  vehicleCodeInit();
 })();

@@ -96,12 +96,11 @@ window.fixAuthorLink = function () {
   }
 };
 
+// #issuetable > tbody > tr> td.stsequence > div.subtask-done
 window.ticketFinder = async function () {
-  const data = AEMLink(url);
+  const data = new AEMLink(classic, url);
 
-  const warningBar = await waitForElm(
-    `${GUX3() ? "#accelerator-page" : "#global-ux"} > div.workflows-warning-bar`
-  );
+  const warningBar = await waitForElm("div.workflows-warning-bar");
 
   const regexRemoveCommas = /.+(ESM-\d\d\d\d\d\d?).+/gm;
   const blockingTicket = warningBar
@@ -109,6 +108,7 @@ window.ticketFinder = async function () {
     .textContent.replace(regexRemoveCommas, "$1");
 
   const a = document.createElement("a");
+  a.style.cursor = "pointer";
 
   const fullPath = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicket}#view-subtasks`;
 
@@ -118,7 +118,6 @@ window.ticketFinder = async function () {
   a.appendChild(linkText);
 
   a.addEventListener("click", async function () {
-    alert(data.market);
     await browser.storage.local.set({ SearchSubTask: data.market });
     window.open(fullPath, "_blank");
   });
