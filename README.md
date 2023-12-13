@@ -12,7 +12,7 @@ This project is designed to automate boring work like copying text or displaying
 ![Options Page](tutorial/OptionsPage.png)  
 
 ### Jira page
-- Automatically creating WF by creating simple button, in Jira ticket page, matching the interface (can disable):  
+- Automatically creating WF by adding simple button, in Jira ticket page, matching the interface (can disable):  
 ![jira WF Button](tutorial/jiraWFButton.png)  
 ![AEM Tools Create WF](tutorial/AEMToolsCreateWF.png)  
 - Auto fix attachment filters (if option enabled)  
