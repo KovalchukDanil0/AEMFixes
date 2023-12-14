@@ -48,8 +48,8 @@ output (clicking to classic, with the shift held down):
 ### Author page
 - Open Touch properties in a new tab without page reload needed:  
 ![Open Touch Properties](tutorial/OpenTouchProperties.png)  
-- Open author in DAM tree in a millisecond!!! Opens an already open page, if it exists:  
-![Open In DAM Tree](tutorial/OpenInDAMTree.png)  
+- Open author in AEM tree in a millisecond!!! Opens an already open page, if it exists:  
+![Open In AEM Tree](tutorial/OpenInAEMTree.png)  
 - Showing blocked ticket with link to its parent ticket:  
 ![Blocking Ticket](tutorial/BlockingTicket.png)
 - My favorite part is replacing boring error with kitten gif (if option enabled):  
