@@ -6,6 +6,18 @@ This project is designed to automate boring work like copying text or displaying
 
 "Break the AEM" image
 
+## Installation
+You can just download it throught chrome web store  
+https://chromewebstore.google.com/detail/aemfixes/enncmomonbnjkpljcmahbooohommdmnk  
+but it always be outdated, so I recommended go throught those steps:  
+- First of all you need to download ZIP from GitHub, just hit the buttons that shown in the picture  
+![Download ZIP](tutorial/DownloadZIP.png)  
+- Unpack ZIP to any folder (Documents recommended)  
+- Then go to the extension dashboard (as marked in red in the picture)  
+![Extension Settings](tutorial/ExtensionSettings.png)  
+- And enable developer mode (right top corner), hit load unpacked, and finally load the extension, hitting open folder, that you unpacked (should be node_modules folder in it)  
+![Load Extension](tutorial/LoadExtension.png)  
+
 ## Features
 ***some functions require their parameters to be enabled in options page***  
 ![Options Button](tutorial/OptionsButton.png)  
