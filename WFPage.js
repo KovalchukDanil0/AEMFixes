@@ -101,26 +101,6 @@ window.AddWFID = async function () {
     "body > div.wrapper-conf > div > div > div > div > div.cq-element-filters"
   );
 
-  function applySelector(selector, records) {
-    // We can't create a NodeList; let's use a Set
-    const result = new Set();
-    // Loop through the records...
-    for (const { addedNodes } of records) {
-      for (const node of addedNodes) {
-        // If it's an element...
-        if (node.nodeType === 1) {
-          // Add it if it's a match
-          if (node.matches(selector)) {
-            result.add(node);
-          }
-          // Add any children
-          addAll(result, node.querySelectorAll(selector));
-        }
-      }
-    }
-    return [...result]; // Result is an array, or just return the set
-  }
-
   const observer = new MutationObserver(function (mutations) {
     for (let i = 0, len = mutations.length; i < len; i++) {
       const added = mutations[i].addedNodes;

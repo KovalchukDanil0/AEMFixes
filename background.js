@@ -201,7 +201,6 @@ const changeContentInTab = async function (regexToMatch, urlPart, content) {
       });
 
       foundExisting = true;
-      return;
     }
   });
 
@@ -325,6 +324,8 @@ browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
     } else {
       msg.func(...msg.args);
     }
+
+    return false;
   }
 
   if (msg.from === "context" && msg.subject === "getHAR") {
@@ -339,6 +340,8 @@ browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
 
     return true;
   }
+
+  return false;
 });
 
 browser.runtime.onInstalled.addListener(function () {

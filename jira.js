@@ -53,17 +53,6 @@ window.marketFromTitle = function (title) {
 window.textToWFPath = function (market, localLanguage, title) {
   let fullPath;
 
-  const WFPathFromTitle = function () {
-    market = marketFromTitle();
-    localLanguage = title.replace(regexWFTitle, "$2");
-
-    if (localLanguage === "") {
-      fullPath = market + market;
-    } else {
-      fullPath = `${market}/${market}${localLanguage}`;
-    }
-  };
-
   const belgium = function () {
     switch (localLanguage) {
       case "Dutch":
@@ -73,7 +62,7 @@ window.textToWFPath = function (market, localLanguage, title) {
         fullPath += `/${fullPath}FR`;
         break;
       default:
-        WFPathFromTitle();
+        wfPathFromTitle();
         break;
     }
   };
@@ -90,7 +79,7 @@ window.textToWFPath = function (market, localLanguage, title) {
         fullPath += `/${fullPath}IT`;
         break;
       default:
-        WFPathFromTitle();
+        wfPathFromTitle();
         break;
     }
   };
@@ -159,12 +148,23 @@ window.textToWFPath = function (market, localLanguage, title) {
       fullPath = "LULU";
       break;
     default:
-      WFPathFromTitle();
+      wfPathFromTitle();
       break;
     // FOE
     // FMNY
     // FMNYDE
     // MS
+  }
+
+  function wfPathFromTitle() {
+    market = marketFromTitle();
+    localLanguage = title.replace(regexWFTitle, "$2");
+
+    if (localLanguage === "") {
+      fullPath = market + market;
+    } else {
+      fullPath = `${market}/${market}${localLanguage}`;
+    }
   }
 
   return fullPath;

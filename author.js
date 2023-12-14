@@ -3,32 +3,6 @@ const url =
     ? window.parent.location.href + window.parent.location.hash
     : window.location.href;
 
-browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  if (msg.from === "background" && msg.subject === "getAlias") {
-    (async () => {
-      const urlPart =
-        /(?:[\s\S]*)?Your real URL will be : \.\.\. \/(home|site-wide-content)(\S+)?(?:[\s\S]*)/gm;
-
-      let realUrl = await waitForElm(
-        "#accelerator-page > div.info-banner > div:nth-child(1)"
-      );
-
-      let content = "";
-      if (realUrl.textContent.replace(urlPart, "$1") === "site-wide-content") {
-        content = "/content";
-      }
-      realUrl = realUrl.textContent.replace(urlPart, content + "$2");
-
-      sendResponse(realUrl);
-    })();
-
-    // Important! Return true to indicate you want to send a response asynchronously
-    return true;
-  }
-
-  return false;
-});
-
 window.catErrors = async function () {
   const savedData = await loadSavedData();
   if (!savedData.enableFunErr) {

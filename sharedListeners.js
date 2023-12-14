@@ -43,5 +43,9 @@ browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         time: 5000,
       });
     }
+
+    return false;
   }
+
+  return false;
 });
