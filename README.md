@@ -7,9 +7,9 @@ This project is designed to automate boring work like copying text or displaying
 "Break the AEM" image
 
 ## Installation
-You can just download it throught chrome web store  
+You can just download it through chrome web store  
 https://chromewebstore.google.com/detail/aemfixes/enncmomonbnjkpljcmahbooohommdmnk  
-but it always be outdated, so I recommended go throught those steps:  
+but it always be updated, so I recommend go through those steps:  
 - First of all you need to download ZIP from GitHub, just hit the buttons that shown in the picture  
 ![Download ZIP](tutorial/DownloadZIP.png)  
 - Unpack ZIP to any folder (Documents recommended)  
@@ -49,12 +49,12 @@ output (clicking to classic, with the shift held down):
 ![Open Touch Properties](tutorial/OpenTouchProperties.png)  
 - Open author in DAM tree in a millisecond!!! Opens an already open page, if it exists:  
 ![Open In DAM Tree](tutorial/OpenInDAMTree.png)  
-- Showing blocked ticket with link to it's parent ticket:  
+- Showing blocked ticket with link to its parent ticket:  
 ![Blocking Ticket](tutorial/BlockingTicket.png)
-- My favorite part is replacing borring error with kitten gif (if option enabled):  
+- My favorite part is replacing boring error with kitten gif (if option enabled):  
 ![Author Kitten 404](tutorial/AuthorKitten404.png)
 ### Live&Perf pages
-- Auto-check mothersite links on page (hi Find&Replace) (can disable);
+- Autocheck mothersite links on page (Hi Find & Replace) (can disable);  
 ![Check Mothersite](tutorial/CheckMothersite.png)
 - most useful - car config is showing directly on page (working on all pages dynamically):  
 ![Vechicle Code PV](tutorial/VechicleCodePV.png)  
@@ -62,8 +62,8 @@ even working with CV on button hit:
 ![Vechicle Code CV](tutorial/VechicleCodeCV.png)
 - Random programmer memes if page doesn't exist (if option enabled)  
 ### Workflow page
-- Auto pastle WF title from link  
-- Insert some userful links (DL, Market config, etc...) !early beta!  
+- Auto insert WF title from the link  
+- Insert some useful links (DL, Market config, etc...) !early beta!  
 - Fixing all links in it to be in Touch UI  
 ![WF Page](tutorial/WFPage.png)  
 ### DAM Tree
