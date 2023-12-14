@@ -351,8 +351,13 @@ const waitForElm = function (selector, doc = null) {
 };
 
 const loadSavedData = async function () {
-  const savedData = await browser.storage.sync.get("savedData");
-  return savedData.savedData;
+  const savedData = await browser.storage.sync.get({
+    disCreateWF: false,
+    disMothersiteCheck: false,
+    enableFunErr: false,
+    enableFiltreFix: false,
+  });
+  return savedData;
 };
 
 const isFunction = function (functionToCheck) {
