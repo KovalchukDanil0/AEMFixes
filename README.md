@@ -10,7 +10,7 @@ This project is designed to automate boring work like copying text or displaying
 ***!!!After installation first of all go to the options page and hit save!!!***  
 You can just download it through chrome web store  
 https://chromewebstore.google.com/detail/aemfixes/enncmomonbnjkpljcmahbooohommdmnk  
-but it always be updated, so I recommend go through those steps:  
+but it always be outdated, so I recommend go through those steps:  
 - First of all you need to download ZIP from GitHub, just hit the buttons that shown in the picture  
 ![Download ZIP](tutorial/DownloadZIP.png)  
 - Unpack ZIP to any folder (Documents recommended)  
