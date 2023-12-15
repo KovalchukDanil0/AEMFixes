@@ -4,6 +4,8 @@ let wizardVehicleSelector;
 let vehicleConfig;
 let lastVehicleIndex = -1;
 
+let showroomConfig;
+
 /*window.ReplaceByRandElmArray = function (elm, replaceArray) {
   let string = elm.textContent;
   string = string.replace(/\S+/gm, function () {
@@ -204,6 +206,62 @@ window.findVehicleCode = async function (idx = 0) {
   });
 };
 
+window.findShowroomCode = async function () {
+  const showroom = await waitForElm("#acc-showroom");
+  if (showroom === null) {
+    return;
+  }
+
+  if (showroomConfig === null || showroomConfig === undefined) {
+    const config = await browser.runtime.sendMessage({
+      from: "context",
+      subject: "getShowroomConfig",
+    });
+    if (config === null) {
+      return;
+    }
+
+    const response = await fetch(config, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    showroomConfig = await response.json();
+  }
+
+  const dataJSON = showroomConfig.data;
+
+  const container = document.createElement("div");
+  container.classList.add(
+    "box",
+    "box-black-background",
+    "image",
+    "image-color-white",
+    "box-regular-top-padding",
+    "box-regular-bottom-padding",
+    "box-small-left-right-padding"
+  );
+  showroom.appendChild(container);
+
+  for (const key in dataJSON) {
+    if (Object.hasOwn(dataJSON, key)) {
+      const element = dataJSON[key];
+
+      const name = document.createElement("h3");
+      name.innerText = element.name;
+      container.appendChild(name);
+
+      const code = document.createElement("p");
+      code.innerText = element.code;
+      container.appendChild(code);
+
+      const breakLine = document.createElement("br");
+      container.appendChild(breakLine);
+    }
+  }
+};
+
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "popup" && msg.subject === "checkMothersite") {
     checkMothersite(msg.from);
@@ -222,4 +280,5 @@ browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   }
 
   vehicleCodeInit();
+  findShowroomCode();
 })();

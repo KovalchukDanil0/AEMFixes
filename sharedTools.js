@@ -21,7 +21,7 @@ const regexLive =
 const regexPerfProd =
   /(?:.+)?www(perf|prod)(?:-beta)?-(\w\w)(\w\w)?\.brandeulb\.ford\.com(?:.+)?/gm;
 const regexAuthor =
-  /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(?:(\w\w)_\w\w|configuration)\/(?:.*?))(?:html)?$/gm;
+  /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(?:(\w\w)_\w\w|configuration)\/(?:.*?))(?:\.html)?$/gm;
 
 const touch = "editor.html";
 const classic = "cf#";
@@ -350,14 +350,14 @@ const waitForElm = function (selector, doc = null) {
   });
 };
 
-const loadSavedData = async function () {
-  const savedData = await browser.storage.sync.get({
+const loadSavedData = function () {
+  return browser.storage.sync.get({
     disCreateWF: false,
     disMothersiteCheck: false,
     enableFunErr: false,
     enableFiltreFix: false,
+    enableAutoLogin: false,
   });
-  return savedData;
 };
 
 const isFunction = function (functionToCheck) {

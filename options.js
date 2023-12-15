@@ -9,7 +9,9 @@ const saveOptions = function () {
     savedData[input.id] = input.checked;
   });
 
-  browser.storage.sync.set({ savedData });
+  console.log(savedData);
+
+  browser.storage.sync.set(savedData);
 
   const status = document.getElementById("status");
   status.textContent = "Options saved.";
@@ -29,6 +31,7 @@ const restoreOptions = async function () {
 
   settings.forEach((input) => {
     input.checked = savedData[input.id];
+    console.log(savedData[input.id]);
   });
 };
 

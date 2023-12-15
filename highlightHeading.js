@@ -60,8 +60,11 @@ window.highlightHeading = function () {
 
   function initializeHeadings() {
     for (const h in headings) {
-      headings[h].elements = [...document.body.querySelectorAll(h)];
-      headings[h].count = headings[h].elements.length;
+      if (Object.hasOwn(headings, h)) {
+        const element = headings[h];
+        element.elements = [...document.body.querySelectorAll(h)];
+        element.count = headings[h].elements.length;
+      }
     }
   }
 

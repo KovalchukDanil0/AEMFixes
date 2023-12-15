@@ -164,8 +164,6 @@ window.UsefulLinks = async function () {
     data.market.includes(mar)
   );*/
 
-  // TODO: check how does this behave on other markets
-
   const marketPath = `/content/guxeu${data.beta}/${data.market}`;
   const marketLocalLangPart = `/${data.fixLocalLanguage()}_${data.fixMarket()}`;
 

@@ -139,4 +139,7 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
 
     buttonOnClick("#buttonOpenInTree", "openInTree", false, true, tab);
   }
+
+  /* const test = document.querySelector("#test");
+  test.innerHTML = "hjhg"; */
 })();

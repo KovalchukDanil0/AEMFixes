@@ -241,6 +241,7 @@ const executeOnEachTab = async function (func, newTab, ...args) {
   });
 };
 
+let showroomConfig = null;
 let vehicleConfig = null;
 (async function getHAR() {
   /* Keep track of the active tab in each window */
@@ -263,7 +264,7 @@ let vehicleConfig = null;
         return;
       }
 
-      const notInteresting = Object.keys(activeTabs).every(function (key) {
+      Object.keys(activeTabs).every(function (key) {
         if (activeTabs[key] === details.tabId) {
           /* We are interested in this request */
           const url = details.url;
@@ -273,16 +274,16 @@ let vehicleConfig = null;
             vehicleConfig = url;
           }
 
+          const regexShowroomConfig = /showroom\/\w\w_\w\w\/product\/pv/gm;
+          if (url.match(regexShowroomConfig)) {
+            showroomConfig = url;
+          }
+
           return false;
         } else {
           return true;
         }
       });
-
-      if (notInteresting) {
-        /* We are not interested in this request */
-        // Just ignore this one
-      }
     },
     { urls: ["<all_urls>"] }
   );
@@ -328,17 +329,32 @@ browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
     return false;
   }
 
-  if (msg.from === "context" && msg.subject === "getHAR") {
-    const intervalID = setInterval(function () {
-      if (vehicleConfig === null) {
-        return;
-      }
+  if (msg.from === "context") {
+    if (msg.subject === "getHAR") {
+      const intervalID = setInterval(function () {
+        if (vehicleConfig === null) {
+          return;
+        }
 
-      sendResponse(vehicleConfig);
-      clearInterval(intervalID);
-    }, 1000);
+        sendResponse(vehicleConfig);
+        clearInterval(intervalID);
+      }, 1000);
 
-    return true;
+      return true;
+    }
+
+    if (msg.subject === "getShowroomConfig") {
+      const intervalID = setInterval(function () {
+        if (showroomConfig === null) {
+          return;
+        }
+
+        sendResponse(showroomConfig);
+        clearInterval(intervalID);
+      }, 1000);
+
+      return true;
+    }
   }
 
   return false;

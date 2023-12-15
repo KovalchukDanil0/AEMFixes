@@ -56,6 +56,10 @@ window.autoLogIn = function () {
   });
 };
 
-(function Main() {
-  autoLogIn();
+(async function Main() {
+  const savedData = await loadSavedData();
+
+  if (savedData.enableAutoLogin) {
+    autoLogIn();
+  }
 })();
