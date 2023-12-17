@@ -82,17 +82,12 @@ window.AddWFID = async function () {
     return url.replace(regexWorkflow, "$4");
   }
 
-  window.addBetaToLink = function (link) {
-    const regexDetermineBeta = /(.+)?(\/content\/guxeu(?:-beta)?\/(?:.+)?)/gm;
-    return link.replace(regexDetermineBeta, `$1/${touch}$2`);
-  };
-
   const form = await waitForElm("#workflow-title-input");
 
   const WorkflowID = WFID();
 
   form.value = WorkflowID;
-  getLinksInWF().forEach((data) => (data.href = addBetaToLink(data.href)));
+  getLinksInWF().forEach((link) => link.addBetaToLink());
 
   const requestButton = document.querySelector("#start-request-workflow");
   requestButton.removeAttribute("disabled");

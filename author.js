@@ -99,6 +99,62 @@ window.ticketFinder = async function () {
   warningBar.appendChild(a);
 };
 
+let refGot = false;
+window.checkReferences = async function () {
+  if (refGot) {
+    return;
+  }
+
+  const encodedURL = encodeURIComponent(url.replace(regexAuthor, "$2"));
+  const config = `https://wwwperf.brandeuauthorlb.ford.com/bin/wcm/references?_charset_=utf-8&path=${encodedURL}&predicate=wcmcontent&exact=false`;
+  console.log(config);
+  const response = await fetch(config, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const refConfig = await response.json();
+
+  const page = GUX3();
+  const container = document.createElement("div");
+  container.addSharedDivClasses();
+  page.insertBefore(container, page.firstChild);
+
+  const pageLinksArr = [];
+  for (const pageRef of refConfig.pages) {
+    const pagePath = pageRef.path + ".html";
+
+    const regexWrongPages =
+      /content\/(?:launches|guxeu(?:-beta)?\/(?:training-tree|\w\w)\/\w\w_\w\w\/home\/(?:sandbox)?)/gm;
+    if (!pagePath.match(regexWrongPages)) {
+      pageLinksArr.push(pagePath);
+    }
+  }
+
+  pageLinksArr.sort((a, b) => a.localeCompare(b));
+  pageLinksArr.forEach((pagePath) => {
+    const pageLink = document.createElement("a");
+    pageLink.href = pagePath;
+    pageLink.target = "_blank";
+    pageLink.textContent = pagePath;
+    pageLink.classList.add("cta-secondary-chevron-right");
+    pageLink.addBetaToLink();
+    container.appendChild(pageLink);
+
+    const breakLine = document.createElement("br");
+    container.appendChild(breakLine);
+  });
+
+  refGot = true;
+};
+
+browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
+  if (msg.from === "popup" && msg.subject === "checkReferences") {
+    checkReferences();
+  }
+});
+
 (async function Main() {
   const savedData = await loadSavedData();
 

@@ -9,6 +9,7 @@ window.ShowAltTexts = function () {
     noAltText.innerHTML = "This image is decoration";
 
     const altTextContainer = document.createElement("div");
+    altTextContainer.addSharedDivClasses();
     altTextContainer.classList.add("altTextExist");
 
     for (const element of imgElements) {

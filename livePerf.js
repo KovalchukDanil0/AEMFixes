@@ -45,8 +45,6 @@ window.randomProgrammerMemes = async function () {
       const memeImage = jsonData[generateRandom(count - 1)].path;
 
       const data = new AEMLink(url);
-      console.log(data.fixMarket());
-      console.log(data);
 
       let billboardContainer = null;
       let billboardImages = [];
@@ -233,15 +231,7 @@ window.findShowroomCode = async function () {
   const dataJSON = showroomConfig.data;
 
   const container = document.createElement("div");
-  container.classList.add(
-    "box",
-    "box-black-background",
-    "image",
-    "image-color-white",
-    "box-regular-top-padding",
-    "box-regular-bottom-padding",
-    "box-small-left-right-padding"
-  );
+  container.addSharedDivClasses();
   showroom.appendChild(container);
 
   for (const key in dataJSON) {
@@ -278,6 +268,11 @@ browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (savedData.enableFunErr) {
     randomProgrammerMemes();
   }
+
+  /* let incorrectData = false;
+  if (ifPerfProd(url)) {
+    incorrectData = true;
+  } */
 
   vehicleCodeInit();
   findShowroomCode();

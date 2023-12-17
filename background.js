@@ -7,7 +7,7 @@ try {
   throw new Error(e);
 }
 
-const toEnvironment = async function (tab, url, env, newTab) {
+const toEnvironment = async function (tab, url, newTab, env) {
   const data = new AEMLink(env, url);
   await data.getAuthorRealUrl(tab);
 
@@ -147,80 +147,33 @@ const toEnvironment = async function (tab, url, env, newTab) {
   });
 };
 
-const openPropertiesTouchUI = async function () {
+const changeContentInTab = async function (content, urlPattern) {
   const tabs = await browser.tabs.query({
-    active: true,
     currentWindow: true,
-  });
-  const tab = tabs[0];
-
-  const newUrl = tab.url.replace(
-    regexAuthor,
-    "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$2"
-  );
-
-  browser.tabs.create({
-    url: newUrl,
-    index: tab.index + 1,
-  });
-};
-
-const copyAllLinks = async function () {
-  let highlightedPageLinks = "";
-
-  const tabs = await browser.tabs.query({
-    highlighted: true,
-    currentWindow: true,
+    url: urlPattern,
   });
 
-  for (const element of tabs) {
-    const tab = element;
-    highlightedPageLinks += tab.url + "\n\n";
-  }
+  let tab;
+  const newUrl = `${urlPattern}#${content}`;
+  if (tabs.length !== 0) {
+    tab = tabs[0];
 
-  browser.tabs.sendMessage(tabs[0].id, {
-    from: "background",
-    subject: "writeToClipboard",
-    text: highlightedPageLinks,
-    showMessage: true,
-  });
-};
-
-const changeContentInTab = async function (regexToMatch, urlPart, content) {
-  let tabs = await browser.tabs.query({ currentWindow: true });
-
-  const newUrl = urlPart + content;
-
-  let foundExisting = false;
-  tabs.forEach((tab) => {
-    if (tab.url.match(regexToMatch)) {
-      browser.tabs.highlight({ tabs: tab.index });
-
-      browser.tabs.update(tab.id, {
-        url: newUrl,
-      });
-
-      foundExisting = true;
-    }
-  });
-
-  if (!foundExisting) {
-    tabs = await browser.tabs.query({
-      currentWindow: true,
-      active: true,
+    browser.tabs.highlight({ tabs: tab.index });
+    browser.tabs.update(tab.id, {
+      url: newUrl,
     });
-    const tab = tabs[0];
-
+  } else {
+    tab = await getCurrentTab();
     browser.tabs.create({ url: newUrl, index: tab.index + 1 });
   }
 };
 
-const openInTree = function (authorTab) {
-  const authorUrl = authorTab.url.replace(regexAuthor, "$2");
+const openInTree = async function (authorUrl) {
+  authorUrl = authorUrl.replace(regexAuthor, "$2");
+
   changeContentInTab(
-    regexAEMTree,
-    "https://wwwperf.brandeuauthorlb.ford.com/siteadmin#",
-    authorUrl
+    authorUrl,
+    "https://wwwperf.brandeuauthorlb.ford.com/siteadmin"
   );
 };
 
@@ -230,7 +183,7 @@ const executeOnEachTab = async function (func, newTab, ...args) {
     currentWindow: true,
   });
   for (const tab of tabs) {
-    await func(tab, tab.url, ...args, newTab);
+    await func(tab, tab.url, newTab, ...args);
   }
 
   browser.runtime.sendMessage({
@@ -299,34 +252,18 @@ let vehicleConfig = null;
 })();
 
 browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
-  if (msg.from === "popup" && msg.subject === "buttonClick") {
-    switch (msg.func) {
-      case "toEnvironment":
-        msg.func = toEnvironment;
-        break;
-      case "openPropertiesTouchUI":
-        msg.func = openPropertiesTouchUI;
-        break;
-      case "highlightHeading":
-        msg.func = highlightHeading;
-        break;
-      case "copyAllLinks":
-        msg.func = copyAllLinks;
-        break;
-      case "openInTree":
-        msg.func = openInTree;
-        break;
-      default:
-        throw new Error(`${msg.func} function doesn't exist`);
+  if (msg.from === "popup") {
+    if (msg.subject === "toEnvironment") {
+      executeOnEachTab(toEnvironment, msg.newTab, msg.env);
+
+      return false;
     }
 
-    if (!msg.once) {
-      executeOnEachTab(msg.func, msg.newTab, ...msg.args);
-    } else {
-      msg.func(...msg.args);
-    }
+    if (msg.subject === "openInTree") {
+      openInTree(msg.tab.url);
 
-    return false;
+      return false;
+    }
   }
 
   if (msg.from === "context") {
@@ -365,6 +302,12 @@ browser.runtime.onInstalled.addListener(function () {
     title: "Open content in DAM",
     contexts: ["image"],
     id: "openInDAM",
+  });
+
+  browser.contextMenus.create({
+    title: "Open content in AEM tree",
+    contexts: ["link"],
+    id: "openInAEM",
   });
 
   const parent = browser.contextMenus.create({
@@ -419,27 +362,29 @@ const menusOnClick = async function (info) {
       const imagePath = info.srcUrl.replace(regexImagePicker, "$1");
 
       changeContentInTab(
-        regexDAMTree,
-        "https://wwwperf.brandeuauthorlb.ford.com/damadmin#",
-        imagePath
+        imagePath,
+        "https://wwwperf.brandeuauthorlb.ford.com/damadmin"
       );
 
       break;
     }
+    case "openInAEM":
+      openInTree(info.linkUrl);
+      break;
     case "toLive":
-      toEnvironment(tab, info.linkUrl, "live", true);
+      toEnvironment(tab, info.linkUrl, true, "live");
       break;
     case "toPerf":
-      toEnvironment(tab, info.linkUrl, "perf", true);
+      toEnvironment(tab, info.linkUrl, true, "perf");
       break;
     case "toProd":
-      toEnvironment(tab, info.linkUrl, "prod", true);
+      toEnvironment(tab, info.linkUrl, true, "prod");
       break;
     case "toTouch":
-      toEnvironment(tab, info.linkUrl, touch, true);
+      toEnvironment(tab, info.linkUrl, true, touch);
       break;
     case "toClassic":
-      toEnvironment(tab, info.linkUrl, classic, true);
+      toEnvironment(tab, info.linkUrl, true, classic);
       break;
     default:
       break;

@@ -99,5 +99,7 @@ output (clicking to classic, with the shift held down):
   ![Copy All Links](tutorial/CopyAllLinks.png)
 - Highlight headings  
   ![Highlight Headings](tutorial/HighlightHeadings.png)
+- Show Alt Text
+  ![Show Alt Text](tutorial/ShowAltText.png)
 
 and much more that I forgot.

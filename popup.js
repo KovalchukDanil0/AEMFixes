@@ -16,130 +16,169 @@ window.showMessage = function (message, time) {
   }
 };
 
-window.buttonOnClick = function (selector, func, showLoading, once, ...args) {
-  const button = document.querySelector(selector);
-  button.disabled = false;
+window.buttonOnClick = async function (but) {
+  const tab = await getCurrentTab();
+  const tabUrl = tab.url;
 
-  button.addEventListener("click", function () {
-    if (showLoading) {
-      button.classList.add("is-loading");
-    }
+  const ifJira = tabUrl.match(regexJira);
+  const ifLive = tabUrl.match(regexLive);
 
-    if (typeof func === "function") {
-      func(...args);
-    } else {
-      browser.runtime.sendMessage({
-        once,
-        func,
-        args,
-        from: "popup",
-        subject: "buttonClick",
-        newTab: false,
-      });
-    }
-  });
-  button.addEventListener("auxclick", function (e) {
+  const ifAuthor = tabUrl.match(regexAuthor);
+  const ifClassic = tabUrl.replace(regexAuthor, "$1") === classic;
+  const ifTouch = tabUrl.replace(regexAuthor, "$1") === touch;
+
+  const ifAnyOfTheEnv = ifLive || ifPerfProd(tabUrl) || ifAuthor;
+
+  let sendAsTab = false;
+  const message = {
+    tab,
+    env: "",
+    func: null,
+    from: "popup",
+    subject: "toEnvironment",
+    newTab: false,
+  };
+
+  const properties = {
+    buttonCreateWF() {
+      sendAsTab = true;
+      message.subject = "createWF";
+      return ifJira;
+    },
+    buttonCheckMothersite() {
+      sendAsTab = true;
+      message.subject = "checkMothersite";
+      return ifLive || ifPerfProd(tabUrl);
+    },
+    buttonShowAltTexts() {
+      sendAsTab = true;
+      message.subject = "showAltTexts";
+      return true;
+    },
+    buttonHighlightHeading() {
+      sendAsTab = true;
+      message.subject = "highlightHeading";
+      return true;
+    },
+    buttonCheckReferences() {
+      sendAsTab = true;
+      message.subject = "checkReferences";
+      return ifAuthor;
+    },
+    buttonOpenInTree() {
+      message.subject = "openInTree";
+      return ifAuthor;
+    },
+    buttonCopyAllLinks() {
+      message.func = copyAllLinks;
+      return true;
+    },
+    buttonOpenPropertiesTouchUI() {
+      message.func = openPropertiesTouchUI;
+      return ifAuthor;
+    },
+    buttonToLive() {
+      message.env = "live";
+      return ifAnyOfTheEnv;
+    },
+    buttonToPerf() {
+      message.env = "perf";
+      return ifAnyOfTheEnv;
+    },
+    buttonToProd() {
+      message.env = "prod";
+      return ifAnyOfTheEnv;
+    },
+    buttonToClassic() {
+      message.env = classic;
+      return !ifClassic && ifAnyOfTheEnv;
+    },
+    buttonToTouch() {
+      message.env = touch;
+      return !ifTouch && ifAnyOfTheEnv;
+    },
+  };
+  const checkButton = properties[but.id];
+  if (checkButton !== undefined && !checkButton()) {
+    but.style.display = "none";
+    return;
+  }
+
+  but.addEventListener("click", sendMessage);
+
+  but.addEventListener("auxclick", function (e) {
     if (e.button !== 1) {
       return;
     }
+    message.newTab = true;
 
-    if (showLoading) {
-      button.classList.add("is-loading");
-    }
+    sendMessage();
+  });
 
-    if (typeof func === "function") {
-      func(...args);
+  function sendMessage() {
+    if (typeof message.func === "function") {
+      message.func(tab);
     } else {
-      browser.runtime.sendMessage({
-        once,
-        func,
-        args,
-        from: "popup",
-        subject: "buttonClick",
-        newTab: true,
-      });
+      //but.classList.add("is-loading");
+
+      if (sendAsTab) {
+        browser.tabs.sendMessage(tab.id, message);
+      } else {
+        browser.runtime.sendMessage(message);
+      }
     }
-  });
+  }
 };
 
-window.createWF = function (tab) {
-  browser.tabs.sendMessage(tab.id, {
-    from: "popup",
-    subject: "createWF",
+window.copyAllLinks = async function () {
+  let highlightedPageLinks = "";
+
+  const tabs = await browser.tabs.query({
+    highlighted: true,
+    currentWindow: true,
   });
+
+  for (const element of tabs) {
+    const tab = element;
+    highlightedPageLinks += tab.url + "\n\n";
+  }
+
+  browser.tabs.sendMessage(tabs[0].id, {
+    from: "popup",
+    subject: "writeToClipboard",
+    text: highlightedPageLinks,
+  });
+
+  showMessage(`LINKS COPIED TO CLIPBOARD:\n ${highlightedPageLinks}`, 5000);
 };
 
-window.checkMothersite = function (tab) {
-  browser.tabs.sendMessage(tab.id, {
-    from: "popup",
-    subject: "checkMothersite",
-  });
-};
+window.openPropertiesTouchUI = async function () {
+  const tab = await getCurrentTab();
 
-window.showAltText = function (tab) {
-  browser.tabs.sendMessage(tab.id, {
-    from: "popup",
-    subject: "showAltTexts",
-  });
-};
+  const newUrl = tab.url.replace(
+    regexAuthor,
+    "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$2"
+  );
 
-window.highlightHeading = function (tab) {
-  browser.tabs.sendMessage(tab.id, {
-    from: "popup",
-    subject: "highlightHeading",
+  browser.tabs.create({
+    url: newUrl,
+    index: tab.index + 1,
   });
 };
 
 browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
-  if (msg.from === "context" && msg.subject === "showMessage") {
+  if (msg.from === "popup") {
+    return;
+  }
+
+  if (msg.subject === "showMessage") {
     showMessage(msg.message, msg.time);
   }
 });
 
 (async function Main() {
-  const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-
-  const tab = tabs[0];
-
-  buttonOnClick("#buttonShowAltTexts", showAltText, false, true, tab);
-  buttonOnClick("#buttonHighlightHeading", highlightHeading, false, true, tab);
-  buttonOnClick("#buttonCopyAllLinks", "copyAllLinks", false, true);
-
-  const ifJira = tab.url.match(regexJira);
-  if (ifJira) {
-    buttonOnClick("#buttonCreateWF", createWF, false, false, tab);
-    return;
-  }
-
-  /*let ifPerf = url.replace(regexPerfProd, "$1") == "perf";
-  let ifProd = url.replace(regexPerfProd, "$1") == "prod";*/
-
-  const ifLive = tab.url.match(regexLive);
-  const ifPerfProd = tab.url.match(regexPerfProd);
-
-  if (ifLive || ifPerfProd) {
-    buttonOnClick("#buttonCheckMothersite", checkMothersite, false, true, tab);
-  }
-
-  const ifAuthor = tab.url.match(regexAuthor);
-
-  buttonOnClick("#buttonToLive", "toEnvironment", true, false, "live");
-  buttonOnClick("#buttonToPerf", "toEnvironment", true, false, "perf");
-  buttonOnClick("#buttonToProd", "toEnvironment", true, false, "prod");
-  buttonOnClick("#buttonToClassic", "toEnvironment", true, false, classic);
-  buttonOnClick("#buttonToTouch", "toEnvironment", true, false, touch);
-
-  if (ifAuthor) {
-    buttonOnClick(
-      "#buttonOpenPropertiesTouchUI",
-      "openPropertiesTouchUI",
-      false,
-      true
-    );
-
-    buttonOnClick("#buttonOpenInTree", "openInTree", false, true, tab);
-  }
-
-  /* const test = document.querySelector("#test");
-  test.innerHTML = "hjhg"; */
+  const buttons = document.querySelectorAll("button.button");
+  buttons.forEach((but) => {
+    buttonOnClick(but);
+  });
 })();

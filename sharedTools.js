@@ -1,3 +1,5 @@
+const isBackground = location.protocol === "chrome-extension:";
+
 const regexWorkflow =
   /(?:.+)?wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/workflow\/packages\/ESM\/(\w\w)(?:_)?(\w\w)?(?:\/\w\w(\w\w))?\/(.+)\.html(?:.+)?/gm;
 const regexWCMWorkflows =
@@ -26,6 +28,8 @@ const regexAuthor =
 const touch = "editor.html";
 const classic = "cf#";
 
+const ifPerfProd = (url) => url.match(regexPerfProd);
+
 const authorClassic = function (url) {
   return url.replace(regexAuthor, "$1") === classic;
 };
@@ -34,13 +38,15 @@ const authorTouch = function (url) {
 };
 
 const GUX3 = function () {
-  const page = document.getElementById("accelerator-page");
-  return page !== null;
+  return document.querySelector("#accelerator-page");
 };
 
 const GUX1 = function () {
-  const page = document.getElementById("global-ux");
-  return page !== null;
+  return document.querySelector("#global-ux");
+};
+
+const nextGen = function () {
+  return document.querySelector("#nextgen-page");
 };
 
 const regexJira = /jira\.uhub\.biz\/browse\//gm;
@@ -122,54 +128,98 @@ const AEMLink = function (toEnv, url = null) {
       this.localLanguage = someLocalLang;
     }
 
-    if (this.env === touch || this.env === classic) {
-      if (this.localLanguage === "") {
-        this.localLanguage = this.market;
+    const properties = function (env) {
+      let toAuthor = null;
+
+      if (new.target) {
+        toAuthor = env === touch || env === classic;
       }
 
-      switch (this.market) {
-        case "uk":
-        case "ie":
-          this.localLanguage = "en";
-          break;
-        case "lu":
-          this.localLanguage = "fr";
-          break;
-        case "at":
-          this.localLanguage = "de";
-          break;
-        case "dk":
-          this.localLanguage = "da";
-          break;
-        case "cz":
-          this.localLanguage = "cs";
-          break;
-        case "gr":
-          this.localLanguage = "el";
-          break;
-        default:
-          break;
-      }
-    } else {
-      switch (this.market) {
-        case "cz":
-        case "gr":
-        case "lu":
-        case "ie":
-        case "at":
-        case "dk":
-          this.localLanguage = "";
-          break;
-        case "uk":
-          this.localLanguage = "co";
-          break;
-        default:
-          break;
+      function changeMarket(author, other) {
+        if (toAuthor) {
+          return author;
+        } else {
+          return other;
+        }
       }
 
-      if (this.localLanguage === this.market) {
-        this.localLanguage = "";
-      }
+      this.uk = function () {
+        return changeMarket("en", "co");
+      };
+
+      this.ie = function () {
+        return changeMarket("en", "");
+      };
+
+      this.lu = function () {
+        return this.fr();
+      };
+
+      this.fr = function () {
+        return changeMarket("fr", "");
+      };
+
+      this.de = function () {
+        return changeMarket("de", "");
+      };
+
+      this.at = function () {
+        this.de();
+      };
+
+      this.dk = function () {
+        return changeMarket("da", "");
+      };
+
+      this.cz = function () {
+        return changeMarket("cs", "");
+      };
+
+      this.gr = function () {
+        return changeMarket("el", "");
+      };
+
+      this.fi = function () {
+        return changeMarket("fi", "");
+      };
+
+      this.hu = function () {
+        return changeMarket("hu", "");
+      };
+
+      this.ro = function () {
+        return changeMarket("ro", "");
+      };
+
+      this.es = function () {
+        return changeMarket("es", "");
+      };
+
+      this.nl = function () {
+        return changeMarket("nl", "");
+      };
+
+      this.it = function () {
+        return changeMarket("it", "");
+      };
+
+      this.no = function () {
+        return changeMarket("no", "");
+      };
+
+      this.pt = function () {
+        return changeMarket("pt", "");
+      };
+
+      this.pl = function () {
+        return changeMarket("pl", "");
+      };
+    };
+    const fixLLdata = new properties(this.env);
+
+    const funcProp = fixLLdata[this.market];
+    if (funcProp !== undefined) {
+      this.localLanguage = funcProp();
     }
 
     return this.localLanguage;
@@ -292,6 +342,29 @@ const AEMLink = function (toEnv, url = null) {
   }
 };
 
+if (!isBackground) {
+  HTMLElement.prototype.addSharedDivClasses = function () {
+    const commonClassesDiv = [
+      "box",
+      "box-black-background",
+      "box-regular-top-padding",
+      "box-regular-bottom-padding",
+      "box-small-left-right-padding",
+      "richtext-white",
+      "nextgen-white-color",
+    ];
+
+    commonClassesDiv.forEach((clas) => {
+      this.classList.add(clas);
+    });
+  };
+
+  HTMLElement.prototype.addBetaToLink = function () {
+    const regexDetermineBeta = /(.+)?(\/content\/guxeu(?:-beta)?\/(?:.+)?)/gm;
+    this.href = this.href.replace(regexDetermineBeta, `$1/${touch}$2`);
+  };
+}
+
 const ifWorkflow = function (url) {
   return url.match(regexWorkflow);
 };
@@ -366,10 +439,15 @@ const isFunction = function (functionToCheck) {
   );
 };
 
-const getCurrentTab = async function () {
+const getCurrentTab = async function (returnUrl = false) {
   const tabs = await browser.tabs.query({
     active: true,
     currentWindow: true,
   });
-  return tabs[0];
+  const tab = tabs[0];
+
+  if (returnUrl) {
+    return tab.url;
+  }
+  return tab;
 };
