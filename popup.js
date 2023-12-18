@@ -79,15 +79,15 @@ window.buttonOnClick = async function (but) {
     },
     buttonToLive() {
       message.env = "live";
-      return ifAnyOfTheEnv;
+      return !ifLive && ifAnyOfTheEnv;
     },
     buttonToPerf() {
       message.env = "perf";
-      return ifAnyOfTheEnv;
+      return !ifPerf(tabUrl) && ifAnyOfTheEnv;
     },
     buttonToProd() {
       message.env = "prod";
-      return ifAnyOfTheEnv;
+      return !ifProd(tabUrl) && ifAnyOfTheEnv;
     },
     buttonToClassic() {
       message.env = classic;

@@ -1,6 +1,6 @@
 const url =
   window.location !== window.parent.location
-    ? window.parent.location.href + window.parent.location.hash
+    ? window.parent.location.href
     : window.location.href;
 
 window.catErrors = async function () {
@@ -72,7 +72,8 @@ window.fixAuthorLink = function () {
 
 // #issuetable > tbody > tr> td.stsequence > div.subtask-done
 window.ticketFinder = async function () {
-  const data = new AEMLink(classic, url);
+  const data = new AEMLink("", url);
+  console.log(data);
 
   const warningBar = await waitForElm("div.workflows-warning-bar");
 

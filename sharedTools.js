@@ -29,6 +29,8 @@ const touch = "editor.html";
 const classic = "cf#";
 
 const ifPerfProd = (url) => url.match(regexPerfProd);
+const ifPerf = (url) => url.replace(regexPerfProd, "$1") === "perf";
+const ifProd = (url) => url.replace(regexPerfProd, "$1") === "prod";
 
 const authorClassic = function (url) {
   return url.replace(regexAuthor, "$1") === classic;
@@ -151,11 +153,11 @@ const AEMLink = function (toEnv, url = null) {
         return changeMarket("en", "");
       };
 
-      this.lu = function () {
-        return this.fr();
+      this.fr = function () {
+        return changeMarket("fr", "");
       };
 
-      this.fr = function () {
+      this.lu = function () {
         return changeMarket("fr", "");
       };
 
@@ -164,7 +166,7 @@ const AEMLink = function (toEnv, url = null) {
       };
 
       this.at = function () {
-        this.de();
+        return changeMarket("de", "");
       };
 
       this.dk = function () {

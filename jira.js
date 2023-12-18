@@ -206,22 +206,23 @@ window.FixSorting = function () {
 };
 
 window.openSubTask = async function () {
-  const ticketMarketToFound = await browser.storage.local.get({
-    SearchSubTask: "",
-  });
-
-  if (ticketMarketToFound["SearchSubTask"] === "") {
-    return;
-  }
-
   const allSubTasks = document.querySelectorAll(
     "#view-subtasks > div.mod-content > div > issuetable-web-component > table > tbody > tr > td.stsummary > a"
   );
+  // #issuetable > tbody > tr > td.stsequence > div:not(.subtask-done)
 
   let linkToOpen = null;
   if (allSubTasks.length === 1) {
     linkToOpen = allSubTasks[0].href;
   } else {
+    /* const ticketMarketToFound = await browser.storage.local.get({
+      SearchSubTask: "",
+    });
+
+    if (ticketMarketToFound["SearchSubTask"] === "") {
+      return;
+    }
+
     allSubTasks.forEach((subTask) => {
       const title = subTask.textContent;
       const market = marketFromTitle(title);
@@ -229,7 +230,7 @@ window.openSubTask = async function () {
       if (ticketMarketToFound === market.toLowerCase()) {
         linkToOpen = subTask.href;
       }
-    });
+    }); */
   }
 
   if (linkToOpen !== null) {

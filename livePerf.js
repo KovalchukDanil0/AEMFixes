@@ -44,13 +44,11 @@ window.randomProgrammerMemes = async function () {
       //Extracting data
       const memeImage = jsonData[generateRandom(count - 1)].path;
 
-      const data = new AEMLink(url);
-
       let billboardContainer = null;
       let billboardImages = [];
       let billboardText;
 
-      if (data.betaBool) {
+      if (GUX3() !== null) {
         billboardContainer =
           "#accelerator-page > div.content > div > div.box-content.cq-dd-image > div > div.billboard.billboard-image-sets-height > div > div.billboard-inner";
 
