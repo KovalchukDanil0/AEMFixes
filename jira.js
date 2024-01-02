@@ -56,7 +56,14 @@ window.ticketNumber = function () {
     }
   });
 
-  return ticketNumber + embargo;
+  let fix = "";
+
+  const ticketStatus = document.querySelector("#status-val > span").textContent;
+  if (RegExp(/deployment/i).exec(ticketStatus)) {
+    fix = "-FIX";
+  }
+
+  return ticketNumber + embargo + fix;
 };
 
 window.marketFromTitle = function (title) {

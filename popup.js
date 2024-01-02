@@ -29,9 +29,9 @@ window.buttonOnClick = async function (but) {
 
   const ifAnyOfTheEnv = ifLive || ifPerfProd(tabUrl) || ifAuthor;
 
-  let sendAsTab = false;
   const message = {
     tab,
+    tabUrl: "",
     env: "",
     func: null,
     from: "popup",
@@ -39,6 +39,8 @@ window.buttonOnClick = async function (but) {
     newTab: false,
   };
 
+  let sendAsTab = false;
+  let isForm = false;
   const properties = {
     buttonCreateWF() {
       sendAsTab = true;
@@ -97,10 +99,19 @@ window.buttonOnClick = async function (but) {
       message.env = touch;
       return !ifTouch && ifAnyOfTheEnv;
     },
+    linkOverride() {
+      message.tabUrl = but.value;
+      isForm = true;
+      return ifAnyOfTheEnv;
+    },
   };
   const checkButton = properties[but.id];
   if (checkButton !== undefined && !checkButton()) {
     but.style.display = "none";
+    return;
+  }
+
+  if (isForm) {
     return;
   }
 
@@ -181,4 +192,7 @@ browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
   buttons.forEach((but) => {
     buttonOnClick(but);
   });
+
+  const linkOverride = document.getElementById("linkOverride");
+  buttonOnClick(linkOverride);
 })();

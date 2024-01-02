@@ -177,23 +177,6 @@ const openInTree = async function (authorUrl) {
   );
 };
 
-const executeOnEachTab = async function (func, newTab, ...args) {
-  const tabs = await browser.tabs.query({
-    highlighted: true,
-    currentWindow: true,
-  });
-  for (const tab of tabs) {
-    await func(tab, tab.url, newTab, ...args);
-  }
-
-  browser.runtime.sendMessage({
-    from: "background",
-    subject: "showMessage",
-    message: "ALL GOOD!!!",
-    time: Number.MAX_VALUE,
-  });
-};
-
 let showroomConfig = null;
 let vehicleConfig = null;
 (async function getHAR() {
@@ -251,10 +234,31 @@ let vehicleConfig = null;
   });
 })();
 
+const executeOnEachTab = async function (func, newTab, ...args) {
+  const tabs = await browser.tabs.query({
+    highlighted: true,
+    currentWindow: true,
+  });
+  for (const tab of tabs) {
+    await func(tab, tab.url, newTab, ...args);
+  }
+
+  browser.runtime.sendMessage({
+    from: "background",
+    subject: "showMessage",
+    message: "ALL GOOD!!!",
+    time: Number.MAX_VALUE,
+  });
+};
+
 browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
   if (msg.from === "popup") {
     if (msg.subject === "toEnvironment") {
-      executeOnEachTab(toEnvironment, msg.newTab, msg.env);
+      if (msg.tabUrl !== "") {
+        toEnvironment(msg.tab, msg.tabUrl, msg.newTab, msg.env);
+      } else {
+        executeOnEachTab(toEnvironment, msg.newTab, msg.env);
+      }
 
       return false;
     }

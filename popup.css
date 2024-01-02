@@ -16,3 +16,9 @@ p {
     font-family: 'DO Futuristic', sans-serif;
     mix-blend-mode: difference;
 }
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
