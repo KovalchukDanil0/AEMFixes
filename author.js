@@ -127,7 +127,7 @@ window.checkReferences = async function () {
     const pagePath = pageRef.path + ".html";
 
     const regexWrongPages =
-      /content\/(?:launches|guxeu(?:-beta)?\/(?:training-tree|\w\w)\/\w\w_\w\w\/home\/(?:sandbox)?)/gm;
+      /content\/launches|content\/guxeu(?:-beta)?\/training-tree|content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w\/home\/sandbox/gm;
     if (!pagePath.match(regexWrongPages)) {
       pageLinksArr.push(pagePath);
     }
@@ -150,6 +150,28 @@ window.checkReferences = async function () {
   refGot = true;
 };
 
+window.monacoEditorInit = function (monacoCode) {
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute(
+    "src",
+    browser.runtime.getURL("monacoEditor/monacoEditor.html")
+  );
+
+  const message = { text: monacoCode };
+  postMessage(message);
+
+  iframe.setAttribute(
+    "style",
+    "border: 0px none; width: 100%; height: 100%; display: block;"
+  );
+  iframe.id = "monacoEditor";
+
+  const textarea = window.parent.document.querySelector(
+    "body > coral-dialog.cq-Dialog.coral3-Dialog.coral3-Dialog--backdropNone.cq-dialog-floating.is-open > div.coral3-Dialog-wrapper > form > coral-dialog-content > div > coral-tabview > coral-panelstack > coral-panel.coral3-Panel.is-selected > coral-panel-content > div > div > div > div.cq-RichText.richtext-container.coral-Form-field.coral-DecoratedTextfield > textarea"
+  );
+  textarea.replaceWith(iframe);
+};
+
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "popup" && msg.subject === "checkReferences") {
     checkReferences();
@@ -165,4 +187,18 @@ browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
 
   //fixAuthorLink();
   ticketFinder();
+
+  /* const intervalID = setInterval(function () {
+    const elm = window.parent.document.querySelector(
+      "body > coral-dialog.cq-Dialog.coral3-Dialog.coral3-Dialog--backdropNone.cq-dialog-floating.is-open > div.coral3-Dialog-wrapper > form > coral-dialog-content > div > coral-tabview > coral-panelstack > coral-panel.coral3-Panel.is-selected > coral-panel-content > div > div > div > div.cq-RichText.richtext-container.coral-Form-field.coral-DecoratedTextfield > input.coral-Form-field"
+    );
+    if (elm === null) {
+      return;
+    }
+
+    monacoEditorInit(elm.value);
+    // elm.value = "<p>Test</p>";
+
+    clearInterval(intervalID);
+  }, 1000); */
 })();

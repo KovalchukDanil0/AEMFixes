@@ -40,10 +40,23 @@ window.ticketTitle = function () {
 };
 
 window.ticketNumber = function () {
-  return document
+  const ticketNumber = document
     .querySelector("#parent_issue_summary")
     .getAttribute("data-issue-key")
     .match(/ESM-\w+/gm);
+
+  let embargo = "";
+
+  const labels = document.querySelectorAll(
+    "#wrap-labels > div > ul > li > a > span"
+  );
+  labels.forEach((label) => {
+    if (RegExp(/embargo/i).exec(label.textContent)) {
+      embargo = "-EMBARGO";
+    }
+  });
+
+  return ticketNumber + embargo;
 };
 
 window.marketFromTitle = function (title) {

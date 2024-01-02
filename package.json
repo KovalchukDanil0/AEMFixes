@@ -1,11 +1,8 @@
 {
   "dependencies": {
     "bulma": "^0.9.4",
-    "jquery": "^3.7.1",
+    "monaco-editor": "^0.45.0",
+    "requirejs": "^2.3.6",
     "webextension-polyfill": "^0.10.0"
-  },
-  "devDependencies": {
-    "@types/jquery": "^3.5.29",
-    "@types/webextension-polyfill": "^0.10.7"
   }
 }

@@ -352,9 +352,7 @@ browser.runtime.onInstalled.addListener(function () {
   });
 });
 
-const menusOnClick = async function (info) {
-  const tab = await getCurrentTab();
-
+const menusOnClick = async function (info, tab) {
   switch (info.menuItemId) {
     case "openInDAM": {
       const regexImagePicker =

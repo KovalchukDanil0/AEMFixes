@@ -352,6 +352,7 @@ if (!isBackground) {
       "box-regular-top-padding",
       "box-regular-bottom-padding",
       "box-small-left-right-padding",
+      "richtext",
       "richtext-white",
       "nextgen-white-color",
     ];

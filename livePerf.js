@@ -110,8 +110,17 @@ window.checkMothersite = function (from) {
   });
 
   const messageText = `MOTHERSITE LINKS ON THIS PAGE - ${mothersiteLinks}`;
+
   if (from === "content" && mothersiteLinks > 0) {
-    // TODO: replace wih popup
+    const divBoxAlert = document.createElement("div");
+    divBoxAlert.addSharedDivClasses();
+    divBoxAlert.id = "alertBanner";
+    divBoxAlert.style.textAlign = "center";
+    divBoxAlert.innerText = messageText;
+
+    const page = GUX3();
+    page.insertBefore(divBoxAlert, page.firstChild);
+
     alert(messageText);
   } else {
     browser.runtime.sendMessage({
@@ -197,6 +206,7 @@ window.findVehicleCode = async function (idx = 0) {
     const a = document.createElement("a");
     a.textContent = fullCode;
     a.href = `?vehicleCode=${fullCode}`;
+    a.classList.add("cta-pill", "cta-pill-primary");
 
     car.parentElement.appendChild(a);
   });
@@ -266,11 +276,6 @@ browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (savedData.enableFunErr) {
     randomProgrammerMemes();
   }
-
-  /* let incorrectData = false;
-  if (ifPerfProd(url)) {
-    incorrectData = true;
-  } */
 
   vehicleCodeInit();
   findShowroomCode();
