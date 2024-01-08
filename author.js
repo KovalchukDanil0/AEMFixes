@@ -150,15 +150,30 @@ window.checkReferences = async function () {
   refGot = true;
 };
 
-window.monacoEditorInit = function (monacoCode) {
+window.monacoEditorFind = async function () {
+  const selectorEditorWindow =
+    "body > coral-dialog.cq-Dialog.coral3-Dialog.coral3-Dialog--backdropNone.cq-dialog-floating.is-open > div.coral3-Dialog-wrapper > form > coral-dialog-content > div > coral-tabview > coral-panelstack";
+
+  const oldEditor = await waitForElm(
+    selectorEditorWindow +
+      " > coral-panel.coral3-Panel.is-selected > coral-panel-content > div > div > div > div.cq-RichText.richtext-container.coral-Form-field.coral-DecoratedTextfield > textarea",
+    window.parent.document
+  );
+
+  const hiddenEditor = window.parent.document.querySelector(
+    selectorEditorWindow +
+      " > coral-panel.coral3-Panel.is-selected > coral-panel-content > div > div > div > div.cq-RichText.richtext-container.coral-Form-field.coral-DecoratedTextfield > input.coral-Form-field"
+  );
+
+  monacoEditorInit(hiddenEditor.value, oldEditor);
+};
+
+window.monacoEditorInit = function (monacoCode, oldEditor) {
   const iframe = document.createElement("iframe");
   iframe.setAttribute(
     "src",
     browser.runtime.getURL("monacoEditor/monacoEditor.html")
   );
-
-  const message = { text: monacoCode };
-  postMessage(message);
 
   iframe.setAttribute(
     "style",
@@ -166,10 +181,10 @@ window.monacoEditorInit = function (monacoCode) {
   );
   iframe.id = "monacoEditor";
 
-  const textarea = window.parent.document.querySelector(
-    "body > coral-dialog.cq-Dialog.coral3-Dialog.coral3-Dialog--backdropNone.cq-dialog-floating.is-open > div.coral3-Dialog-wrapper > form > coral-dialog-content > div > coral-tabview > coral-panelstack > coral-panel.coral3-Panel.is-selected > coral-panel-content > div > div > div > div.cq-RichText.richtext-container.coral-Form-field.coral-DecoratedTextfield > textarea"
-  );
-  textarea.replaceWith(iframe);
+  oldEditor.replaceWith(iframe);
+  chrome.runtime.sendMessage({ from: "context", text: monacoCode });
+
+  monacoEditorFind();
 };
 
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
@@ -185,20 +200,10 @@ browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
     catErrors();
   }
 
+  if (savedData.enableMonacoEditor) {
+    monacoEditorFind();
+  }
+
   //fixAuthorLink();
   ticketFinder();
-
-  /* const intervalID = setInterval(function () {
-    const elm = window.parent.document.querySelector(
-      "body > coral-dialog.cq-Dialog.coral3-Dialog.coral3-Dialog--backdropNone.cq-dialog-floating.is-open > div.coral3-Dialog-wrapper > form > coral-dialog-content > div > coral-tabview > coral-panelstack > coral-panel.coral3-Panel.is-selected > coral-panel-content > div > div > div > div.cq-RichText.richtext-container.coral-Form-field.coral-DecoratedTextfield > input.coral-Form-field"
-    );
-    if (elm === null) {
-      return;
-    }
-
-    monacoEditorInit(elm.value);
-    // elm.value = "<p>Test</p>";
-
-    clearInterval(intervalID);
-  }, 1000); */
 })();

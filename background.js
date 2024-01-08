@@ -252,6 +252,8 @@ const executeOnEachTab = async function (func, newTab, ...args) {
 };
 
 browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
+  console.log(msg);
+
   if (msg.from === "popup") {
     if (msg.subject === "toEnvironment") {
       if (msg.tabUrl !== "") {
@@ -310,8 +312,14 @@ browser.runtime.onInstalled.addListener(function () {
 
   browser.contextMenus.create({
     title: "Open content in AEM tree",
-    contexts: ["link"],
+    contexts: ["link", "selection"],
     id: "openInAEM",
+  });
+
+  browser.contextMenus.create({
+    title: "Open content in TouchUI",
+    contexts: ["selection"],
+    id: "openInTouchUI",
   });
 
   const parent = browser.contextMenus.create({
@@ -370,9 +378,31 @@ const menusOnClick = async function (info, tab) {
 
       break;
     }
-    case "openInAEM":
-      openInTree(info.linkUrl);
+    case "openInAEM": {
+      let linkUrl;
+      if (info.selectionText !== undefined) {
+        console.log(info.selectionText);
+        linkUrl = `https://wwwperf.brandeuauthorlb.ford.com${info.selectionText}.html`;
+      } else {
+        linkUrl = info.linkUrl;
+      }
+
+      openInTree(linkUrl);
+
       break;
+    }
+    case "openInTouchUI": {
+      let content = info.selectionText;
+      const regexHTMLExist = /\.html(?:.+)?$/gm;
+      if (!content.match(regexHTMLExist)) {
+        content += ".html";
+      }
+
+      const newUrl = `https://wwwperf.brandeuauthorlb.ford.com/editor.html${content}`;
+      browser.tabs.create({ url: newUrl, index: tab.index + 1 });
+
+      break;
+    }
     case "toLive":
       toEnvironment(tab, info.linkUrl, true, "live");
       break;

@@ -402,11 +402,7 @@ const getElementByXpath = function (path) {
   ).singleNodeValue;
 };
 
-const waitForElm = function (selector, doc = null) {
-  if (doc === null) {
-    doc = document;
-  }
-
+const waitForElm = function (selector, doc = document) {
   return new Promise((resolve) => {
     if (doc.querySelector(selector)) {
       return resolve(doc.querySelector(selector));
@@ -433,6 +429,7 @@ const loadSavedData = function () {
     enableFunErr: false,
     enableFiltreFix: false,
     enableAutoLogin: false,
+    enableMonacoEditor: false,
   });
 };
 

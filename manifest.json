@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AEMFixes",
   "description": "Quality of Life changes for AEM",
-  "version": "2.0",
+  "version": "3.0",
   "author": "Danylo",
   "offline_enabled": false,
   "icons": {

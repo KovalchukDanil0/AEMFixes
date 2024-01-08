@@ -1,8 +1,13 @@
-window.addEventListener("message", monacoEditorInit);
+chrome.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
+  console.log(msg);
 
-function monacoEditorInit(event) {
-  const message = event.data;
+  if (msg.from === "context") {
+    console.log("gg");
+    monacoEditorInit(msg.text);
+  }
+});
 
+window.monacoEditorInit = function (value) {
   require.config({
     paths: {
       vs: "/node_modules/monaco-editor/min/vs",
@@ -11,9 +16,9 @@ function monacoEditorInit(event) {
 
   require(["vs/editor/editor.main"], async function () {
     const editor = monaco.editor.create(document.getElementById("container"), {
-      value: message.text,
+      value,
       language: "html",
       theme: "vs-dark",
     });
   });
-}
+};
