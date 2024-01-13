@@ -1,26 +1,5 @@
 const url = window.location.href;
 
-let wizardVehicleSelector;
-let vehicleConfig;
-let lastVehicleIndex = -1;
-
-let showroomConfig;
-
-/*window.ReplaceByRandElmArray = function (elm, replaceArray) {
-  let string = elm.textContent;
-  string = string.replace(/\S+/gm, function () {
-    let replacedString =
-      replaceArray[Math.floor(Math.random() * replaceArray.length)];
-
-    if (elm.tagName !== "P") {
-      replacedString = replacedString.toUpperCase();
-    }
-    return replacedString;
-  });
-
-  return string;
-};*/
-
 window.randomProgrammerMemes = async function () {
   if (document.title !== "404") {
     return;
@@ -116,12 +95,13 @@ window.checkMothersite = function (from) {
     divBoxAlert.addSharedDivClasses();
     divBoxAlert.id = "alertBanner";
     divBoxAlert.style.textAlign = "center";
-    divBoxAlert.innerText = messageText;
+
+    const p = document.createElement("p");
+    p.textContent = messageText;
+    divBoxAlert.appendChild(p);
 
     const page = GUX3();
     page.insertBefore(divBoxAlert, page.firstChild);
-
-    alert(messageText);
   } else {
     browser.runtime.sendMessage({
       from: "context",
@@ -136,24 +116,36 @@ window.getCarByName = function (data, value) {
   return data.filter((el) => el.desc === value)[0];
 };
 
+let wizardConfig;
+let wizardVehicleSelector;
+
 window.vehicleCodeInit = async function () {
+  const wizardWindow = "div.wizard.initialized-wizard.ng-scope > ";
+
+  wizardConfig = await waitForElm(wizardWindow + "span.configuration");
+
+  await waitForElm(
+    wizardWindow +
+      "div.ng-scope > div > div.steps-wrapper.full-view > div.wizard-vehicle-selector.ng-scope > div.vehicle-list > figure:nth-child(1)"
+  );
+
   wizardVehicleSelector = document.querySelector(".wizard-vehicle-selector");
-  if (wizardVehicleSelector !== null) {
-    await waitForElm(
-      "div.category-buttons > div.category-buttons-container > button.ng-binding.ng-scope"
-    );
-    const buttons = wizardVehicleSelector.querySelectorAll(
-      "div.category-buttons > div.category-buttons-container > button.ng-binding.ng-scope"
-    );
+  const buttonContainer = document.querySelector(
+    "div.category-buttons > div.category-buttons-container",
+    wizardVehicleSelector
+  );
 
-    for (let index = 0; index < buttons.length; index++) {
-      const but = buttons[index];
-      but.addEventListener("click", () => findVehicleCode(index));
-    }
-
-    findVehicleCode();
+  const butContChildren = buttonContainer.children;
+  for (let index = 0; index < butContChildren.length; index++) {
+    const but = butContChildren[index];
+    but.addEventListener("click", () => findVehicleCode(index));
   }
+
+  findVehicleCode();
 };
+
+let vehicleConfig;
+let lastVehicleIndex = -1;
 
 window.findVehicleCode = async function (idx = 0) {
   if (lastVehicleIndex === idx) {
@@ -162,13 +154,13 @@ window.findVehicleCode = async function (idx = 0) {
   lastVehicleIndex = idx;
 
   if (vehicleConfig === null || vehicleConfig === undefined) {
-    const config = await browser.runtime.sendMessage({
-      from: "context",
-      subject: "getHAR",
-    });
-    if (config === null) {
-      return;
-    }
+    const config = `${wizardConfig.getAttribute(
+      "data-nameplate-service"
+    )}/${wizardConfig.getAttribute(
+      "data-campaign-code"
+    )}/${wizardConfig.getAttribute("data-site-id")}/${wizardConfig.getAttribute(
+      "data-event-type"
+    )}?locale=${wizardConfig.getAttribute("data-culture-code")}`;
 
     const response = await fetch(config, {
       method: "GET",
@@ -180,61 +172,53 @@ window.findVehicleCode = async function (idx = 0) {
   }
 
   const allCars = wizardVehicleSelector.querySelectorAll(
-    "div.vehicle-list > figure > div > figcaption > a"
+    "div.vehicle-list > figure > div > figcaption > a:not(#carCode)"
   );
 
   allCars.forEach((car) => {
+    car.id = "carCode";
+
     const carName = car.textContent.replace(regexRemoveSpaces, "");
     const carObj = getCarByName(vehicleConfig.data[idx].eventItem, carName);
 
+    let carCode;
+
     const wersCode = carObj?.wersCode;
     if (carObj == null || wersCode === "" || wersCode == null) {
-      const p = document.createElement("p");
-      p.textContent = "NO DATA";
-      car.parentElement.appendChild(p);
+      carCode = document.createElement("p");
+      carCode.textContent = "NO DATA";
+    } else {
+      const wersDerivCode = carObj.wersDerivCode;
 
-      return;
+      let fullCode = carObj.wersCode;
+      if (wersDerivCode !== "") {
+        fullCode += `-${wersDerivCode}`;
+      }
+
+      carCode = document.createElement("a");
+      carCode.textContent = fullCode;
+      carCode.href = `?vehicleCode=${fullCode}`;
+      carCode.classList.add("cta-pill", "cta-pill-primary");
     }
 
-    const wersDerivCode = carObj.wersDerivCode;
-
-    let fullCode = carObj.wersCode;
-    if (wersDerivCode !== "") {
-      fullCode += `-${wersDerivCode}`;
-    }
-
-    const a = document.createElement("a");
-    a.textContent = fullCode;
-    a.href = `?vehicleCode=${fullCode}`;
-    a.classList.add("cta-pill", "cta-pill-primary");
-
-    car.parentElement.appendChild(a);
+    carCode.id = "carCode";
+    car.parentElement.appendChild(carCode);
   });
 };
 
 window.findShowroomCode = async function () {
   const showroom = await waitForElm("#acc-showroom");
-  if (showroom === null) {
-    return;
-  }
 
-  if (showroomConfig === null || showroomConfig === undefined) {
-    const config = await browser.runtime.sendMessage({
-      from: "context",
-      subject: "getShowroomConfig",
-    });
-    if (config === null) {
-      return;
-    }
+  const showroomElm = await waitForElm("#acc-showroom > span");
+  const config = showroomElm.getAttribute("data-bsl-url");
 
-    const response = await fetch(config, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    });
-    showroomConfig = await response.json();
-  }
+  const response = await fetch(config, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const showroomConfig = await response.json();
 
   const dataJSON = showroomConfig.data;
 

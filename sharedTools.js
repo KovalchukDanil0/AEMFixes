@@ -326,7 +326,8 @@ const AEMLink = function (toEnv, url = null) {
 
       isAuthor = true;
     } else {
-      throw new Error("Link doesn't math any of the env");
+      // throw new Error("Link doesn't math any of the env");
+      return;
     }
 
     this.isMarketInBeta();

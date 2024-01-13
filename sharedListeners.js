@@ -42,11 +42,9 @@ browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
 /* (async function Main() {
   const metaTitle = await waitForElm('head > meta[name="og:title"]');
-  console.log(metaTitle.content);
 
   const metaDescription = document.querySelector(
     'head > meta[name="og:description"]'
   );
-  console.log(metaDescription.content);
 })();
  */

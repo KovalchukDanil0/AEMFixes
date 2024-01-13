@@ -21,7 +21,7 @@
   "minimum_chrome_version": "92",
   "options_page": "options.html",
   "host_permissions": ["<all_urls>"],
-  "permissions": ["tabs", "storage", "contextMenus", "webRequest", "scripting"],
+  "permissions": ["tabs", "storage", "contextMenus"],
   "web_accessible_resources": [
     {
       "resources": ["monacoEditor/*", "node_modules/*"],

@@ -63,7 +63,7 @@ window.ticketNumber = function () {
     fix = "-FIX";
   }
 
-  return ticketNumber + embargo + fix;
+  return String(ticketNumber) + embargo + fix;
 };
 
 window.marketFromTitle = function (title) {
@@ -177,7 +177,7 @@ window.textToWFPath = function (market, localLanguage, title) {
   }
 
   function wfPathFromTitle() {
-    market = marketFromTitle();
+    market = marketFromTitle(title);
     localLanguage = title.replace(regexWFTitle, "$2");
 
     if (localLanguage === "") {

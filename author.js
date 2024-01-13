@@ -73,7 +73,6 @@ window.fixAuthorLink = function () {
 // #issuetable > tbody > tr> td.stsequence > div.subtask-done
 window.ticketFinder = async function () {
   const data = new AEMLink("", url);
-  console.log(data);
 
   const warningBar = await waitForElm("div.workflows-warning-bar");
 
@@ -82,19 +81,20 @@ window.ticketFinder = async function () {
     .querySelector("i:nth-child(3)")
     .textContent.replace(regexRemoveCommas, "$1");
 
+  const fullPath = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicket}#view-subtasks`;
+
   const a = document.createElement("a");
   a.style.cursor = "pointer";
-
-  const fullPath = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicket}#view-subtasks`;
+  a.href = fullPath;
 
   const linkText = document.createTextNode(
     `blocking parent ticket is ${fullPath}`
   );
   a.appendChild(linkText);
 
-  a.addEventListener("click", async function () {
-    await browser.storage.local.set({ SearchSubTask: data.market });
-    window.open(fullPath, "_blank");
+  // May not working when opening a new window
+  a.addEventListener("click", function () {
+    browser.storage.local.set({ SearchSubTask: data.market });
   });
 
   warningBar.appendChild(a);
@@ -108,7 +108,6 @@ window.checkReferences = async function () {
 
   const encodedURL = encodeURIComponent(url.replace(regexAuthor, "$2"));
   const config = `https://wwwperf.brandeuauthorlb.ford.com/bin/wcm/references?_charset_=utf-8&path=${encodedURL}&predicate=wcmcontent&exact=false`;
-  console.log(config);
   const response = await fetch(config, {
     method: "GET",
     headers: {
@@ -150,6 +149,7 @@ window.checkReferences = async function () {
   refGot = true;
 };
 
+let hiddenEditor;
 window.monacoEditorFind = async function () {
   const selectorEditorWindow =
     "body > coral-dialog.cq-Dialog.coral3-Dialog.coral3-Dialog--backdropNone.cq-dialog-floating.is-open > div.coral3-Dialog-wrapper > form > coral-dialog-content > div > coral-tabview > coral-panelstack";
@@ -160,15 +160,15 @@ window.monacoEditorFind = async function () {
     window.parent.document
   );
 
-  const hiddenEditor = window.parent.document.querySelector(
+  hiddenEditor = window.parent.document.querySelector(
     selectorEditorWindow +
       " > coral-panel.coral3-Panel.is-selected > coral-panel-content > div > div > div > div.cq-RichText.richtext-container.coral-Form-field.coral-DecoratedTextfield > input.coral-Form-field"
   );
 
-  monacoEditorInit(hiddenEditor.value, oldEditor);
+  monacoEditorInit(oldEditor);
 };
 
-window.monacoEditorInit = function (monacoCode, oldEditor) {
+window.monacoEditorInit = function (oldEditor) {
   const iframe = document.createElement("iframe");
   iframe.setAttribute(
     "src",
@@ -182,7 +182,11 @@ window.monacoEditorInit = function (monacoCode, oldEditor) {
   iframe.id = "monacoEditor";
 
   oldEditor.replaceWith(iframe);
-  chrome.runtime.sendMessage({ from: "context", text: monacoCode });
+  browser.runtime.sendMessage({
+    from: "context",
+    subject: "monacoEditorInit",
+    text: hiddenEditor.value,
+  });
 
   monacoEditorFind();
 };
@@ -190,6 +194,11 @@ window.monacoEditorInit = function (monacoCode, oldEditor) {
 browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg.from === "popup" && msg.subject === "checkReferences") {
     checkReferences();
+  }
+
+  if (msg.from === "monaco" && msg.subject === "saveMonaco") {
+    alert(msg.monacoValue);
+    hiddenEditor.value = msg.monacoValue;
   }
 });
 

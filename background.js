@@ -177,63 +177,6 @@ const openInTree = async function (authorUrl) {
   );
 };
 
-let showroomConfig = null;
-let vehicleConfig = null;
-(async function getHAR() {
-  /* Keep track of the active tab in each window */
-  const activeTabs = {};
-
-  browser.tabs.onActivated.addListener(function (details) {
-    activeTabs[details.windowId] = details.tabId;
-  });
-
-  /* Clear the corresponding entry, whenever a window is closed */
-  browser.windows.onRemoved.addListener(function (winId) {
-    delete activeTabs[winId];
-  });
-
-  /* Listen for web-requests and filter them */
-  browser.webRequest.onBeforeRequest.addListener(
-    function (details) {
-      if (details.tabId === -1) {
-        // Skipping request from non-tabbed context...
-        return;
-      }
-
-      Object.keys(activeTabs).every(function (key) {
-        if (activeTabs[key] === details.tabId) {
-          /* We are interested in this request */
-          const url = details.url;
-
-          const regexVehicleCode = /(?:SL1|KMI|TDR)\?locale=\w\w_\w\w/gm;
-          if (url.match(regexVehicleCode)) {
-            vehicleConfig = url;
-          }
-
-          const regexShowroomConfig = /showroom\/\w\w_\w\w\/product\/pv/gm;
-          if (url.match(regexShowroomConfig)) {
-            showroomConfig = url;
-          }
-
-          return false;
-        } else {
-          return true;
-        }
-      });
-    },
-    { urls: ["<all_urls>"] }
-  );
-
-  /* Get the active tabs in all currently open windows */
-  const activeTab = await browser.tabs.query({
-    active: true,
-  });
-
-  activeTab.forEach(function (tab) {
-    activeTabs[tab.windowId] = tab.id;
-  });
-})();
-
 const executeOnEachTab = async function (func, newTab, ...args) {
   const tabs = await browser.tabs.query({
     highlighted: true,
@@ -251,9 +194,7 @@ const executeOnEachTab = async function (func, newTab, ...args) {
   });
 };
 
-browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
-  console.log(msg);
-
+browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
   if (msg.from === "popup") {
     if (msg.subject === "toEnvironment") {
       if (msg.tabUrl !== "") {
@@ -261,46 +202,12 @@ browser.runtime.onMessage.addListener(function (msg, _sender, sendResponse) {
       } else {
         executeOnEachTab(toEnvironment, msg.newTab, msg.env);
       }
-
-      return false;
     }
 
     if (msg.subject === "openInTree") {
       openInTree(msg.tab.url);
-
-      return false;
     }
   }
-
-  if (msg.from === "context") {
-    if (msg.subject === "getHAR") {
-      const intervalID = setInterval(function () {
-        if (vehicleConfig === null) {
-          return;
-        }
-
-        sendResponse(vehicleConfig);
-        clearInterval(intervalID);
-      }, 1000);
-
-      return true;
-    }
-
-    if (msg.subject === "getShowroomConfig") {
-      const intervalID = setInterval(function () {
-        if (showroomConfig === null) {
-          return;
-        }
-
-        sendResponse(showroomConfig);
-        clearInterval(intervalID);
-      }, 1000);
-
-      return true;
-    }
-  }
-
-  return false;
 });
 
 browser.runtime.onInstalled.addListener(function () {
@@ -381,7 +288,6 @@ const menusOnClick = async function (info, tab) {
     case "openInAEM": {
       let linkUrl;
       if (info.selectionText !== undefined) {
-        console.log(info.selectionText);
         linkUrl = `https://wwwperf.brandeuauthorlb.ford.com${info.selectionText}.html`;
       } else {
         linkUrl = info.linkUrl;
