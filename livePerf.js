@@ -181,26 +181,27 @@ window.findVehicleCode = async function (idx = 0) {
     const carName = car.textContent.replace(regexRemoveSpaces, "");
     const carObj = getCarByName(vehicleConfig.data[idx].eventItem, carName);
 
-    let carCode;
+    let modelCode;
+    let versionCode;
 
-    const wersCode = carObj?.wersCode;
-    if (carObj == null || wersCode === "" || wersCode == null) {
-      carCode = document.createElement("p");
-      carCode.textContent = "NO DATA";
+    modelCode = carObj.wersCode;
+    if (modelCode === "" || modelCode == null) {
+      modelCode = carObj.modelCode;
+      versionCode = carObj.derivativeCode;
     } else {
-      const wersDerivCode = carObj.wersDerivCode;
-
-      let fullCode = carObj.wersCode;
-      if (wersDerivCode !== "") {
-        fullCode += `-${wersDerivCode}`;
-      }
-
-      carCode = document.createElement("a");
-      carCode.textContent = fullCode;
-      carCode.href = `?vehicleCode=${fullCode}`;
-      carCode.classList.add("cta-pill", "cta-pill-primary");
+      versionCode = carObj.wersDerivCode;
     }
 
+    let fullCode;
+    fullCode = modelCode;
+    if (versionCode !== "") {
+      fullCode += `-${versionCode}`;
+    }
+
+    const carCode = document.createElement("a");
+    carCode.textContent = fullCode;
+    carCode.href = `?vehicleCode=${fullCode}`;
+    carCode.classList.add("cta-pill", "cta-pill-primary");
     carCode.id = "carCode";
     car.parentElement.appendChild(carCode);
   });
