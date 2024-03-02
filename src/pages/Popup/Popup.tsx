@@ -230,8 +230,6 @@ function openPropertiesTouchUI(tab: Tabs.Tab) {
 }
 
 function showMessage(message: string, time: number) {
-  console.log(message);
-
   if (statusBar === undefined) {
     statusBar = document.getElementById("statusBar") as HTMLParagraphElement;
   }

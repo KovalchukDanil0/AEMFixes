@@ -1,54 +1,54 @@
 import Browser from "webextension-polyfill";
 
-export const touch: string = "editor.html";
-export const classic: string = "cf#";
+export const touch = "editor.html";
+export const classic = "cf#";
 
-export const regexJira: RegExp = /jira\.uhub\.biz\/browse\//;
+export const regexJira = /jira\.uhub\.biz\/browse\//;
 
-export const regexWorkflow: RegExp =
+export const regexWorkflow =
   /(?:.+)?wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/workflow\/packages\/ESM\/(\w\w)(?:_)?(\w\w)?(?:\/\w\w(\w\w))?\/(.+)\.html(?:.+)?/;
-export const regexWCMWorkflows: RegExp =
+export const regexWCMWorkflows =
   /wwwperf\.brandeuauthorlb\.ford\.com\/miscadmin#\/etc\/workflow\/packages\/ESM\//;
-export const regexInbox: RegExp = /wwwperf\.brandeuauthorlb\.ford\.com\/inbox/;
-export const regexResourceResolver: RegExp =
+export const regexInbox = /wwwperf\.brandeuauthorlb\.ford\.com\/inbox/;
+export const regexResourceResolver =
   /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxacc\/tools\/resource-resolvertool/;
-export const regexFindAndReplaceLinks: RegExp =
+export const regexFindAndReplaceLinks =
   /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxfoe\/tools\/find-replace-links/;
-export const regexAEMTree: RegExp =
+export const regexAEMTree =
   /(.+wwwperf\.brandeuauthorlb\.ford\.com\/siteadmin#)\/content.+/;
-export const regexDAMTree: RegExp =
+export const regexDAMTree =
   /(.+wwwperf\.brandeuauthorlb\.ford\.com\/damadmin#)(\/content\/dam\/guxeu(?:-beta)?\/(?:\w\w|rhd)\/(?:\w\w_\w\w|central)\/(?:(mavs)\/)?(?:.+)?)/;
-export const regexLogInForm: RegExp =
+export const regexLogInForm =
   /corpqa\.sts\.ford\.com\/adfs\/ls|corp\.sts\.ford\.com\/adfs\/oauth2\/authorize/;
 
-export const regexUrlPart: RegExp = /(http(?:s)?:\/\/)?([^/\s]+)(.*)/;
+export const regexUrlPart = /(http(?:s)?:\/\/)?([^/\s]+)(.*)/;
 
-export const regexLive: RegExp =
+export const regexLive =
   /(?:.+)?(?:secure|www)(?:\.(\w\w))?\.ford\.(\w\w)(?:\.(\w\w))?(?:.+)?/;
-export const regexPerfProd: RegExp =
+export const regexPerfProd =
   /(?:.+)?www(perf|prod)(?:-beta)?-(\w\w)(\w\w)?\.brandeulb\.ford\.com(?:.+)?/;
-export const regexAuthor: RegExp =
+export const regexAuthor =
   /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(?:(\w\w)_\w\w|configuration)\/(?:.*?))(?:\.html)?$/;
 
-export const regexRemoveSpaces: RegExp = /^\s+|\s+$|\s+(?=\s)/;
+export const regexRemoveSpaces = /^\s+|\s+$|\s+(?=\s)/;
 
-export const regexRemoveCommas: RegExp = /.+(ESM-\d\d\d\d\d\d?).+/gm;
+export const regexRemoveCommas = /.+(ESM-\d\d\d\d\d\d?).+/gm;
 
-export const regexWrongPages: RegExp =
+export const regexWrongPages =
   /content\/launches|content\/guxeu(?:-beta)?\/training-tree|content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w\/home\/sandbox/gm;
 
-export const regexFastAuthor: RegExp =
+export const regexFastAuthor =
   /(.+wwwperf\.brandeu(author)?)(lb\.ford\.com\/)((?:editor\.html|cf#)\/)?(content(?:.+?(html)|.+)?)/gm;
 
-export const regexFixSiteWide: RegExp =
+export const regexFixSiteWide =
   /((?:\S+)?\/content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w)(\/home\/)(content)?(\S+)?/gm;
 
-export const regexImagePicker: RegExp =
+export const regexImagePicker =
   /(?:.+)?(\/content\/dam\/guxeu.+?\.(?:jpeg|jpg|png))(?:\.renditions\..+)?/gm;
 
-export const regexHTMLExist: RegExp = /\.html(?:.+)?$/gm;
+export const regexHTMLExist = /\.html(?:.+)?$/gm;
 
-export const regexWFTitle: RegExp = /^(?:NWP_)?(\w\w)(\w\w)?(?:.+)?/gm;
+export const regexWFTitle = /^(?:NWP_)?(\w\w)(\w\w)?(?:.+)?/gm;
 
 export const ifJira = (url: string): boolean => regexJira.test(url);
 
@@ -95,14 +95,14 @@ export const nextGen = (): Element | null =>
 export default class AEMLink {
   url: URL;
 
-  market: string = "ss";
-  localLanguage: string = "ss";
-  urlPart: string = "/";
-  beta: string = "-beta";
+  market = "xx";
+  localLanguage = "xx";
+  urlPart = "/";
+  beta = "-beta";
 
-  betaBool: boolean = false;
-  authorBeta: boolean = false;
-  isAuthor: boolean = false;
+  betaBool = false;
+  authorBeta = false;
+  isAuthor = false;
 
   marketsInBeta: string[] = [
     "uk",
@@ -384,7 +384,7 @@ export default class AEMLink {
   }
 
   async makeAuthor(isTouch: boolean) {
-    let wrongLink: string = `/content/guxeu${this.beta}/${
+    let wrongLink = `/content/guxeu${this.beta}/${
       this.market
     }/${this.fixLocalLanguage()}_${this.fixMarket()}/${
       this.isMarketHasHomeNew() && this.urlPart === "" ? "home-new" : "home"

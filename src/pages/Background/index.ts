@@ -48,7 +48,7 @@ const changeContentInTab = async function (
   });
 
   let tab: Tabs.Tab;
-  const newUrl: string = `${urlPattern}#${content}`;
+  const newUrl = `${urlPattern}#${content}`;
   if (tabs.length !== 0) {
     tab = tabs[0];
 
@@ -150,7 +150,7 @@ async function menusOnClick(
   info: Menus.OnClickData,
   tabs: Tabs.Tab | undefined,
 ) {
-  const tab = new Array(tabs) as Tabs.Tab[];
+  const tab: Tabs.Tab[] = [tabs!];
   switch (info.menuItemId) {
     case "openInDAM": {
       const imagePath: string = info.srcUrl!.replace(regexImagePicker, "$1");
@@ -180,7 +180,7 @@ async function menusOnClick(
         content += ".html";
       }
 
-      const newUrl: string = `https://wwwperf.brandeuauthorlb.ford.com/editor.html${content}`;
+      const newUrl = `https://wwwperf.brandeuauthorlb.ford.com/editor.html${content}`;
       Browser.tabs.create({
         url: newUrl,
         index: tab[tab.length - 1].index + 1,

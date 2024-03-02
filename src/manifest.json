@@ -1,8 +1,6 @@
 {
   "manifest_version": 3,
   "name": "AEMFixes",
-  "description": "Quality of Life changes for AEM",
-  "version": "4.0",
   "author": "Danylo",
   "offline_enabled": false,
   "icons": {
@@ -11,9 +9,14 @@
     "48": "icon-64.png",
     "128": "icon-128.png"
   },
-  "homepage_url": "https://github.com/KovalchukDanil0/AEMFixes",
   "action": {
     "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "AEMFixes@gomofob.com",
+      "strict_min_version": "109.0"
+    }
   },
   "background": {
     "service_worker": "background.bundle.js"

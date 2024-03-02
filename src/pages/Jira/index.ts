@@ -26,12 +26,12 @@ const selectorTextNoSpaces = (selector: string): string =>
   document.querySelector(selector)!.textContent!.replace(regexRemoveSpaces, "");
 
 function ticketNumber(): string {
-  const ticketNumber: string = document
+  const ticketNum: string = document
     .querySelector("#parent_issue_summary")!
     .getAttribute("data-issue-key")!
     .match(/ESM-\w+/gm)?.[0]!;
 
-  let embargo: string = "";
+  let embargo = "";
 
   const labels: NodeListOf<HTMLSpanElement> = document.querySelectorAll(
     "#wrap-labels > div > ul > li > a > span",
@@ -42,7 +42,7 @@ function ticketNumber(): string {
     }
   });
 
-  let fix: string = "";
+  let fix = "";
   const ticketStatus: string = (
     document.querySelector("#status-val > span") as HTMLSpanElement
   ).textContent!;
@@ -50,7 +50,7 @@ function ticketNumber(): string {
     fix = "-FIX";
   }
 
-  return ticketNumber + embargo + fix;
+  return ticketNum + embargo + fix;
 }
 
 function textToWFPath(
@@ -58,7 +58,7 @@ function textToWFPath(
   localLanguage: string,
   title: string,
 ): string {
-  let fullPath: string = "";
+  let fullPath = "";
 
   function belgium() {
     switch (localLanguage) {
