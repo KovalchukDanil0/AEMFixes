@@ -2,7 +2,7 @@ import Browser, { Menus, Tabs } from "webextension-polyfill";
 import { ButtonOnClick } from "../Popup/Popup";
 import AEMLink, {
   classic,
-  getCurrentTab,
+  getCurrenTab,
   regexAuthor,
   regexHTMLExist,
   regexImagePicker,
@@ -57,7 +57,7 @@ const changeContentInTab = async function (
       url: newUrl,
     });
   } else {
-    tab = await getCurrentTab();
+    tab = await getCurrenTab();
     Browser.tabs.create({ url: newUrl, index: tab.index + 1 });
   }
 };
@@ -73,13 +73,14 @@ const openInTree = async function (authorUrl: string) {
 
 Browser.runtime.onMessage.addListener(
   (msg: ButtonOnClick, _sender, _sendResponse) => {
-    if (msg.from === "popup") {
+    if (msg.from !== "background") {
       if (msg.subject === "toEnvironment") {
-        toEnvironment(msg.tabs, msg.newTab, msg.env);
+        toEnvironment(msg.tabs!, msg.newTab!, msg.env!);
       }
 
       if (msg.subject === "openInTree") {
-        openInTree(msg.tabs[msg.tabs.length - 1].url!);
+        const url = msg.url ?? msg.tabs![msg.tabs!.length - 1].url!;
+        openInTree(url);
       }
     }
   },

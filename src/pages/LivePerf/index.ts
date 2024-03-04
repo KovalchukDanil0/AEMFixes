@@ -4,7 +4,6 @@ import {
   GUX3,
   loadSavedData,
   regexAuthor,
-  regexRemoveSpaces,
   waitForElm,
 } from "../SharedTools";
 
@@ -211,7 +210,7 @@ async function findVehicleCode(idx: number = 0) {
   allCars.forEach((car) => {
     car.id = "carCode";
 
-    const carName = car.textContent!.replace(regexRemoveSpaces, "");
+    const carName = car.textContent!.trim();
 
     const carObj: CarProps = getCarByName(
       vehicleConfig.data[0].eventItem,

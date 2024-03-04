@@ -1,11 +1,11 @@
 import { Alert, Button, Spinner } from "flowbite-react";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import Browser, { Tabs } from "webextension-polyfill";
 import {
   classic,
-  getCurrentTab,
+  getCurrenTab,
   ifAnyOfTheEnv,
   ifAuthor,
   ifClassic,
@@ -21,119 +21,203 @@ import "./Popup.css";
 
 let statusBar: HTMLParagraphElement;
 
-let createWFBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonCreateWF"
-    gradientDuoTone="purpleToBlue"
-    onClick={buttonOnClick}
-  >
-    Create WF
-  </Button>
-);
+const reactButtons: {
+  toolsButtonDisplayed: boolean;
+  toolsButtonsExist: Function;
+  buttonCreateWF: Function;
+  buttonToLive: Function;
+  buttonToPerf: Function;
+  buttonToProd: Function;
+  buttonToTouch: Function;
+  buttonToClassic: Function;
+  buttonOpenPropertiesTouchUI: Function;
+  buttonOpenInTree: Function;
+  buttonCheckReferences: Function;
+  buttonCheckMothersite: Function;
+} = {
+  toolsButtonDisplayed: false,
+  toolsButtonsExist() {
+    if (!this.toolsButtonDisplayed) {
+      const separatorElm: HTMLHRElement = document.getElementById(
+        "separator",
+      ) as HTMLHRElement;
 
-let liveBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonToLive"
-    color="success"
-    onClick={buttonOnClick}
-    onAuxClick={buttonOnClick}
-  >
-    To Live
-  </Button>
-);
-let perfBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonToPerf"
-    color="blue"
-    onClick={buttonOnClick}
-    onAuxClick={buttonOnClick}
-  >
-    To Perf
-  </Button>
-);
-let prodBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonToProd"
-    color="warning"
-    onClick={buttonOnClick}
-    onAuxClick={buttonOnClick}
-  >
-    To Prod
-  </Button>
-);
-let touchBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonToTouch"
-    onClick={buttonOnClick}
-    onAuxClick={buttonOnClick}
-  >
-    To Touch
-  </Button>
-);
-let classicBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonToClassic"
-    color="failure"
-    onClick={buttonOnClick}
-    onAuxClick={buttonOnClick}
-  >
-    To Classic
-  </Button>
-);
+      if (separatorElm === null) {
+        return;
+      }
 
-let propertiesTouchBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonOpenPropertiesTouchUI"
-    color="light"
-    onClick={buttonOnClick}
-  >
-    Open Properties Touch UI
-  </Button>
-);
-let openInTreeBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonOpenInTree"
-    color="success"
-    onClick={buttonOnClick}
-  >
-    Open In Tree
-  </Button>
-);
-let checkReferencesBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonCheckReferences"
-    color="failure"
-    onClick={buttonOnClick}
-  >
-    Check references
-  </Button>
-);
-let checkMothersiteBut: ReactElement = (
-  <Button
-    size="lg"
-    id="buttonCheckMothersite"
-    color="success"
-    onClick={buttonOnClick}
-  >
-    Check mothersite links
-  </Button>
-);
+      separatorElm.classList.remove("hidden");
+      separatorElm.classList.add("block");
+      this.toolsButtonDisplayed = true;
+    }
+  },
+  buttonCreateWF(url: string): React.ReactElement {
+    if (ifJira(url)) {
+      return (
+        <Button
+          size="lg"
+          id="buttonCreateWF"
+          gradientDuoTone="purpleToBlue"
+          onClick={buttonOnClick}
+        >
+          Create WF
+        </Button>
+      );
+    }
+    return <></>;
+  },
+  buttonToLive(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && !ifLive(url)) {
+      return (
+        <Button
+          size="lg"
+          id="buttonToLive"
+          color="success"
+          onClick={buttonOnClick}
+          onAuxClick={buttonOnClick}
+        >
+          To Live
+        </Button>
+      );
+    }
+    return <></>;
+  },
+  buttonToPerf(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && !ifPerf(url)) {
+      return (
+        <Button
+          size="lg"
+          id="buttonToPerf"
+          color="blue"
+          onClick={buttonOnClick}
+          onAuxClick={buttonOnClick}
+        >
+          To Perf
+        </Button>
+      );
+    }
+    return <></>;
+  },
+  buttonToProd(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && !ifProd(url)) {
+      return (
+        <Button
+          size="lg"
+          id="buttonToProd"
+          color="warning"
+          onClick={buttonOnClick}
+          onAuxClick={buttonOnClick}
+        >
+          To Prod
+        </Button>
+      );
+    }
+    return <></>;
+  },
+  buttonToTouch(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && !ifTouch(url)) {
+      return (
+        <Button
+          size="lg"
+          id="buttonToTouch"
+          onClick={buttonOnClick}
+          onAuxClick={buttonOnClick}
+        >
+          To Touch
+        </Button>
+      );
+    }
+    return <></>;
+  },
+  buttonToClassic(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && !ifClassic(url)) {
+      return (
+        <Button
+          size="lg"
+          id="buttonToClassic"
+          color="failure"
+          onClick={buttonOnClick}
+          onAuxClick={buttonOnClick}
+        >
+          To Classic
+        </Button>
+      );
+    }
+    return <></>;
+  },
+  buttonOpenPropertiesTouchUI(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && ifAuthor(url)) {
+      this.toolsButtonsExist();
+      return (
+        <Button
+          size="lg"
+          id="buttonOpenPropertiesTouchUI"
+          color="light"
+          onClick={buttonOnClick}
+        >
+          Open Properties Touch UI
+        </Button>
+      );
+    }
+    return <></>;
+  },
+  buttonOpenInTree(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && ifAuthor(url)) {
+      this.toolsButtonsExist();
+      return (
+        <Button
+          size="lg"
+          id="buttonOpenInTree"
+          color="success"
+          onClick={buttonOnClick}
+        >
+          Open In Tree
+        </Button>
+      );
+    }
+    return <></>;
+  },
+  buttonCheckReferences(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && ifAuthor(url)) {
+      this.toolsButtonsExist();
+      return (
+        <Button
+          size="lg"
+          id="buttonCheckReferences"
+          color="failure"
+          onClick={buttonOnClick}
+        >
+          Check references
+        </Button>
+      );
+    }
+    return <></>;
+  },
+  buttonCheckMothersite(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && !ifAuthor(url)) {
+      this.toolsButtonsExist();
+      return (
+        <Button
+          size="lg"
+          id="buttonCheckMothersite"
+          color="success"
+          onClick={buttonOnClick}
+        >
+          Check mothersite links
+        </Button>
+      );
+    }
+    return <></>;
+  },
+};
 
 export interface ButtonOnClick {
   from: string;
-  tabs: Tabs.Tab[];
-  env: string;
   subject: string;
-  newTab: boolean;
+  env?: string;
+  tabs?: Tabs.Tab[];
+  newTab?: boolean;
+  url?: string;
 }
 
 async function buttonOnClick(event: React.MouseEvent<HTMLButtonElement>) {
@@ -258,50 +342,11 @@ Browser.runtime.onMessage.addListener(function (msg, _sender, _sendResponse) {
 
 export default function Popup(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
-
-  let tabUrl: string;
+  const [tabUrl, setTabUrl] = useState<string>();
 
   async function buttonLogic() {
-    tabUrl = (await getCurrentTab()).url!;
-
-    if (!ifJira(tabUrl)) {
-      createWFBut = <></>;
-    }
-
-    if (!ifAnyOfTheEnv(tabUrl)) {
-      liveBut = <></>;
-      perfBut = <></>;
-      prodBut = <></>;
-      touchBut = <></>;
-      classicBut = <></>;
-      propertiesTouchBut = <></>;
-      openInTreeBut = <></>;
-      checkReferencesBut = <></>;
-      checkMothersiteBut = <></>;
-    } else {
-      if (ifLive(tabUrl)) {
-        liveBut = <></>;
-      }
-      if (ifPerf(tabUrl)) {
-        perfBut = <></>;
-      }
-      if (ifProd(tabUrl)) {
-        prodBut = <></>;
-      }
-      if (ifAuthor(tabUrl)) {
-        checkMothersiteBut = <></>;
-        if (ifTouch(tabUrl)) {
-          touchBut = <></>;
-        }
-        if (ifClassic(tabUrl)) {
-          classicBut = <></>;
-        }
-      } else {
-        propertiesTouchBut = <></>;
-        openInTreeBut = <></>;
-        checkReferencesBut = <></>;
-      }
-    }
+    const url: string = (await getCurrenTab()).url!;
+    setTabUrl(url);
 
     setIsLoading(false);
   }
@@ -320,20 +365,22 @@ export default function Popup(): React.JSX.Element {
 
   return (
     <main className="mx-3">
-      <div className="my-3 flex place-content-center gap-2">{createWFBut}</div>
       <div className="my-3 flex place-content-center gap-2">
-        {liveBut}
-        {perfBut}
-        {prodBut}
-        {touchBut}
-        {classicBut}
+        {reactButtons.buttonCreateWF(tabUrl)}
       </div>
-
+      <div className="my-3 flex place-content-center gap-2">
+        {reactButtons.buttonToLive(tabUrl)}
+        {reactButtons.buttonToPerf(tabUrl)}
+        {reactButtons.buttonToProd(tabUrl)}
+        {reactButtons.buttonToTouch(tabUrl)}
+        {reactButtons.buttonToClassic(tabUrl)}
+      </div>
+      <hr id="separator" className="my-4 hidden h-px border-0 bg-gray-200" />
       <div className="my-3 flex flex-wrap place-content-center gap-2">
-        {propertiesTouchBut}
-        {openInTreeBut}
-        {checkReferencesBut}
-        {checkMothersiteBut}
+        {reactButtons.buttonOpenPropertiesTouchUI(tabUrl)}
+        {reactButtons.buttonOpenInTree(tabUrl)}
+        {reactButtons.buttonCheckReferences(tabUrl)}
+        {reactButtons.buttonCheckMothersite(tabUrl)}
       </div>
 
       <Alert className="hidden" color="info">

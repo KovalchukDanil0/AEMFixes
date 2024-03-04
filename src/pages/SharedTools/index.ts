@@ -28,9 +28,7 @@ export const regexLive =
 export const regexPerfProd =
   /(?:.+)?www(perf|prod)(?:-beta)?-(\w\w)(\w\w)?\.brandeulb\.ford\.com(?:.+)?/;
 export const regexAuthor =
-  /(?:.+)?wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(?:(\w\w)_\w\w|configuration)\/(?:.*?))(?:\.html)?$/;
-
-export const regexRemoveSpaces = /^\s+|\s+$|\s+(?=\s)/;
+  /(?:.+)?(?:wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?)?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(?:(\w\w)_\w\w|configuration)\/(?:.*?))(?:\.html)?$/;
 
 export const regexRemoveCommas = /.+(ESM-\d\d\d\d\d\d?).+/gm;
 
@@ -212,7 +210,7 @@ export default class AEMLink {
     return this.market;
   }
 
-  fixLocalLanguage(toAuthor: boolean = true, someLocalLang?: string) {
+  fixLocalLanguage(toAuthor = true, someLocalLang?: string) {
     if (someLocalLang !== undefined) {
       this.localLanguage = someLocalLang;
     }
@@ -241,7 +239,9 @@ export default class AEMLink {
     };
 
     const marketProp = properties[this.market as keyof typeof properties];
-    this.localLanguage = marketProp[+toAuthor];
+    if (marketProp !== undefined) {
+      this.localLanguage = marketProp[+toAuthor];
+    }
 
     return this.localLanguage;
   }
@@ -268,7 +268,7 @@ export default class AEMLink {
       return this.urlPart;
     }
 
-    const tab = await getCurrentTab();
+    const tab = await Browser.tabs.getCurrent();
 
     let html = null;
     const currTabUrl = tab.url;
@@ -345,7 +345,7 @@ export default class AEMLink {
   }
 
   makeLive() {
-    let britain: string = "";
+    let britain = "";
     if (this.market === "uk") {
       britain = this.market;
       this.market = this.localLanguage + ".";
@@ -376,11 +376,11 @@ export default class AEMLink {
   }
 
   async makeTouch() {
-    return await this.makeAuthor(true);
+    return this.makeAuthor(true);
   }
 
   async makeClassic() {
-    return await this.makeAuthor(false);
+    return this.makeAuthor(false);
   }
 
   async makeAuthor(isTouch: boolean) {
@@ -394,27 +394,24 @@ export default class AEMLink {
       wrongLink = wrongLink.replace(regexFixSiteWide, "$1/site-wide-content$4");
     }
 
-    if (this.betaBool && this.urlPart !== "") {
-      const response: Response = await fetch(
-        "https://wwwperf.brandeuauthorlb.ford.com/bin/guxacc/tools/customslingresresolver?page-path=" +
-          wrongLink,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
+    const response: Response = await fetch(
+      "https://wwwperf.brandeuauthorlb.ford.com/bin/guxacc/tools/customslingresresolver?page-path=" +
+        wrongLink,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
         },
-      );
-      const customResolverData: { map: { originalPath: string } } =
-        await response.json();
+      },
+    );
 
-      return this.makeRealAuthorLink(
-        customResolverData.map.originalPath,
-        isTouch,
-      );
-    }
+    const customResolverData: { map: { originalPath: string } } =
+      await response.json();
 
-    return this.makeRealAuthorLink(wrongLink, isTouch);
+    return this.makeRealAuthorLink(
+      customResolverData.map.originalPath,
+      isTouch,
+    );
   }
 
   makeRealAuthorLink(wrongLink: string, isTouch: boolean) {
@@ -476,10 +473,5 @@ export const loadSavedData = (): Promise<Record<string, any>> =>
     enableAutoLogin: false,
   });
 
-export const getCurrentTab = async (): Promise<Browser.Tabs.Tab> =>
-  (
-    await Browser.tabs.query({
-      active: true,
-      currentWindow: true,
-    })
-  )[0];
+export const getCurrenTab = async () =>
+  (await Browser.tabs.query({ active: true, currentWindow: true }))[0]!;

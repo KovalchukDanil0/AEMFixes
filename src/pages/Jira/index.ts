@@ -1,5 +1,5 @@
 import Browser from "webextension-polyfill";
-import { loadSavedData, regexRemoveSpaces, regexWFTitle } from "../SharedTools";
+import { loadSavedData, regexWFTitle } from "../SharedTools";
 
 function createWFButton() {
   const buttonsContainer = document.querySelector(
@@ -23,7 +23,7 @@ function createWFButton() {
 }
 
 const selectorTextNoSpaces = (selector: string): string =>
-  document.querySelector(selector)!.textContent!.replace(regexRemoveSpaces, "");
+  document.querySelector(selector)!.textContent!.trim();
 
 function ticketNumber(): string {
   const ticketNum: string = document
@@ -164,6 +164,14 @@ function textToWFPath(
   }
 
   function wfPathFromTitle() {
+    // eslint-disable-next-line no-restricted-globals
+    const response = confirm(
+      "Market was not determined, can we take path from title?",
+    );
+    if (!response) {
+      return;
+    }
+
     market = title.replace(regexWFTitle, "$1");
     localLanguage = title.replace(regexWFTitle, "$2");
 
