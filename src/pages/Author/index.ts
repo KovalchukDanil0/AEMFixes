@@ -1,5 +1,5 @@
 import Browser from "webextension-polyfill";
-import AEMLink, {
+import {
   GUX3,
   addBetaToLink,
   addSharedDivClasses,
@@ -59,34 +59,24 @@ async function catErrors() {
 }
 
 async function ticketFinder() {
-  const data = new AEMLink(new URL(url));
-
-  const warningBar = await waitForElm("div.workflows-warning-bar");
-
-  const blockingTicket = warningBar
-    .querySelector("i:nth-child(3)")!
-    .textContent!.replace(regexRemoveCommas, "$1");
-
-  const fullPath = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicket}#view-subtasks`;
-
-  const a = document.createElement("a");
-  a.style.cursor = "pointer";
-  a.href = fullPath;
-  a.target = "_blank";
-
-  const linkText = document.createTextNode(
-    `blocking parent ticket is ${fullPath}`,
+  const blockingTicketElm = await waitForElm(
+    "div.workflows-warning-bar > i:nth-child(3)",
   );
-  a.appendChild(linkText);
 
-  function linkClick() {
-    Browser.storage.local.set({ SearchSubTask: data.market });
-  }
+  const blockingTicket: string = blockingTicketElm.textContent!;
+  const blockingTicketReplaced: string = blockingTicket.replace(
+    regexRemoveCommas,
+    "$1",
+  );
 
-  a.addEventListener("click", linkClick);
-  a.addEventListener("auxclick", linkClick);
+  const a: HTMLAnchorElement = document.createElement("a");
+  a.style.cursor = "pointer";
+  a.href = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicketReplaced}#view-subtasks`;
+  a.target = "_blank";
+  a.textContent = blockingTicket;
 
-  warningBar.appendChild(a);
+  blockingTicketElm.innerHTML = "";
+  blockingTicketElm.appendChild(a);
 }
 
 let refGot = false;

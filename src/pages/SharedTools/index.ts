@@ -1,52 +1,66 @@
-import Browser from "webextension-polyfill";
+import Browser, { Tabs } from "webextension-polyfill";
 
 export const touch = "editor.html";
 export const classic = "cf#";
 
-export const regexJira = /jira\.uhub\.biz\/browse\//;
+const mathAllNonCapt: string = /(?:.+)?/.source;
+const authorBase: string = /wwwperf\.brandeuauthorlb\.ford\.com/.source;
+const authorEnvBase = /(?:\/(?:editor\.html|cf#))?/.source;
 
-export const regexWorkflow =
-  /(?:.+)?wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/workflow\/packages\/ESM\/(\w\w)(?:_)?(\w\w)?(?:\/\w\w(\w\w))?\/(.+)\.html(?:.+)?/;
-export const regexWCMWorkflows =
-  /wwwperf\.brandeuauthorlb\.ford\.com\/miscadmin#\/etc\/workflow\/packages\/ESM\//;
-export const regexInbox = /wwwperf\.brandeuauthorlb\.ford\.com\/inbox/;
-export const regexResourceResolver =
-  /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxacc\/tools\/resource-resolvertool/;
-export const regexFindAndReplaceLinks =
-  /wwwperf\.brandeuauthorlb\.ford\.com(?:\/(?:editor\.html|cf#))?\/etc\/guxfoe\/tools\/find-replace-links/;
-export const regexAEMTree =
-  /(.+wwwperf\.brandeuauthorlb\.ford\.com\/siteadmin#)\/content.+/;
-export const regexDAMTree =
-  /(.+wwwperf\.brandeuauthorlb\.ford\.com\/damadmin#)(\/content\/dam\/guxeu(?:-beta)?\/(?:\w\w|rhd)\/(?:\w\w_\w\w|central)\/(?:(mavs)\/)?(?:.+)?)/;
-export const regexLogInForm =
-  /corpqa\.sts\.ford\.com\/adfs\/ls|corp\.sts\.ford\.com\/adfs\/oauth2\/authorize/;
+const regexJira = /jira\.uhub\.biz\/browse\//;
 
-export const regexUrlPart = /(http(?:s)?:\/\/)?([^/\s]+)(.*)/;
+export const regexWorkflow = new RegExp(
+  mathAllNonCapt +
+    authorBase +
+    authorEnvBase +
+    /\/etc\/workflow\/packages\/ESM\/(\w\w)(?:_)?(\w\w)?(?:\/\w\w(\w\w))?\/(ESM-?\d*-\w*?)\.html/
+      .source +
+    mathAllNonCapt,
+);
+export const regexDAMTree = new RegExp(
+  mathAllNonCapt +
+    authorBase +
+    /\/damadmin#(\/content\/dam\/guxeu(?:-beta)?\/(?:\w\w|rhd)\/(?:\w\w_\w\w|central)\/(?:(mavs)\/)?(?:.+)?)/
+      .source,
+);
 
-export const regexLive =
-  /(?:.+)?(?:secure|www)(?:\.(\w\w))?\.ford\.(\w\w)(?:\.(\w\w))?(?:.+)?/;
-export const regexPerfProd =
-  /(?:.+)?www(perf|prod)(?:-beta)?-(\w\w)(\w\w)?\.brandeulb\.ford\.com(?:.+)?/;
+export const regexLive = new RegExp(
+  mathAllNonCapt +
+    /(?:secure|www)(?:\.(\w\w))?\.ford\.(\w\w)(?:\.(\w\w))?/.source +
+    mathAllNonCapt,
+);
+export const regexPerfProd = new RegExp(
+  mathAllNonCapt +
+    /www(perf|prod)(?:-beta)?-(\w\w)(\w\w)?\.brandeulb\.ford\.com/.source +
+    mathAllNonCapt,
+);
 export const regexAuthor =
-  /(?:.+)?(?:wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?)?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(?:(\w\w)_\w\w|configuration)\/(?:.*?))(?:\.html)?$/;
+  /(?:(?:.+)wwwperf\.brandeu(?:author)?lb\.ford\.com(?:\/(editor\.html|cf#))?)?(\/content\/guxeu(?:-beta)?\/(\w\w|mothersite)\/(?:(\w\w)_\w\w|configuration)\/(?:.*?))(?:\.html)?$/;
 
-export const regexRemoveCommas = /.+(ESM-\d\d\d\d\d\d?).+/gm;
+export const regexRemoveCommas = /.+(ESM-\d\d\d\d\d\d?).+/;
 
 export const regexWrongPages =
-  /content\/launches|content\/guxeu(?:-beta)?\/training-tree|content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w\/home\/sandbox/gm;
+  /content\/launches|content\/guxeu(?:-beta)?\/training-tree|content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w\/home\/sandbox/;
 
-export const regexFastAuthor =
-  /(.+wwwperf\.brandeu(author)?)(lb\.ford\.com\/)((?:editor\.html|cf#)\/)?(content(?:.+?(html)|.+)?)/gm;
+const regexFastAuthor =
+  /(.+wwwperf\.brandeu(author)?)(lb\.ford\.com\/)((?:editor\.html|cf#)\/)?(content(?:.+?(html)|.+)?)/;
 
-export const regexFixSiteWide =
-  /((?:\S+)?\/content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w)(\/home\/)(content)?(\S+)?/gm;
+const regexFixSiteWide =
+  /((?:\S+)?\/content\/guxeu(?:-beta)?\/\w\w\/\w\w_\w\w)(\/home\/)(content)?(\S+)?/;
 
-export const regexImagePicker =
-  /(?:.+)?(\/content\/dam\/guxeu.+?\.(?:jpeg|jpg|png))(?:\.renditions\..+)?/gm;
+export const regexImagePicker = new RegExp(
+  mathAllNonCapt +
+    /(\/content\/dam\/guxeu.+?\.(?:jpeg|jpg|png))(?:\.renditions\..+)?/.source,
+);
+export const regexHTMLExist = new RegExp(
+  /\.html/.source + `${mathAllNonCapt}$`,
+);
 
-export const regexHTMLExist = /\.html(?:.+)?$/gm;
+export const regexWFTitle = new RegExp(
+  /^(?:NWP_)?(\w\w)(\w\w)?/.source + mathAllNonCapt,
+);
 
-export const regexWFTitle = /^(?:NWP_)?(\w\w)(\w\w)?(?:.+)?/gm;
+export const regexCopyContent = /\/content.+(?=\.html)/;
 
 export const ifJira = (url: string): boolean => regexJira.test(url);
 
@@ -69,19 +83,6 @@ export const ifAnyOfTheEnv = (url: string) =>
 
 export const ifWorkflow = (url: string): boolean => regexWorkflow.test(url);
 
-export const ifWCMWorkflows = (url: string): boolean =>
-  regexWCMWorkflows.test(url);
-
-export const ifInbox = (url: string): boolean => regexInbox.test(url);
-
-export const ifResourceResolver = (url: string): boolean =>
-  regexResourceResolver.test(url);
-
-export const ifFindAndReplace = (url: string): boolean =>
-  regexFindAndReplaceLinks.test(url);
-
-export const ifLogInForm = (url: string): boolean => regexLogInForm.test(url);
-
 export const GUX3 = (): Element | null =>
   document.querySelector("#accelerator-page");
 
@@ -89,6 +90,15 @@ export const GUX1 = (): Element | null => document.querySelector("#global-ux");
 
 export const nextGen = (): Element | null =>
   document.querySelector("#nextgen-page");
+
+export interface MessageCommon {
+  from: string;
+  subject: string;
+  env?: string;
+  tabs?: Tabs.Tab[];
+  newTab?: boolean;
+  url?: string;
+}
 
 export default class AEMLink {
   url: URL;
@@ -268,7 +278,7 @@ export default class AEMLink {
       return this.urlPart;
     }
 
-    const tab = await Browser.tabs.getCurrent();
+    const tab = await getCurrenTab();
 
     let html = null;
     const currTabUrl = tab.url;

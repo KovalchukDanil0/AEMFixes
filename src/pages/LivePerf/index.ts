@@ -3,6 +3,7 @@ import {
   addSharedDivClasses,
   GUX3,
   loadSavedData,
+  MessageCommon,
   regexAuthor,
   waitForElm,
 } from "../SharedTools";
@@ -29,7 +30,7 @@ interface CarProps {
 }
 
 let vehicleConfig: VehicleConfig;
-let lastVehicleIndex: number = -1;
+let lastVehicleIndex = -1;
 
 async function randomProgrammerMemes() {
   if (document.title !== "404") {
@@ -114,7 +115,7 @@ function checkMothersite(from: string) {
   const links: NodeListOf<HTMLLinkElement> =
     document.querySelectorAll("[href]");
 
-  let mothersiteLinks: number = 0;
+  let mothersiteLinks = 0;
   links.forEach((element) => {
     if (element.href.includes("mothersite")) {
       element.style.backgroundColor = "blue";
@@ -178,7 +179,7 @@ async function vehicleCodeInit() {
   findVehicleCode();
 }
 
-async function findVehicleCode(idx: number = 0) {
+async function findVehicleCode(idx = 0) {
   if (lastVehicleIndex === idx) {
     return;
   }
@@ -283,7 +284,11 @@ async function findShowroomCode() {
 }
 
 Browser.runtime.onMessage.addListener(
-  (msg: any, _sender: Runtime.MessageSender, _sendResponse: Function) => {
+  (
+    msg: MessageCommon,
+    _sender: Runtime.MessageSender,
+    _sendResponse: Function,
+  ) => {
     if (msg.from === "popup" && msg.subject === "checkMothersite") {
       checkMothersite(msg.from);
     }

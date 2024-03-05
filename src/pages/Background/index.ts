@@ -1,6 +1,6 @@
 import Browser, { Menus, Tabs } from "webextension-polyfill";
-import { ButtonOnClick } from "../Popup/Popup";
 import AEMLink, {
+  MessageCommon,
   classic,
   getCurrenTab,
   regexAuthor,
@@ -72,7 +72,7 @@ const openInTree = async function (authorUrl: string) {
 };
 
 Browser.runtime.onMessage.addListener(
-  (msg: ButtonOnClick, _sender, _sendResponse) => {
+  (msg: MessageCommon, _sender, _sendResponse) => {
     if (msg.from !== "background") {
       if (msg.subject === "toEnvironment") {
         toEnvironment(msg.tabs!, msg.newTab!, msg.env!);

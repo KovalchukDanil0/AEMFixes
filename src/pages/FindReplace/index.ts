@@ -1,6 +1,5 @@
 import Browser from "webextension-polyfill";
-import { ButtonOnClick } from "../Popup/Popup";
-import { waitForElm } from "../SharedTools";
+import { MessageCommon, waitForElm } from "../SharedTools";
 
 async function fixOldLinks() {
   await waitForElm(
@@ -12,7 +11,7 @@ async function fixOldLinks() {
   );
   oldLinks.forEach((link) => {
     const url: string = link.textContent!;
-    const message: ButtonOnClick = {
+    const message: MessageCommon = {
       from: "content",
       subject: "openInTree",
       url,

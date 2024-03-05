@@ -25,34 +25,6 @@ function createWFButton() {
 const selectorTextNoSpaces = (selector: string): string =>
   document.querySelector(selector)!.textContent!.trim();
 
-function ticketNumber(): string {
-  const ticketNum: string = document
-    .querySelector("#parent_issue_summary")!
-    .getAttribute("data-issue-key")!
-    .match(/ESM-\w+/gm)?.[0]!;
-
-  let embargo = "";
-
-  const labels: NodeListOf<HTMLSpanElement> = document.querySelectorAll(
-    "#wrap-labels > div > ul > li > a > span",
-  );
-  labels.forEach((label: HTMLSpanElement) => {
-    if (label.textContent!.includes("embargo")) {
-      embargo = "-EMBARGO";
-    }
-  });
-
-  let fix = "";
-  const ticketStatus: string = (
-    document.querySelector("#status-val > span") as HTMLSpanElement
-  ).textContent!;
-  if (ticketStatus.includes("deployment")) {
-    fix = "-FIX";
-  }
-
-  return ticketNum + embargo + fix;
-}
-
 function textToWFPath(
   market: string,
   localLanguage: string,
@@ -186,6 +158,40 @@ function textToWFPath(
 }
 
 function AEMToolsCreateWF(): string {
+  const ticketNumElm: HTMLElement = document.querySelector(
+    "#parent_issue_summary",
+  ) as HTMLElement;
+  if (ticketNumElm === null) {
+    throw new Error("This is not children ticket page");
+  }
+
+  function ticketNumber(): string {
+    const ticketNum: string = ticketNumElm
+      .getAttribute("data-issue-key")!
+      .match(/ESM-\w+/gm)?.[0]!;
+
+    let embargo = "";
+
+    const labels: NodeListOf<HTMLSpanElement> = document.querySelectorAll(
+      "#wrap-labels > div > ul > li > a > span",
+    );
+    labels.forEach((label: HTMLSpanElement) => {
+      if (label.textContent!.includes("embargo")) {
+        embargo = "-EMBARGO";
+      }
+    });
+
+    let fix = "";
+    const ticketStatus: string = (
+      document.querySelector("#status-val > span") as HTMLSpanElement
+    ).textContent!;
+    if (ticketStatus.includes("deployment")) {
+      fix = "-FIX";
+    }
+
+    return ticketNum + embargo + fix;
+  }
+
   const ticketMarket: string = selectorTextNoSpaces("#customfield_13300-val");
   const ticketLocalLanguage: string = selectorTextNoSpaces(
     "#customfield_15000-val",

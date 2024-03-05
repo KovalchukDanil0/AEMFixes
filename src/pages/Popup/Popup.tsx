@@ -4,6 +4,7 @@ import { FaGithub } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import Browser, { Tabs } from "webextension-polyfill";
 import {
+  MessageCommon,
   classic,
   getCurrenTab,
   ifAnyOfTheEnv,
@@ -15,6 +16,7 @@ import {
   ifProd,
   ifTouch,
   regexAuthor,
+  regexCopyContent,
   touch,
 } from "../SharedTools";
 import "./Popup.css";
@@ -30,6 +32,7 @@ const reactButtons: {
   buttonToProd: Function;
   buttonToTouch: Function;
   buttonToClassic: Function;
+  buttonCopyContent: Function;
   buttonOpenPropertiesTouchUI: Function;
   buttonOpenInTree: Function;
   buttonCheckReferences: Function;
@@ -70,6 +73,8 @@ const reactButtons: {
     if (ifAnyOfTheEnv(url) && !ifLive(url)) {
       return (
         <Button
+          but-env="live"
+          but-subject="live"
           size="lg"
           id="buttonToLive"
           color="success"
@@ -145,6 +150,22 @@ const reactButtons: {
     }
     return <></>;
   },
+  buttonCopyContent(url: string): React.ReactElement {
+    if (ifAnyOfTheEnv(url) && ifAuthor(url)) {
+      this.toolsButtonsExist();
+      return (
+        <Button
+          size="lg"
+          id="buttonCopyContent"
+          color="purple"
+          onClick={() => copyContent(url)}
+        >
+          Copy Content
+        </Button>
+      );
+    }
+    return <></>;
+  },
   buttonOpenPropertiesTouchUI(url: string): React.ReactElement {
     if (ifAnyOfTheEnv(url) && ifAuthor(url)) {
       this.toolsButtonsExist();
@@ -211,17 +232,10 @@ const reactButtons: {
   },
 };
 
-export interface ButtonOnClick {
-  from: string;
-  subject: string;
-  env?: string;
-  tabs?: Tabs.Tab[];
-  newTab?: boolean;
-  url?: string;
-}
-
 async function buttonOnClick(event: React.MouseEvent<HTMLButtonElement>) {
   const but: HTMLButtonElement = event.currentTarget;
+  console.log(but.getAttribute("but-env"));
+  console.log(but.getAttribute("but-subject"));
 
   const tab: Tabs.Tab[] = await Browser.tabs.query({
     highlighted: true,
@@ -230,7 +244,7 @@ async function buttonOnClick(event: React.MouseEvent<HTMLButtonElement>) {
 
   const newTab: boolean = event.type !== "click";
 
-  const message: ButtonOnClick = {
+  const message: MessageCommon = {
     from: "popup",
     env: "",
     subject: "toEnvironment",
@@ -313,6 +327,12 @@ function openPropertiesTouchUI(tab: Tabs.Tab) {
   });
 }
 
+async function copyContent(url: string) {
+  const content: string = regexCopyContent.exec(url)?.[0]!;
+  navigator.clipboard.writeText(content);
+  showMessage(`${content} copied to clipboard`, 3000);
+}
+
 function showMessage(message: string, time: number) {
   if (statusBar === undefined) {
     statusBar = document.getElementById("statusBar") as HTMLParagraphElement;
@@ -377,6 +397,7 @@ export default function Popup(): React.JSX.Element {
       </div>
       <hr id="separator" className="my-4 hidden h-px border-0 bg-gray-200" />
       <div className="my-3 flex flex-wrap place-content-center gap-2">
+        {reactButtons.buttonCopyContent(tabUrl)}
         {reactButtons.buttonOpenPropertiesTouchUI(tabUrl)}
         {reactButtons.buttonOpenInTree(tabUrl)}
         {reactButtons.buttonCheckReferences(tabUrl)}
