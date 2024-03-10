@@ -7,7 +7,7 @@ import AEMLink, {
   regexHTMLExist,
   regexImagePicker,
   touch,
-} from "../SharedTools";
+} from "../../shared";
 
 function toEnvironment(
   tabs: Tabs.Tab[],
@@ -16,7 +16,7 @@ function toEnvironment(
   url?: string,
 ) {
   tabs.forEach(async (tab) => {
-    const tempUrl = url ?? tab.url!;
+    const tempUrl: string = url ?? tab.url!;
 
     const data = new AEMLink(new URL(tempUrl));
     const newUrl = await data.determineEnv(env);
@@ -165,7 +165,7 @@ async function menusOnClick(
     }
     case "openInAEM": {
       let linkUrl: string;
-      if (info.selectionText !== undefined) {
+      if (info.selectionText != null) {
         linkUrl = `https://wwwperf.brandeuauthorlb.ford.com${info.selectionText}.html`;
       } else {
         linkUrl = info.linkUrl!;

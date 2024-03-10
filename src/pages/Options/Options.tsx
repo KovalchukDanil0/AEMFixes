@@ -1,7 +1,7 @@
 import { Checkbox, Label, Spinner } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import Browser from "webextension-polyfill";
-import { loadSavedData } from "../SharedTools";
+import { loadSavedData } from "../../shared";
 import "./Options.css";
 
 let savedData: { [key: string]: boolean };

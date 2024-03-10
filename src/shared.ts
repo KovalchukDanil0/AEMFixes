@@ -83,13 +83,13 @@ export const ifAnyOfTheEnv = (url: string) =>
 
 export const ifWorkflow = (url: string): boolean => regexWorkflow.test(url);
 
-export const GUX3 = (): Element | null =>
-  document.querySelector("#accelerator-page");
+export const GUX3 = (): HTMLElement =>
+  document.querySelector("#accelerator-page")!;
 
-export const GUX1 = (): Element | null => document.querySelector("#global-ux");
+export const GUX1 = (): HTMLElement => document.querySelector("#global-ux")!;
 
-export const nextGen = (): Element | null =>
-  document.querySelector("#nextgen-page");
+export const nextGen = (): HTMLElement =>
+  document.querySelector("#nextgen-page")!;
 
 export interface MessageCommon {
   from: string;
@@ -98,6 +98,21 @@ export interface MessageCommon {
   tabs?: Tabs.Tab[];
   newTab?: boolean;
   url?: string;
+}
+
+export interface ShowroomCode {
+  data: {
+    [key: string]: {
+      code: string;
+      name: string;
+    };
+  };
+}
+
+export interface ReferencesConfig {
+  pages: {
+    path: string;
+  }[];
 }
 
 export default class AEMLink {
@@ -131,7 +146,7 @@ export default class AEMLink {
   constructor(url?: URL) {
     this.url = url!;
 
-    if (url === undefined) {
+    if (url == null) {
       return;
     }
 
@@ -184,7 +199,7 @@ export default class AEMLink {
   }
 
   isMarketInBeta(someMarket?: string): boolean {
-    if (someMarket !== undefined) {
+    if (someMarket != null) {
       this.market = someMarket!;
     }
 
@@ -200,7 +215,7 @@ export default class AEMLink {
     !!this.marketsHomeNew.some((mar): boolean => this.market.includes(mar));
 
   fixMarket(someMarket?: string) {
-    if (someMarket !== undefined) {
+    if (someMarket != null) {
       this.market = someMarket;
     }
 
@@ -221,7 +236,7 @@ export default class AEMLink {
   }
 
   fixLocalLanguage(toAuthor = true, someLocalLang?: string) {
-    if (someLocalLang !== undefined) {
+    if (someLocalLang != null) {
       this.localLanguage = someLocalLang;
     }
 
@@ -249,7 +264,7 @@ export default class AEMLink {
     };
 
     const marketProp = properties[this.market as keyof typeof properties];
-    if (marketProp !== undefined) {
+    if (marketProp != null) {
       this.localLanguage = marketProp[+toAuthor];
     }
 
@@ -257,7 +272,7 @@ export default class AEMLink {
   }
 
   fixUrlPart(someUrlPart = null) {
-    if (someUrlPart !== null) {
+    if (someUrlPart != null) {
       this.urlPart = someUrlPart;
     }
 
@@ -282,7 +297,7 @@ export default class AEMLink {
 
     let html = null;
     const currTabUrl = tab.url;
-    if (currTabUrl === undefined) {
+    if (currTabUrl == null) {
       return;
     }
 
@@ -348,7 +363,7 @@ export default class AEMLink {
         newUrl = await this.makeClassic();
         break;
       default:
-        throw new Error("No such environment");
+        throw new Error("No such environment " + env);
     }
 
     return newUrl;

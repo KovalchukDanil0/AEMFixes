@@ -1,4 +1,4 @@
-import { regexDAMTree, touch } from "../SharedTools";
+import { regexDAMTree, touch } from "../../shared";
 
 console.log(regexDAMTree);
 console.log(regexDAMTree.exec(document.location.href));

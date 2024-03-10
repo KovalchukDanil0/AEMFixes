@@ -1,12 +1,17 @@
+import { ReactElement } from "react";
+import { createRoot, Root } from "react-dom/client";
 import Browser, { Runtime } from "webextension-polyfill";
+import InfoAlert from "../../containers/InfoAlert";
+import ShowroomCodes from "../../containers/ShowroomCodes";
+import VehicleCode from "../../containers/VehicleCode";
 import {
-  addSharedDivClasses,
   GUX3,
   loadSavedData,
   MessageCommon,
   regexAuthor,
+  ShowroomCode,
   waitForElm,
-} from "../SharedTools";
+} from "../../shared";
 
 const url: string = window.location.href;
 
@@ -59,7 +64,7 @@ async function randomProgrammerMemes() {
       let billboardImages: HTMLElement;
       let billboardText: HTMLElement;
 
-      if (GUX3() !== null) {
+      if (GUX3() != null) {
         billboardContainer =
           "#accelerator-page > div.content > div > div.box-content.cq-dd-image > div > div.billboard.billboard-image-sets-height > div > div.billboard-inner";
 
@@ -125,26 +130,23 @@ function checkMothersite(from: string) {
     }
   });
 
-  const messageText = `MOTHERSITE LINKS ON THIS PAGE - ${mothersiteLinks}`;
+  const message = `MOTHERSITE LINKS ON THIS PAGE - ${mothersiteLinks}`;
 
-  if (from === "content" && mothersiteLinks > 0) {
-    const divBoxAlert: HTMLDivElement = document.createElement("div");
-    addSharedDivClasses(divBoxAlert);
-    divBoxAlert.id = "alertBanner";
-    divBoxAlert.style.textAlign = "center";
+  if (mothersiteLinks > 0 && from === "content") {
+    const page = GUX3();
+    const container = page.insertBefore(
+      document.createElement("div"),
+      page.firstChild,
+    );
+    const root = createRoot(container);
 
-    const p = document.createElement("p");
-    p.textContent = messageText;
-    divBoxAlert.appendChild(p);
-
-    const page = GUX3()!;
-
-    page.insertBefore(divBoxAlert, page.firstChild);
+    const vehicleCodeElm: ReactElement = InfoAlert({ message });
+    root.render(vehicleCodeElm);
   } else {
     Browser.runtime.sendMessage({
       from: "context",
       subject: "showMessage",
-      message: messageText,
+      message,
       time: 5000,
     });
   }
@@ -185,7 +187,7 @@ async function findVehicleCode(idx = 0) {
   }
   lastVehicleIndex = idx;
 
-  if (vehicleConfig === null || vehicleConfig === undefined) {
+  if (vehicleConfig == null) {
     const config = `${wizardConfig.getAttribute(
       "data-nameplate-service",
     )}/${wizardConfig.getAttribute(
@@ -235,13 +237,10 @@ async function findVehicleCode(idx = 0) {
       fullCode += `-${versionCode}`;
     }
 
-    const carCode = document.createElement("a");
-    carCode.textContent = fullCode;
-    carCode.href = `?vehicleCode=${fullCode}`;
-    carCode.classList.add("cta-pill", "cta-pill-primary");
-    carCode.id = "carCode";
+    const vehicleCodeElm: ReactElement = VehicleCode({ code: fullCode });
 
-    car.parentElement!.appendChild(carCode);
+    const root: Root = createRoot(car.parentElement!);
+    root.render(vehicleCodeElm);
   });
 }
 
@@ -257,30 +256,15 @@ async function findShowroomCode() {
       Accept: "application/json",
     },
   });
-  const showroomConfig = await response.json();
+  const showroomConfig: ShowroomCode = await response.json();
 
-  const dataJSON = showroomConfig.data;
+  const showroomCodes: ReactElement = ShowroomCodes({
+    data: showroomConfig.data,
+  });
 
-  const container = document.createElement("div");
-  addSharedDivClasses(container);
-  showroom.appendChild(container);
-
-  for (const key in dataJSON) {
-    if (Object.hasOwn(dataJSON, key)) {
-      const element: { name: string; code: string } = dataJSON[key];
-
-      const name = document.createElement("h3");
-      name.innerText = element.name;
-      container.appendChild(name);
-
-      const code = document.createElement("p");
-      code.innerText = element.code;
-      container.appendChild(code);
-
-      const breakLine = document.createElement("br");
-      container.appendChild(breakLine);
-    }
-  }
+  const div: HTMLDivElement = document.createElement("div");
+  const root = createRoot(showroom.appendChild(div));
+  root.render(showroomCodes);
 }
 
 Browser.runtime.onMessage.addListener(

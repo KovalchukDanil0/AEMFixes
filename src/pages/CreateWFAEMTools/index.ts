@@ -1,5 +1,5 @@
 import Browser from "webextension-polyfill";
-import { waitForElm } from "../SharedTools";
+import { waitForElm } from "../../shared";
 
 async function createWF(WFTitle: string, WFName: string) {
   if (WFTitle === "" || WFName === "") {

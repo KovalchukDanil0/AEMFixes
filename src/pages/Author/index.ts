@@ -1,14 +1,15 @@
+import { ReactElement } from "react";
+import { createRoot } from "react-dom/client";
 import Browser from "webextension-polyfill";
+import ReferencesBanner from "../../containers/ReferencesBanner";
+import WFShowTicket from "../../containers/WFShowTicket";
 import {
   GUX3,
-  addBetaToLink,
-  addSharedDivClasses,
+  ReferencesConfig,
   loadSavedData,
   regexAuthor,
-  regexRemoveCommas,
-  regexWrongPages,
   waitForElm,
-} from "../SharedTools";
+} from "../../shared";
 
 const url =
   window.location !== window.parent.location
@@ -58,27 +59,19 @@ async function catErrors() {
   }
 }
 
+//! May not work
 async function ticketFinder() {
-  const blockingTicketElm = await waitForElm(
+  const blockingTicketElm: HTMLElement = await waitForElm(
     "div.workflows-warning-bar > i:nth-child(3)",
   );
+  const root = createRoot(blockingTicketElm);
 
   const blockingTicket: string = blockingTicketElm.textContent!;
-  const blockingTicketReplaced: string = blockingTicket.replace(
-    regexRemoveCommas,
-    "$1",
-  );
-
-  const a: HTMLAnchorElement = document.createElement("a");
-  a.style.cursor = "pointer";
-  a.href = `https://jira.uhub.biz/browse/GTBEMEA${blockingTicketReplaced}#view-subtasks`;
-  a.target = "_blank";
-  a.textContent = blockingTicket;
-
-  blockingTicketElm.innerHTML = "";
-  blockingTicketElm.appendChild(a);
+  const wfShowTicket: ReactElement = WFShowTicket({ blockingTicket });
+  root.render(wfShowTicket);
 }
 
+//! May not work
 let refGot = false;
 async function checkReferences() {
   if (refGot) {
@@ -93,35 +86,19 @@ async function checkReferences() {
       Accept: "application/json",
     },
   });
-  const refConfig = await response.json();
+  const refConfig: ReferencesConfig = await response.json();
 
   const page = GUX3();
-  const container = document.createElement("div");
-  addSharedDivClasses(container);
-  page!.insertBefore(container, page!.firstChild);
+  const container = page.insertBefore(
+    document.createElement("div"),
+    page.firstChild,
+  );
+  const root = createRoot(container);
 
-  const pageLinksArr = [];
-  for (const pageRef of refConfig.pages) {
-    const pagePath = pageRef.path + ".html";
-
-    if (!regexWrongPages.test(pagePath)) {
-      pageLinksArr.push(pagePath);
-    }
-  }
-
-  pageLinksArr.sort((a, b) => a.localeCompare(b));
-  pageLinksArr.forEach((pagePath) => {
-    const pageLink = document.createElement("a");
-    pageLink.href = pagePath;
-    pageLink.target = "_blank";
-    pageLink.textContent = pagePath;
-    pageLink.classList.add("cta-secondary-chevron-right");
-    addBetaToLink(pageLink);
-    container.appendChild(pageLink);
-
-    const breakLine = document.createElement("br");
-    container.appendChild(breakLine);
+  const referencesBanner: ReactElement = ReferencesBanner({
+    pages: refConfig.pages,
   });
+  root.render(referencesBanner);
 
   refGot = true;
 }

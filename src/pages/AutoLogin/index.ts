@@ -1,4 +1,4 @@
-import { loadSavedData, waitForElm } from "../SharedTools";
+import { loadSavedData, waitForElm } from "../../shared";
 
 function isEmpty(str: string) {
   return str.trim().length === 0;

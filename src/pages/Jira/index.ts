@@ -1,5 +1,5 @@
 import Browser from "webextension-polyfill";
-import { loadSavedData, regexWFTitle } from "../SharedTools";
+import { loadSavedData, regexWFTitle } from "../../shared";
 
 function createWFButton() {
   const buttonsContainer = document.querySelector(
@@ -161,7 +161,7 @@ function AEMToolsCreateWF(): string {
   const ticketNumElm: HTMLElement = document.querySelector(
     "#parent_issue_summary",
   ) as HTMLElement;
-  if (ticketNumElm === null) {
+  if (ticketNumElm == null) {
     throw new Error("This is not children ticket page");
   }
 
@@ -213,17 +213,17 @@ function AEMToolsCreateWF(): string {
 }
 
 function FixSorting() {
-  const sortByDate: HTMLAnchorElement | null = document.querySelector(
+  const sortByDate: HTMLAnchorElement = document.querySelector(
     '#attachment-sorting-options > li:nth-child(2) > a:not([class*="aui-checked"])',
-  ) as HTMLAnchorElement;
-  if (sortByDate !== null) {
+  )!;
+  if (sortByDate != null) {
     sortByDate.click();
   }
 
-  const descending: HTMLAnchorElement | null = document.querySelector(
+  const descending: HTMLAnchorElement = document.querySelector(
     '#attachment-sorting-order-options > li:nth-child(2) > a:not([class*="aui-checked"])',
-  ) as HTMLAnchorElement;
-  if (descending !== null) {
+  )!;
+  if (descending != null) {
     descending.click();
   }
 }

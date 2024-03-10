@@ -1,5 +1,7 @@
 import Browser from "webextension-polyfill";
-import { MessageCommon, waitForElm } from "../SharedTools";
+import "../../assets/css/tailwind.css";
+import { MessageCommon, waitForElm } from "../../shared";
+import "../../shared.css";
 
 async function fixOldLinks() {
   await waitForElm(

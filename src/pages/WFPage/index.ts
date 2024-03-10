@@ -1,8 +1,11 @@
+import { ReactElement } from "react";
+import { createRoot } from "react-dom/client";
+import WFFixedLinks from "../../containers/WFFixedLinks";
 import AEMLink, {
   addBetaToLink,
   regexWorkflow,
   waitForElm,
-} from "../SharedTools";
+} from "../../shared";
 
 const url = new URL(document.location.href);
 
@@ -33,7 +36,8 @@ async function UsefulLinks() {
   const container = await waitForElm(
     "body > div.wrapper-conf > div > div.content-conf.workflow-package-page > div.configSection > div > div:nth-child(2)",
   );
-  const ULinkContainer = container.cloneNode(false);
+
+  const ULinkContainer: HTMLElement = container.cloneNode(false) as HTMLElement;
 
   const data = new AEMLink();
 
@@ -83,20 +87,13 @@ async function UsefulLinks() {
     addElem(fullPath);
   }
 
-  function addElem(fullPath: string) {
-    fullPath += ".html";
+  //! May not work
+  function addElem(path: string) {
+    const div = document.createElement("div");
+    const root = createRoot(ULinkContainer.appendChild(div));
 
-    const a = document.createElement("a");
-    a.href = `/cf#${fullPath}`;
-    a.target = "_blank";
-
-    const linkText = document.createTextNode(fullPath);
-    a.appendChild(linkText);
-
-    ULinkContainer.appendChild(a);
-
-    const lineBreak = document.createElement("br");
-    a.appendChild(lineBreak);
+    const wfFixedLinks: ReactElement = WFFixedLinks({ path });
+    root.render(wfFixedLinks);
 
     container.parentNode!.insertBefore(ULinkContainer, container);
   }

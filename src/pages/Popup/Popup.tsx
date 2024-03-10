@@ -18,7 +18,7 @@ import {
   regexAuthor,
   regexCopyContent,
   touch,
-} from "../SharedTools";
+} from "../../shared";
 import "./Popup.css";
 
 let statusBar: HTMLParagraphElement;
@@ -45,7 +45,7 @@ const reactButtons: {
         "separator",
       ) as HTMLHRElement;
 
-      if (separatorElm === null) {
+      if (separatorElm == null) {
         return;
       }
 
@@ -58,6 +58,8 @@ const reactButtons: {
     if (ifJira(url)) {
       return (
         <Button
+          but-subject="createWF"
+          but-send-as="tab"
           size="lg"
           id="buttonCreateWF"
           gradientDuoTone="purpleToBlue"
@@ -74,7 +76,8 @@ const reactButtons: {
       return (
         <Button
           but-env="live"
-          but-subject="live"
+          but-subject="toEnvironment"
+          but-send-as="runtime"
           size="lg"
           id="buttonToLive"
           color="success"
@@ -91,6 +94,9 @@ const reactButtons: {
     if (ifAnyOfTheEnv(url) && !ifPerf(url)) {
       return (
         <Button
+          but-env="perf"
+          but-subject="toEnvironment"
+          but-send-as="runtime"
           size="lg"
           id="buttonToPerf"
           color="blue"
@@ -107,6 +113,9 @@ const reactButtons: {
     if (ifAnyOfTheEnv(url) && !ifProd(url)) {
       return (
         <Button
+          but-env="prod"
+          but-subject="toEnvironment"
+          but-send-as="runtime"
           size="lg"
           id="buttonToProd"
           color="warning"
@@ -123,6 +132,9 @@ const reactButtons: {
     if (ifAnyOfTheEnv(url) && !ifTouch(url)) {
       return (
         <Button
+          but-env={touch}
+          but-subject="toEnvironment"
+          but-send-as="runtime"
           size="lg"
           id="buttonToTouch"
           onClick={buttonOnClick}
@@ -138,6 +150,9 @@ const reactButtons: {
     if (ifAnyOfTheEnv(url) && !ifClassic(url)) {
       return (
         <Button
+          but-env={classic}
+          but-subject="toEnvironment"
+          but-send-as="runtime"
           size="lg"
           id="buttonToClassic"
           color="failure"
@@ -174,7 +189,7 @@ const reactButtons: {
           size="lg"
           id="buttonOpenPropertiesTouchUI"
           color="light"
-          onClick={buttonOnClick}
+          onClick={openPropertiesTouchUI}
         >
           Open Properties Touch UI
         </Button>
@@ -187,6 +202,8 @@ const reactButtons: {
       this.toolsButtonsExist();
       return (
         <Button
+          but-subject="openInTree"
+          but-send-as="runtime"
           size="lg"
           id="buttonOpenInTree"
           color="success"
@@ -203,6 +220,8 @@ const reactButtons: {
       this.toolsButtonsExist();
       return (
         <Button
+          but-subject="checkReferences"
+          but-send-as="tab"
           size="lg"
           id="buttonCheckReferences"
           color="failure"
@@ -219,6 +238,8 @@ const reactButtons: {
       this.toolsButtonsExist();
       return (
         <Button
+          but-subject="checkMothersite"
+          but-send-as="tab"
           size="lg"
           id="buttonCheckMothersite"
           color="success"
@@ -234,88 +255,35 @@ const reactButtons: {
 
 async function buttonOnClick(event: React.MouseEvent<HTMLButtonElement>) {
   const but: HTMLButtonElement = event.currentTarget;
-  console.log(but.getAttribute("but-env"));
-  console.log(but.getAttribute("but-subject"));
+  const sendAs = but.getAttribute("but-send-as")!;
 
-  const tab: Tabs.Tab[] = await Browser.tabs.query({
+  const tabs: Tabs.Tab[] = await Browser.tabs.query({
     highlighted: true,
     currentWindow: true,
   });
 
-  const newTab: boolean = event.type !== "click";
-
   const message: MessageCommon = {
     from: "popup",
-    env: "",
-    subject: "toEnvironment",
-    tabs: tab,
-    newTab,
+    newTab: event.type !== "click",
+    env: but.getAttribute("but-env")!,
+    subject: but.getAttribute("but-subject")!,
+    tabs,
   };
 
-  enum SendAs {
-    Tab,
-    Runtime,
-    None,
-  }
-
-  const properties: {
-    [key: string]: Function;
-  } = {
-    buttonCreateWF() {
-      message.subject = "createWF";
-      return SendAs.Tab;
-    },
-    buttonToLive() {
-      message.env = "live";
-      return SendAs.Runtime;
-    },
-    buttonToPerf() {
-      message.env = "perf";
-      return SendAs.Runtime;
-    },
-    buttonToProd() {
-      message.env = "prod";
-      return SendAs.Runtime;
-    },
-    buttonToTouch() {
-      message.env = touch;
-      return SendAs.Runtime;
-    },
-    buttonToClassic() {
-      message.env = classic;
-      return SendAs.Runtime;
-    },
-    buttonOpenPropertiesTouchUI() {
-      openPropertiesTouchUI(tab[tab.length - 1]);
-      return SendAs.None;
-    },
-    buttonOpenInTree() {
-      message.subject = "openInTree";
-      return SendAs.Runtime;
-    },
-    buttonCheckReferences() {
-      message.subject = "checkReferences";
-      return SendAs.Tab;
-    },
-    buttonCheckMothersite() {
-      message.subject = "checkMothersite";
-      return SendAs.Tab;
-    },
-  };
-
-  const result: null = properties[but.id as keyof typeof properties]();
-  if (result === SendAs.None) {
+  if (sendAs == null) {
     return;
   }
 
-  if (result === SendAs.Tab) {
-    Browser.tabs.sendMessage(tab[tab.length - 1].id!, message);
+  if (sendAs === "tab") {
+    Browser.tabs.sendMessage(tabs[tabs.length - 1].id!, message);
   } else {
     Browser.runtime.sendMessage(message);
   }
 }
 
-function openPropertiesTouchUI(tab: Tabs.Tab) {
+async function openPropertiesTouchUI() {
+  const tab: Tabs.Tab = await getCurrenTab();
+
   const newUrl: string = tab.url!.replace(
     regexAuthor,
     "https://wwwperf.brandeuauthorlb.ford.com/mnt/overlay/wcm/core/content/sites/properties.html?item=$2",
@@ -334,7 +302,7 @@ async function copyContent(url: string) {
 }
 
 function showMessage(message: string, time: number) {
-  if (statusBar === undefined) {
+  if (statusBar == null) {
     statusBar = document.getElementById("statusBar") as HTMLParagraphElement;
   }
   const statusBarParent =

@@ -1,0 +1,23 @@
+a {
+    @apply font-medium text-blue-600 hover:underline
+}
+
+button {
+    @apply text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 p-2 focus:ring-gray-100 font-medium rounded-lg text-sm
+}
+
+button.apply[data-ng-click="validateLinks()"] {
+    @apply text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-yellow-300
+}
+
+button.apply[data-ng-click="applyLinksReplace()"], button#start-request-workflow {
+    @apply text-white bg-green-700 hover:bg-green-800 focus:ring-green-300
+}
+
+input[type="text"] {
+    @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2
+}
+
+input[type="checkbox"] {
+    @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2
+}
