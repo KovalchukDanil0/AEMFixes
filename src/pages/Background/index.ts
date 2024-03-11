@@ -16,9 +16,9 @@ function toEnvironment(
   url?: string,
 ) {
   tabs.forEach(async (tab) => {
-    const tempUrl: string = url ?? tab.url!;
+    const initUrl: string = url ?? tab.url!;
 
-    const data = new AEMLink(new URL(tempUrl));
+    const data = new AEMLink(initUrl);
     const newUrl = await data.determineEnv(env);
 
     if (newTab) {

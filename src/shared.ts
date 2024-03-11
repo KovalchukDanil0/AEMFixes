@@ -13,7 +13,7 @@ export const regexWorkflow = new RegExp(
   mathAllNonCapt +
     authorBase +
     authorEnvBase +
-    /\/etc\/workflow\/packages\/ESM\/(\w\w)(?:_)?(\w\w)?(?:\/\w\w(\w\w))?\/(ESM-?\d*-\w*?)\.html/
+    /\/etc\/workflow\/packages\/ESM\/(\w\w)(?:_)?(\w\w)?(?:\/\w\w(\w\w))?\/(ESM-.*)\.html/
       .source +
     mathAllNonCapt,
 );
@@ -116,7 +116,7 @@ export interface ReferencesConfig {
 }
 
 export default class AEMLink {
-  url: URL;
+  url?: URL;
 
   market = "xx";
   localLanguage = "xx";
@@ -143,44 +143,44 @@ export default class AEMLink {
 
   marketsHomeNew: string[] = ["ie", "fi", "be", "cz", "hu", "gr", "ro", "lu"];
 
-  constructor(url?: URL) {
-    this.url = url!;
+  constructor(url?: string) {
+    this.url = new URL(url!);
 
     if (url == null) {
       return;
     }
 
-    this.urlPart = url.pathname + url.search + url.hash;
+    this.urlPart = this.url.pathname + this.url.search + this.url.hash;
     if (this.urlPart === "/") {
       this.urlPart = "";
     }
 
     // Live
-    if (regexLive.test(url.href)) {
-      if (url.href.replace(regexLive, "$3") === "") {
-        this.market = url.href.replace(regexLive, "$2");
-        this.localLanguage = url.href.replace(regexLive, "$1");
+    if (regexLive.test(this.url.href)) {
+      if (this.url.href.replace(regexLive, "$3") === "") {
+        this.market = this.url.href.replace(regexLive, "$2");
+        this.localLanguage = this.url.href.replace(regexLive, "$1");
       } else {
-        this.market = url.href.replace(regexLive, "$3");
-        this.localLanguage = url.href.replace(regexLive, "$2");
+        this.market = this.url.href.replace(regexLive, "$3");
+        this.localLanguage = this.url.href.replace(regexLive, "$2");
       }
     }
     // Perf & Prod
-    else if (regexPerfProd.test(url.href)) {
-      if (url.href.replace(regexPerfProd, "$3") === "uk") {
-        this.market = url.href.replace(regexPerfProd, "$3");
-        this.localLanguage = url.href.replace(regexPerfProd, "$2");
+    else if (regexPerfProd.test(this.url.href)) {
+      if (this.url.href.replace(regexPerfProd, "$3") === "uk") {
+        this.market = this.url.href.replace(regexPerfProd, "$3");
+        this.localLanguage = this.url.href.replace(regexPerfProd, "$2");
       } else {
-        this.market = url.href.replace(regexPerfProd, "$2");
-        this.localLanguage = url.href.replace(regexPerfProd, "$3");
+        this.market = this.url.href.replace(regexPerfProd, "$2");
+        this.localLanguage = this.url.href.replace(regexPerfProd, "$3");
       }
     }
     // Author
-    else if (regexAuthor.test(url.href)) {
-      this.market = url.href.replace(regexAuthor, "$3");
+    else if (regexAuthor.test(this.url.href)) {
+      this.market = this.url.href.replace(regexAuthor, "$3");
       this.localLanguage = this.fixLocalLanguage(
         false,
-        url.href.replace(regexAuthor, "$4"),
+        this.url.href.replace(regexAuthor, "$4"),
       );
 
       this.isAuthor = true;
@@ -189,13 +189,6 @@ export default class AEMLink {
     }
 
     this.isMarketInBeta();
-    if (this.isAuthor) {
-      if (this.betaBool) {
-        this.authorBeta = true;
-      } else {
-        this.fixUrlPart();
-      }
-    }
   }
 
   isMarketInBeta(someMarket?: string): boolean {
@@ -271,39 +264,28 @@ export default class AEMLink {
     return this.localLanguage;
   }
 
-  fixUrlPart(someUrlPart = null) {
-    if (someUrlPart != null) {
-      this.urlPart = someUrlPart;
-    }
+  fixUrlPart(someUrlPart?: string): string {
+    someUrlPart = someUrlPart ?? this.urlPart;
 
     const regexFixSWAuthor =
       /\S+?(site-wide-content|home-new|home)((?:\S+)?(?=\.html)|\S+)(?:\S+)?/gm;
 
-    if (this.urlPart.replace(regexFixSWAuthor, "$1") === "site-wide-content") {
-      this.urlPart = this.urlPart.replace(regexFixSWAuthor, "/content$2");
+    if (someUrlPart.replace(regexFixSWAuthor, "$1") === "site-wide-content") {
+      someUrlPart = someUrlPart.replace(regexFixSWAuthor, "/content$2");
     } else {
-      this.urlPart = this.urlPart.replace(regexFixSWAuthor, "$2");
+      someUrlPart = someUrlPart.replace(regexFixSWAuthor, "$2");
     }
 
-    return this.urlPart;
+    return someUrlPart;
   }
 
-  async getAuthorRealUrl() {
-    if (!this.authorBeta) {
-      return this.urlPart;
-    }
-
-    const tab = await getCurrenTab();
-
+  async getPerfRealUrl() {
     let html = null;
-    const currTabUrl = tab.url;
-    if (currTabUrl == null) {
-      return;
-    }
+    const tabUrl = this.url!.href;
 
-    if (!regexAuthor.test(currTabUrl)) {
+    if (!regexAuthor.test(tabUrl)) {
       const regexDeleteEnv = /\/(?:editor\.html|cf#)/gm;
-      const toEnvUrl = this.url.href.replace(regexDeleteEnv, "");
+      const toEnvUrl = this.url!.href.replace(regexDeleteEnv, "");
 
       const response = await fetch(toEnvUrl, {
         headers: {
@@ -313,12 +295,15 @@ export default class AEMLink {
       html = await response.text();
     }
 
-    const callback = await Browser.tabs.sendMessage(tab.id!, {
+    const tab: Tabs.Tab = (
+      await Browser.tabs.query({ url: this.url?.href, currentWindow: true })
+    )[0];
+    const realPerfUrl = await Browser.tabs.sendMessage(tab.id!, {
       from: "background",
       subject: "getRealUrl",
       html,
     });
-    this.urlPart = this.fixUrlPart(callback);
+    this.urlPart = this.fixUrlPart(realPerfUrl);
 
     return this.urlPart;
   }
@@ -329,11 +314,11 @@ export default class AEMLink {
     if (this.isAuthor) {
       if (env === classic || env === touch) {
         const notContainsAuthor: boolean =
-          this.url.href.replace(regexFastAuthor, "$2") !== "author";
+          this.url!.href.replace(regexFastAuthor, "$2") !== "author";
         const notContainsHtml: boolean =
-          this.url.href.replace(regexFastAuthor, "$6") !== "html";
+          this.url!.href.replace(regexFastAuthor, "$6") !== "html";
 
-        newUrl = this.url.href.replace(
+        newUrl = this.url!.href.replace(
           regexFastAuthor,
           `$1${notContainsAuthor ? "author" : ""}$3${env + "/"}$5${
             notContainsHtml ? ".html" : ""
@@ -343,7 +328,7 @@ export default class AEMLink {
         return newUrl;
       }
 
-      await this.getAuthorRealUrl();
+      this.urlPart = await this.getPerfRealUrl();
     }
 
     switch (env) {

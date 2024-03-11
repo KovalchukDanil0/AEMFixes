@@ -5,6 +5,7 @@ import ReferencesBanner from "../../containers/ReferencesBanner";
 import WFShowTicket from "../../containers/WFShowTicket";
 import {
   GUX3,
+  MessageCommon,
   ReferencesConfig,
   loadSavedData,
   regexAuthor,
@@ -15,6 +16,11 @@ const url =
   window.location !== window.parent.location
     ? window.parent.location.href
     : window.location.href;
+
+function getRealPerfUrl(): string {
+  return document.querySelector<HTMLMetaElement>("head > meta[name='og:url']")
+    ?.content!;
+}
 
 async function catErrors() {
   const savedData = await loadSavedData();
@@ -59,7 +65,6 @@ async function catErrors() {
   }
 }
 
-//! May not work
 async function ticketFinder() {
   const blockingTicketElm: HTMLElement = await waitForElm(
     "div.workflows-warning-bar > i:nth-child(3)",
@@ -71,7 +76,6 @@ async function ticketFinder() {
   root.render(wfShowTicket);
 }
 
-//! May not work
 let refGot = false;
 async function checkReferences() {
   if (refGot) {
@@ -103,11 +107,17 @@ async function checkReferences() {
   refGot = true;
 }
 
-Browser.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
-  if (msg.from === "popup" && msg.subject === "checkReferences") {
-    checkReferences();
-  }
-});
+Browser.runtime.onMessage.addListener(
+  (msg: MessageCommon, _sender, _sendResponse) => {
+    if (msg.from === "popup" && msg.subject === "checkReferences") {
+      checkReferences();
+    }
+
+    if (msg.from === "background" && msg.subject === "getRealUrl") {
+      return Promise.resolve(getRealPerfUrl());
+    }
+  },
+);
 
 (async function Main() {
   const savedData = await loadSavedData();
