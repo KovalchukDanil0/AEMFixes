@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 import { createRoot } from "react-dom/client";
+import "../../assets/css/tailwind-no-overlap.css";
 import WFFixedLinks from "../../containers/WFFixedLinks";
 import AEMLink, {
   addBetaToLink,
@@ -87,7 +88,6 @@ async function UsefulLinks() {
     addElem(fullPath);
   }
 
-  //! May not work
   function addElem(path: string) {
     const div = document.createElement("div");
     const root = createRoot(ULinkContainer.appendChild(div));

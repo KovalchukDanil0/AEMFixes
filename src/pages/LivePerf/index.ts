@@ -1,6 +1,7 @@
 import { ReactElement } from "react";
 import { createRoot, Root } from "react-dom/client";
 import Browser, { Runtime } from "webextension-polyfill";
+import "../../assets/css/tailwind-no-overlap.css";
 import InfoAlert from "../../containers/InfoAlert";
 import ShowroomCodes from "../../containers/ShowroomCodes";
 import VehicleCode from "../../containers/VehicleCode";
@@ -144,9 +145,9 @@ function checkMothersite(from: string) {
     root.render(vehicleCodeElm);
   } else {
     Browser.runtime.sendMessage({
+      message,
       from: "context",
       subject: "showMessage",
-      message,
       time: 5000,
     });
   }

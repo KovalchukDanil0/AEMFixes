@@ -1,5 +1,4 @@
 import React from "react";
-import "../../assets/css/tailwind.css";
 import { regexRemoveCommas } from "../../shared";
 
 export default function WFShowTicket({
@@ -13,7 +12,7 @@ export default function WFShowTicket({
   );
   return (
     <a
-      className="cursor-pointer font-medium text-blue-600 hover:underline dark:text-blue-500"
+      className="cursor-pointer font-medium text-blue-500 hover:underline"
       href={`https://jira.uhub.biz/browse/GTBEMEA${blockingTicketReplaced}#view-subtasks`}
       target="_blank"
       rel="noreferrer"

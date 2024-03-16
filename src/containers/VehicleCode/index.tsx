@@ -1,6 +1,5 @@
 import { Button } from "flowbite-react";
 import React from "react";
-import "../../assets/css/tailwind.css";
 
 export default function VehicleCode({
   code,

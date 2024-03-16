@@ -144,11 +144,11 @@ export default class AEMLink {
   marketsHomeNew: string[] = ["ie", "fi", "be", "cz", "hu", "gr", "ro", "lu"];
 
   constructor(url?: string) {
-    this.url = new URL(url!);
-
     if (url == null) {
       return;
     }
+
+    this.url = new URL(url);
 
     this.urlPart = this.url.pathname + this.url.search + this.url.hash;
     if (this.urlPart === "/") {

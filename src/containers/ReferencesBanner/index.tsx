@@ -1,12 +1,11 @@
 import React from "react";
-import "../../assets/css/tailwind.css";
 import { ReferencesConfig, touch } from "../../shared";
 
 export default function ReferencesBanner({
   pages,
 }: Readonly<ReferencesConfig>): React.ReactElement {
   return (
-    <div className="grid grid-rows-4 bg-gradient-to-r from-black to-gray-600 px-24 py-24">
+    <div className="grid grid-rows-4 bg-gray-900 px-24 py-24">
       {pages
         .toSorted((a, b) => a.path.localeCompare(b.path))
         .map((page, i) => {

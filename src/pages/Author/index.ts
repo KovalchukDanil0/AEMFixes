@@ -1,6 +1,7 @@
 import { ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 import Browser from "webextension-polyfill";
+import "../../assets/css/tailwind-no-overlap.css";
 import ReferencesBanner from "../../containers/ReferencesBanner";
 import WFShowTicket from "../../containers/WFShowTicket";
 import {

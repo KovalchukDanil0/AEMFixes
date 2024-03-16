@@ -1,12 +1,11 @@
 import React from "react";
-import "../../assets/css/tailwind.css";
 import { ShowroomCode } from "../../shared";
 
 export default function ShowroomCodes({
   data,
 }: Readonly<ShowroomCode>): React.ReactElement {
   return (
-    <div className="bg-gradient-to-r from-black to-gray-600 px-24 py-24">
+    <div className="bg-gray-900 px-24 py-24">
       {Object.keys(data).map((item, i) => {
         const dataElm = data[item as keyof typeof data];
         return (

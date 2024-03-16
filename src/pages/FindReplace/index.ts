@@ -1,5 +1,5 @@
 import Browser from "webextension-polyfill";
-import "../../assets/css/tailwind.css";
+import "../../assets/css/tailwind-no-overlap.css";
 import { MessageCommon, waitForElm } from "../../shared";
 import "../../shared.css";
 

@@ -1,5 +1,4 @@
 import React from "react";
-import "../../assets/css/tailwind.css";
 import "../../shared.css";
 
 export default function WFFixedLinks({
