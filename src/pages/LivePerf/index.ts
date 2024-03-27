@@ -293,4 +293,11 @@ Browser.runtime.onMessage.addListener(
 
   vehicleCodeInit();
   findShowroomCode();
+
+  /*   loader.init().then((monacoEditor) => {
+    monacoEditor.editor.create(document.body, {
+      value: "<div>FFF</div>",
+      language: "html",
+    });
+  }); */
 })();

@@ -9,6 +9,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const ReactRefreshTypeScript = require("react-refresh-typescript");
 const pkg = require("./package.json");
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 process.env.version = pkg.version;
 process.env.description = pkg.description;

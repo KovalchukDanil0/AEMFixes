@@ -6,16 +6,6 @@ This project is designed to automate **boring work** like copying text or displa
 
 _Break the AEM_ image
 
-## Installation
-
-AEM Fixes can be downloaded through chrome web store <https://chromewebstore.google.com/detail/aemfixes/enncmomonbnjkpljcmahbooohommdmnk>
-
-Also it can be built from source:
-
-- clone repository
-- run `npm run build`
-- load unpacked /build folder in extensions page
-
 ## Features
 
 **_Some functions require their parameters to be enabled in options page_**
@@ -89,3 +79,13 @@ output (clicking to classic, with the shift held down):
   ![Context Menu](tutorial/ContextMenu.png)
 
 and much more that I forgot.
+
+## Installation
+
+AEM Fixes can be downloaded through chrome web store <https://chromewebstore.google.com/detail/aemfixes/enncmomonbnjkpljcmahbooohommdmnk>
+
+Also it can be built from source:
+
+- clone repository
+- run `npm run build`
+- load unpacked /build folder in extensions page

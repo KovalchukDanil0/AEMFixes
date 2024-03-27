@@ -2,16 +2,16 @@ import Browser from "webextension-polyfill";
 import { loadSavedData, regexWFTitle } from "../../shared";
 
 function createWFButton() {
-  const buttonsContainer = document.querySelector(
-    "#stalker > div > div.command-bar > div > div > div > div.aui-toolbar2-primary",
-  ) as HTMLDivElement;
+  const buttonsContainer: HTMLDivElement = document.querySelector(
+    "#stalker >* div.aui-toolbar2-primary",
+  )!;
 
   const butCreateWF: HTMLAnchorElement = document
     .querySelector("#assign-issue")!
     .cloneNode(true) as HTMLAnchorElement;
 
   butCreateWF.removeAttribute("id");
-  butCreateWF.href = AEMToolsCreateWF();
+  butCreateWF.href = AEMToolsCreateWF(butCreateWF);
   butCreateWF.target = "_blank";
 
   butCreateWF.title = "Create WF";
@@ -22,8 +22,15 @@ function createWFButton() {
   buttonsContainer.appendChild(butCreateWF);
 }
 
-const selectorTextNoSpaces = (selector: string): string =>
-  document.querySelector(selector)!.textContent!.trim();
+function selectorTextNoSpaces(selector: string): string {
+  try {
+    return document.querySelector(selector)!.textContent!.trim();
+  } catch (err) {
+    throw new Error(
+      `element with selector "${selector}" was not found\nfull error - ${err}`,
+    );
+  }
+}
 
 function textToWFPath(
   market: string,
@@ -157,7 +164,7 @@ function textToWFPath(
   return fullPath;
 }
 
-function AEMToolsCreateWF(): string {
+function AEMToolsCreateWF(but?: HTMLAnchorElement): string {
   const ticketNumElm: HTMLElement = document.querySelector(
     "#parent_issue_summary",
   ) as HTMLElement;
@@ -183,7 +190,9 @@ function AEMToolsCreateWF(): string {
 
     let fix = "";
     const ticketStatus: string = (
-      document.querySelector("#status-val > span") as HTMLSpanElement
+      document.querySelector(
+        "#opsbar-transitions_more > span",
+      ) as HTMLSpanElement
     ).textContent!;
     if (ticketStatus.includes("deployment")) {
       fix = "-FIX";
@@ -198,7 +207,13 @@ function AEMToolsCreateWF(): string {
   );
   const ticketTitle: string = selectorTextNoSpaces("#summary-val");
 
-  Browser.storage.local.set({ WFTitle: ticketTitle, WFName: ticketNumber() });
+  if (but == null) {
+    SaveData(ticketTitle, ticketNumber());
+  } else {
+    but.addEventListener("click", function () {
+      SaveData(ticketTitle, ticketNumber());
+    });
+  }
 
   const WFPath: string = textToWFPath(
     ticketMarket,
@@ -210,6 +225,10 @@ function AEMToolsCreateWF(): string {
     "https://wwwperf.brandeuauthorlb.ford.com/miscadmin#/etc/workflow/packages/ESM/" +
     WFPath
   );
+}
+
+function SaveData(ticketTitle: string, ticketNumber: string) {
+  Browser.storage.local.set({ WFTitle: ticketTitle, WFName: ticketNumber });
 }
 
 function FixSorting() {

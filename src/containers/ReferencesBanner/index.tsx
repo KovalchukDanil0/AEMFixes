@@ -5,7 +5,7 @@ export default function ReferencesBanner({
   pages,
 }: Readonly<ReferencesConfig>): React.ReactElement {
   return (
-    <div className="grid grid-rows-4 bg-gray-900 px-24 py-24">
+    <div className="flex flex-col bg-gray-900 px-24 py-24">
       {pages
         .toSorted((a, b) => a.path.localeCompare(b.path))
         .map((page, i) => {
