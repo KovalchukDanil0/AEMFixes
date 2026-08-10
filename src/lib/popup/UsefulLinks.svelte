@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Link } from "$lib";
-  import { Github, Wrench } from "@lucide/svelte";
+  import { FolderGit2Icon, Wrench } from "@lucide/svelte";
+  import { Link } from "..";
 </script>
 
 <div class="useful-links">
@@ -13,15 +13,15 @@
     target="_blank"
     postHogEvent="guide_link_clicked"
   >
-    <Github />
+    <FolderGit2Icon />
   </Link>
 </div>
 
 <style lang="scss">
   div.useful-links {
     display: flex;
-    flex-grow: 0.5;
-    gap: 0.5rem;
+    flex-grow: 1;
+    gap: 8px;
     align-items: flex-end;
     width: 100%;
     justify-content: space-between;

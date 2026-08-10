@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Callisto, Europa, Ganymede, Io } from "$assets/jupiter-moons";
-  import type { Component } from "svelte";
+  import type { SvelteComponent } from "svelte";
   import { Moon } from ".";
 
   // Constants
@@ -13,7 +13,7 @@
   // Moon Data
   let moons = $state<
     Array<{
-      style: {
+      styles: {
         zIndex: number;
         size: number;
         left?: number;
@@ -23,32 +23,32 @@
       name: string;
       period: number;
       orbitRadius: number;
-      el: Component;
+      el: SvelteComponent;
     }>
   >([
     {
-      style: { zIndex: 4, size: 49 * 5 },
+      styles: { zIndex: 4, size: 49 * 5 },
       name: "Io",
       period: 1.769 * EARTH_DAY,
       orbitRadius: 140,
       el: Io,
     },
     {
-      style: { zIndex: 2, size: 27 * 5 },
+      styles: { zIndex: 2, size: 27 * 5 },
       name: "Europa",
       period: 3.551 * EARTH_DAY,
       orbitRadius: 170,
       el: Europa,
     },
     {
-      style: { zIndex: 3, size: 28 * 5 },
+      styles: { zIndex: 3, size: 28 * 5 },
       name: "Ganymede",
       period: 7.155 * EARTH_DAY,
       orbitRadius: 200,
       el: Ganymede,
     },
     {
-      style: { zIndex: 1, size: 15 * 5 },
+      styles: { zIndex: 1, size: 15 * 5 },
       name: "Callisto",
       period: 16.689 * EARTH_DAY,
       orbitRadius: 230,
@@ -59,7 +59,7 @@
   function setMoons() {
     const time = Date.now();
 
-    for (const { style, period, orbitRadius } of moons) {
+    for (const { styles, period, orbitRadius } of moons) {
       const orbitalAngle = ((time % period) / period) * Math.PI * 2;
 
       const rotationAngle = ((time % JUPITER_DAY) / JUPITER_DAY) * Math.PI * 2;
@@ -71,11 +71,11 @@
         const x = WIDTH / 2 + Math.cos(apparent) * orbitRadius;
         const y = HORIZON_Y - Math.sin(apparent) * 90;
 
-        style.left = x;
-        style.top = y;
-        style.display = "block";
+        styles.left = x;
+        styles.top = y;
+        styles.display = "block";
       } else {
-        style.display = "none";
+        styles.display = "none";
       }
     }
   }
@@ -84,7 +84,7 @@
 </script>
 
 <div class="jupiter-moons">
-  {#each moons as { el, style }}
+  {#each moons as { el, styles: style }, idx (idx)}
     <Moon icon={el} {...style} />
   {/each}
 </div>

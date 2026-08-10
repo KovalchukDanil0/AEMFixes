@@ -1,6 +1,7 @@
 import { mount } from "svelte";
-import Popup from "./Popup.svelte";
+import App from "./App.svelte";
+import "./style.scss";
 
-export default mount(Popup, {
-  target: document.body,
+export default mount(App, {
+  target: document.getElementById("app")!,
 });

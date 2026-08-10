@@ -2,14 +2,14 @@
   import { regexDetermineBeta } from "$lib/storage";
   import type { HTMLAttributes } from "svelte/elements";
 
-  type Props = ReferencesConfig & HTMLAttributes<EventTarget>;
+  type Props = App.ReferencesConfig & HTMLAttributes<EventTarget>;
 
   const { pages, ...restProps }: Props = $props();
 </script>
 
 <div {...restProps} class="referencesBanner">
   {#if pages.length !== 0}
-    {#each pages.toSorted( ({ path }, { path: pathToCompare }) => path.localeCompare(pathToCompare), ) as { path } (path)}
+    {#each pages.toSorted( ({ path }, { path: pathToCompare }) => path.localeCompare(pathToCompare) ) as { path } (path)}
       {@const href =
         path.replace(regexDetermineBeta, `$1/editor.html$2`) + ".html"}
 
@@ -25,8 +25,8 @@
     display: flex;
     flex-direction: column;
     background-color: slategray;
-    padding: 6rem;
-    gap: 1rem;
+    padding: 96px;
+    gap: 16px;
 
     a {
       width: fit-content;

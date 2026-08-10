@@ -14,7 +14,7 @@
 
 <style lang="scss">
   p.invalidLinks {
-    padding: 1rem;
+    padding: 16px;
     background-color: crimson;
     color: white;
   }

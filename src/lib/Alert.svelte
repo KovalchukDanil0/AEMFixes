@@ -19,11 +19,11 @@
   @use "$assets/variables" as *;
 
   div {
-    padding: 0.75rem;
-    border-radius: 0.75rem;
+    padding: 12px;
+    border-radius: 192px;
     width: 66.666667%;
-    font-size: 1.125rem;
-    line-height: 1.75rem;
+    font-size: 18px;
+    line-height: 28px;
     text-align: center;
 
     &.green {

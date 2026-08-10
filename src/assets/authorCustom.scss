@@ -2,7 +2,7 @@ button {
   align-items: center;
   background-color: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.25rem;
+  border-radius: 4px;
   box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
   box-sizing: border-box;
   color: rgba(0, 0, 0, 0.85);
@@ -11,8 +11,8 @@ button {
   font-weight: 600;
   justify-content: center;
   line-height: 1.25;
-  margin: 0.1rem;
-  padding: 0.25rem 0.75rem;
+  margin: 1.6px;
+  padding: 4px 12px;
   position: relative;
   text-decoration: none;
   transition: all 250ms;

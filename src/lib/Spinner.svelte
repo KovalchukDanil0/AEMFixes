@@ -37,8 +37,8 @@
   }
 
   svg.spinner {
-    width: 2rem;
-    height: 2rem;
+    width: 32px;
+    height: 32px;
     color: $secondary-color;
     fill: $tertiary-color-2;
     animation: spin 1s linear infinite;

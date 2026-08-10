@@ -16,7 +16,7 @@
 </script>
 
 <div class="sky">
-  {#each stars as { duration, left, top, size }}
+  {#each stars as { duration, left, top, size }, idx (idx)}
     <div
       class="star"
       style:width="{size}px"

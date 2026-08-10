@@ -7,7 +7,7 @@
 
   const { text, ...restProps }: Props = $props();
 
-  let currentElement: HTMLDivElement;
+  let currentElement: HTMLElement;
 </script>
 
 <div {...restProps} bind:this={currentElement} class="alertBanner">
@@ -22,7 +22,7 @@
 <style lang="scss">
   div.alertBanner {
     background-color: rgb(17 24 39 / 72%);
-    padding: 1rem;
+    padding: 16px;
     position: fixed;
     width: 100%;
     top: 0;
@@ -32,21 +32,21 @@
       margin-top: 0;
       margin-bottom: 0;
       text-align: center;
-      font-size: 1.5rem;
-      line-height: 2rem;
+      font-size: 24px;
+      line-height: 32px;
       font-weight: 700;
       color: rgb(220 38 38);
     }
 
     button {
-      height: 2rem;
+      height: 32px;
       border-width: 1px;
       border-color: transparent;
       background-color: transparent;
       color: white;
       position: absolute;
-      right: 1rem;
-      top: 1rem;
+      right: 16px;
+      top: 16px;
     }
   }
 </style>

@@ -1,4 +1,4 @@
-import { ErrorMessage, ReferencesBanner, WFShowTicket } from "$lib";
+import { ErrorMessage, ReferencesBanner, WFShowTicket } from "$lib/content";
 import { onMessage } from "$lib/messaging";
 import {
   authorMatch,
@@ -26,7 +26,7 @@ function getRealPerfUrl() {
     const realAuthorLink = document.querySelector<HTMLLinkElement>(
       "head > link[rel='canonical']",
     )?.href;
-    alias = `https://${fullAuthorPath}${realAuthorLink}`;
+    alias = `https://${fullAuthorPath}${realAuthorLink ?? ""}`;
   }
 
   return alias;
@@ -85,7 +85,7 @@ async function checkReferences() {
         Accept: "application/json",
       },
     })
-    .json<ReferencesConfig>();
+    .json<App.ReferencesConfig>();
 
   const container = document.body.insertBefore(
     document.createElement("span"),

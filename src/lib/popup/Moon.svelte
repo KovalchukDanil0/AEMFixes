@@ -12,7 +12,7 @@
     display?: string;
   }
 
-  let { icon: Icon, size, left, zIndex, display }: Props = $props();
+  let { icon: Icon, size, left, top, zIndex, display }: Props = $props();
 </script>
 
 <div

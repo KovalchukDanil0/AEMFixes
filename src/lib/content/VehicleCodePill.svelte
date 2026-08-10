@@ -14,7 +14,7 @@
 
 <style lang="scss">
   a.carCodeElm {
-    margin-top: 0.6rem;
+    margin-top: 9.6px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -39,7 +39,6 @@
     position: relative;
     transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
     user-select: none;
-    -webkit-user-select: none;
     touch-action: manipulation;
     vertical-align: middle;
     white-space: nowrap;

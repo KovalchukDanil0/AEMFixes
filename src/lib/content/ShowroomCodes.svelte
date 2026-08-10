@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from "svelte/elements";
 
-  type Props = HTMLAttributes<HTMLDivElement> & ShowroomCode;
+  type Props = HTMLAttributes<HTMLDivElement> & App.ShowroomCode;
 
   const { data: showroomConfig, ...restProps }: Props = $props();
 </script>
@@ -16,7 +16,7 @@
 <style lang="scss">
   div.showroomCodes {
     background-color: rgb(17 24 39);
-    padding: 6rem;
+    padding: 96px;
     display: flex;
     flex-direction: column;
 

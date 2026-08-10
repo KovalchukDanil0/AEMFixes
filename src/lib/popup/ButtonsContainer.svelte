@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Alert, Button, ButtonEnv, Spinner } from "$lib";
-  import { onMessage, sendMessage } from "$lib/messaging";
-  import { fullAuthorPath, propertiesPath, regexAuthor } from "$lib/storage";
   import ky from "ky";
+  import { Alert, Button, ButtonEnv, Spinner } from "..";
+  import { onMessage, sendMessage } from "../messaging";
+  import { fullAuthorPath, propertiesPath, regexAuthor } from "../storage";
   import { mergeClass } from "../utils";
 
   interface Props {
@@ -11,7 +11,7 @@
 
   interface AlertType {
     text: string;
-    color: ColorProps;
+    color: App.ColorProps;
   }
 
   let { tab }: Props = $props();
@@ -22,10 +22,10 @@
 
   let fadeOut = $state(false);
   let pageLoaded = $state(false);
-  let environment = $state<EnvTypes | null>(null);
+  let environment = $state<App.EnvTypes | null>(null);
   let alertBanner = $state<AlertType>();
 
-  const setEnvironment = (env: EnvTypes) => (environment = env);
+  const setEnvironment = (env: App.EnvTypes) => (environment = env);
 
   browser.tabs.onUpdated.addListener(async (updatedTabId, changeInfo) => {
     if (updatedTabId !== tab?.id) {
@@ -78,7 +78,10 @@
       throw new Error(`copied content is undefined`);
     }
 
-    alertBanner = { text: `${content} copied to clipboard`, color: "green" };
+    alertBanner = {
+      text: `${content} copied to clipboard`,
+      color: "green",
+    };
     await navigator.clipboard.writeText(content);
   }
 
@@ -320,7 +323,8 @@
   div.buttons-container {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    flex-grow: 1;
+    gap: 20px;
     justify-content: center;
     align-items: center;
     opacity: 1;
@@ -349,7 +353,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 8px;
   }
 
   div.wrap {
@@ -359,12 +363,12 @@
   div.rescue-banner {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 12px;
 
     &-buttons {
       display: flex;
       flex-direction: row;
-      gap: 0.75rem;
+      gap: 12px;
     }
   }
 </style>

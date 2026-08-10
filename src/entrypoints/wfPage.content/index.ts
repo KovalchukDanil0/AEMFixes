@@ -1,11 +1,15 @@
 import "$assets/authorCustom.scss";
-import { WFOpenAllPages, WFUsefulLinks } from "$lib";
+import { WFOpenAllPages, WFUsefulLinks } from "$lib/content";
 import { regexDetermineBeta, wfPageMatch } from "$lib/storage";
 import { waitForElm } from "$lib/utils";
 import { mount } from "svelte";
 import "./style.scss";
 
-function addBetaToLink(link: HTMLAnchorElement) {
+function addAuthorToLink(link: HTMLAnchorElement) {
+  if (link.href.includes("/editor.html")) {
+    return;
+  }
+
   link.href = link.href.replace(regexDetermineBeta, `$1/editor.html$2`);
 }
 
@@ -27,7 +31,7 @@ function addWorkflowId() {
   workflowTitleInput.value = workflowID;
 
   for (const link of linksInWF) {
-    addBetaToLink(link);
+    addAuthorToLink(link);
   }
 
   const requestButton = document.querySelector<HTMLButtonElement>(
@@ -77,7 +81,7 @@ async function checkNodes() {
           "div > div:nth-child(1) > div.configValue > a",
         );
         if (linkElm) {
-          addBetaToLink(linkElm);
+          addAuthorToLink(linkElm);
         }
 
         const placeholderElm = childElm.querySelector("img");

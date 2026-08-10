@@ -1,19 +1,16 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from "svelte/elements";
   import posthog from "./posthog";
-  import type { PostHogProps } from "./types";
-  import { mergeClass } from "./utils";
 
   type ColorVariant = "green" | "red";
-  type Variant = "icon";
+  type Variant = "icon" | "option-back";
 
-  interface Props extends HTMLAnchorAttributes, Partial<PostHogProps> {
+  interface Props extends HTMLAnchorAttributes, Partial<App.PostHogProps> {
     color?: ColorVariant;
     variant?: Variant;
   }
 
   const {
-    class: className,
     color,
     variant,
     onclick,
@@ -35,7 +32,7 @@
 
 <a
   {...restProps}
-  class={mergeClass(variant && [color ?? "", variant], className?.toString())}
+  class={variant && [color ?? "", variant]}
   onclick={(ev) => {
     onclick?.(ev);
     posthogCapture();
@@ -53,16 +50,29 @@
     cursor: pointer;
     color: white;
 
-    border-radius: 0.75rem;
+    border-radius: 12px;
     border-style: none;
-    font-size: 1rem;
-    line-height: 1.5rem;
+    font-size: 16px;
+    line-height: 24px;
 
     &.icon {
       display: flex;
       flex-direction: row;
-      gap: 0.25rem;
+      gap: 4px;
       align-items: center;
+    }
+
+    &.option-back {
+      position: absolute;
+
+      top: 20px;
+      left: 20px;
+
+      z-index: 10;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     &.green {

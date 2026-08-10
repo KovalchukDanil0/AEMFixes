@@ -3,22 +3,24 @@
 @use "$assets/variables" as *;
 
 body {
-  display: flex;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  flex-direction: column;
-  justify-content: center;
-  box-sizing: border-box;
+    display: flex;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
 
-  width: $popup-width;
-  height: auto;
-  min-height: $popup-min-height;
+    min-width: $popup-width;
+    width: 100%;
+    min-height: $popup-min-height;
+    height: auto;
 
-  font-family: Open Sans;
+    font-family: Open Sans;
 }
 
-main {
-  display: contents;
+main,
+#app {
+    display: contents;
 }
 
 p,
@@ -34,7 +36,7 @@ span,
 label,
 button,
 textarea {
-  color: white;
+    color: white;
 }
 
 /* @layer base {

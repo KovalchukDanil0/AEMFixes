@@ -10,18 +10,9 @@ export default defineConfig({
       svelteSVG({ requireSuffix: false, svgoConfig: {} }),
       ViteImageOptimizer(),
     ],
-    optimizeDeps: {
-      esbuildOptions: {
-        target: "esnext",
-      },
-    },
     build: {
       target: "esnext",
       minify: true,
-    },
-    esbuild: {
-      legalComments: "none",
-      drop: ["console", "debugger"],
     },
     server: {
       hmr: false,

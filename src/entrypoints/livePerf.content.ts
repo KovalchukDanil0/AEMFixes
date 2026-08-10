@@ -2,8 +2,8 @@ import {
   AlertMothersite,
   ProgrammerError,
   ShowroomCodes,
-  VehicleCode,
-} from "$lib";
+  VehicleCodePill,
+} from "$lib/content";
 import { onMessage, sendMessage } from "$lib/messaging";
 import {
   isLive,
@@ -18,7 +18,6 @@ import ky from "ky";
 import { mount } from "svelte";
 
 let lastVehicleIndex = -1;
-
 let showroomShowed = false;
 
 interface VehicleConfig {
@@ -91,7 +90,7 @@ async function randomProgrammerMemes() {
 
   const memesData = await ky
     .get(`${githubPath}memes.json`)
-    .json<MemeResponseType>();
+    .json<App.MemeResponseType>();
 
   // Removing all children of element
   billboardElm.replaceChildren();
@@ -238,9 +237,11 @@ function findVehicleCode(
         fullCode += `-${versionCode}`;
       }
 
-      mount(VehicleCode, {
+      mount(VehicleCodePill, {
         target: carElm.parentElement,
-        props: { code: fullCode },
+        props: {
+          code: fullCode,
+        },
       });
     }
   }
@@ -274,7 +275,7 @@ async function findShowroomCode() {
         Accept: "application/json",
       },
     })
-    .json<ShowroomCode>()
+    .json<App.ShowroomCode>()
     .catch(async () => {
       await sendMessage("showMessage", {
         text: "Please log in to AEM account, or try to refresh page",
@@ -358,14 +359,16 @@ async function nextGenCodes() {
       nameplateId,
     });
 
-    mount(VehicleCode, {
+    mount(VehicleCodePill, {
       target: car,
-      props: { code: fullCode.toString() },
+      props: {
+        code: fullCode.toString(),
+      },
     });
   }
 }
 
-const determineEnvironment = (): EnvTypes | undefined => {
+const determineEnvironment = (): App.EnvTypes | undefined => {
   if (isLive(location.href)) {
     return "live";
   }

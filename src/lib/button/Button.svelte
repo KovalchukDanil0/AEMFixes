@@ -2,12 +2,11 @@
   import type { HTMLButtonAttributes } from "svelte/elements";
   import type { ButtonProps } from ".";
   import posthog from "../posthog";
-  import type { PostHogProps } from "../types";
   import { mergeClass } from "../utils";
 
   type Props = ButtonProps &
     Omit<HTMLButtonAttributes, "color"> &
-    Partial<PostHogProps>;
+    Partial<App.PostHogProps>;
 
   const {
     class: className,
@@ -56,15 +55,15 @@
     cursor: pointer;
 
     display: flex;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
     flex-direction: row;
-    gap: 0.25rem;
+    gap: 4px;
     border-style: none;
-    font-size: 1.25rem;
-    line-height: 1.75rem;
+    font-size: 20px;
+    line-height: 28px;
     text-align: center;
     transition-property: transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -105,15 +104,15 @@
 
     &.rounded {
       &-small {
-        border-radius: 0.5rem;
+        border-radius: 8px;
       }
 
       &-medium {
-        border-radius: 0.75rem;
+        border-radius: 12px;
       }
 
       &-big {
-        border-radius: 4rem;
+        border-radius: 64px;
       }
     }
   }

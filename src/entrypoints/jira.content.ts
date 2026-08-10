@@ -1,4 +1,4 @@
-import { WFCreateButton } from "$lib";
+import { WFCreateButton } from "$lib/content";
 import { onMessage } from "$lib/messaging";
 import {
   fullAuthorPath,

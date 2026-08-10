@@ -9,7 +9,6 @@
   import { initPosthog } from "$lib/posthog";
   import { initTour } from "$lib/tour";
   import { onMount } from "svelte";
-  import "./style.scss";
 
   const [tab] = await browser.tabs.query({
     active: true,
@@ -48,8 +47,8 @@
 <style lang="scss">
   div.content {
     position: relative;
-    padding: 0.5rem;
-    padding-top: 2rem;
+    padding: 8px;
+    padding-top: 32px;
     box-sizing: border-box;
     width: 100%;
     height: 100%;

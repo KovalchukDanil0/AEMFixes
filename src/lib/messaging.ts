@@ -9,18 +9,18 @@ interface MessageTabs extends MessageCommon {
 }
 
 interface MessageEnv extends MessageTabs {
-  env?: EnvTypes;
+  env?: App.EnvTypes;
   tabs: Browser.tabs.Tab[];
   newTab: boolean;
 }
 
 interface MessageAlert extends MessageCommon {
   text: string;
-  color: ColorProps;
+  color: App.ColorProps;
 }
 
 export interface ProtocolMap {
-  getEnvironment(data: MessageCommon): EnvTypes | null;
+  getEnvironment(data: MessageCommon): App.EnvTypes | null;
   getRealUrl(): string | undefined;
 
   toEnvironment(data: MessageEnv): void;

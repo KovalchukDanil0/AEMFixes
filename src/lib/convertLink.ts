@@ -15,313 +15,307 @@ import {
 } from "./storage";
 
 interface OriginalPathType {
-  map: { originalPath: string };
-}
-
-const marketsInBeta: string[] = [
-  "uk",
-  "de",
-  "es",
-  "fr",
-  "nl",
-  "it",
-  "no",
-  "at",
-  "pt",
-  "pl",
-  "dk",
-];
-
-const marketsHomeNew: string[] = [
-  "ie",
-  "fi",
-  "be",
-  "cz",
-  "hu",
-  "gr",
-  "ro",
-  "lu",
-  "ch",
-];
-
-export const isMarketInBeta = (market?: string) =>
-  marketsInBeta.some((marketBeta) => marketBeta === market);
-
-export const betaString = (beta: boolean) => (beta ? "-beta" : "");
-
-const isMarketHasHomeNew = (market?: string) =>
-  marketsHomeNew.some((mar) => market?.includes(mar));
-
-export function fixMarket(market?: string) {
-  const marketsFixAuthor = ["gb", "en", "gl"];
-  const marketsFixPerf = ["uk", "uk", "mothersite"];
-
-  if (!market) {
-    return;
-  }
-  const marketLower = market.toLowerCase();
-
-  const idxAuthor = marketsFixAuthor.indexOf(marketLower);
-  if (idxAuthor >= 0) {
-    return marketsFixPerf[idxAuthor] ?? market;
-  }
-
-  const idxPerf = marketsFixPerf.indexOf(marketLower);
-  if (idxPerf >= 0) {
-    return marketsFixAuthor[idxPerf] ?? market;
-  }
-
-  return marketLower;
-}
-
-export function fixLocalLanguage(
-  market?: string,
-  localLanguage?: string,
-  toAuthor = false,
-) {
-  if (!market || localLanguage === market) {
-    return "";
-  }
-
-  const properties: {
-    [market: string]: [string, string] | undefined;
-  } = {
-    uk: ["co", "en"],
-    ie: ["", "en"],
-    fr: ["", "fr"],
-    lu: ["", "fr"],
-    de: ["", "de"],
-    at: ["", "de"],
-    dk: ["", "da"],
-    cz: ["", "cs"],
-    gr: ["", "el"],
-    fi: ["", "fi"],
-    hu: ["", "hu"],
-    ro: ["", "ro"],
-    es: ["", "es"],
-    nl: ["", "nl"],
-    it: ["", "it"],
-    no: ["", "no"],
-    pt: ["", "pt"],
-    pl: ["", "pl"],
+  map: {
+    originalPath: string;
   };
-
-  return properties[market]?.[+toAuthor] ?? localLanguage;
 }
 
-function fixUrlPart(urlPart: string) {
-  const regexFixSWAuthor =
-    /\S+?(site-wide-content|home-new|home)((?:\S+)?(?=\.html)|\S+)(?:\S+)?/gm;
+export class UrlConverter {
+  private readonly betaMarkets = [
+    "uk",
+    "de",
+    "es",
+    "fr",
+    "nl",
+    "it",
+    "no",
+    "at",
+    "pt",
+    "pl",
+    "dk",
+  ];
 
-  const matchSiteWide = regexFixSWAuthor.exec(urlPart);
-  if (!matchSiteWide) {
-    throw new Error("Regex not matched url part");
-  }
+  private readonly homeNewMarkets = [
+    "ie",
+    "fi",
+    "be",
+    "cz",
+    "hu",
+    "gr",
+    "ro",
+    "lu",
+    "ch",
+  ];
 
-  const [, siteWide, partWithoutContent] = matchSiteWide;
+  isMarketInBeta = (market?: string) =>
+    this.betaMarkets.some((marketBeta) => marketBeta === market);
 
-  if (siteWide === "site-wide-content") {
-    urlPart = `/content${partWithoutContent}`;
-  } else {
-    urlPart = partWithoutContent;
-  }
+  betaString = (beta: boolean) => (beta ? "-beta" : "");
 
-  return urlPart;
-}
+  async convertLink(env: App.EnvTypes, url: URL): Promise<string> {
+    const { pathname, search, hash, href } = url;
 
-async function getPerfRealUrl(url: string) {
-  const [tab] = await browser.tabs.query({ currentWindow: true, url });
-  if (!tab?.id) {
-    throw new Error("tab id is undefined");
-  }
-
-  const realPerfUrl = await sendMessage("getRealUrl", undefined, tab.id);
-  if (!realPerfUrl) {
-    throw new Error(
-      "Cannot get the alias of the page, make sure you on TouchUI page or try to reload page",
-    );
-  }
-
-  return fixUrlPart(realPerfUrl);
-}
-
-async function determineEnv(
-  env: EnvTypes,
-  url: string,
-  isAuthor: boolean,
-  urlPart: string,
-  market?: string,
-  localLanguage?: string,
-) {
-  let newUrl: string;
-
-  const beta = isMarketInBeta(market);
-
-  if (isAuthor) {
-    if (env === "cf#" || env === "editor.html") {
-      const matchFastAuthor = regexFastAuthor.exec(url);
-      if (!matchFastAuthor) {
-        throw new Error("Regex not matched fast author");
-      }
-
-      const [, linkDomain, authorPart, authorEnv, , linkContent, htmlPart] =
-        matchFastAuthor;
-
-      newUrl = `${linkDomain}${
-        authorPart === "author" ? "" : "author"
-      }${authorEnv}${env}/${linkContent}${htmlPart === "html" ? "" : ".html"}`;
-
-      return newUrl;
+    let urlPart = pathname + search + hash;
+    if (urlPart === "/") {
+      urlPart = "";
     }
 
-    urlPart = await getPerfRealUrl(url);
+    const live = regexLive.exec(href);
+    if (live) {
+      const [, languageTmp, tld, domain] = live;
+
+      const market = domain || tld;
+      const language = domain ? tld : languageTmp;
+
+      return this.determineEnv(env, href, false, urlPart, market, language);
+    }
+
+    const perf = regexPerfProd.exec(href);
+    if (perf) {
+      const [, , tld, domain] = perf;
+
+      const isUk = domain === "uk";
+
+      return this.determineEnv(
+        env,
+        href,
+        false,
+        urlPart,
+        isUk ? domain : tld,
+        isUk ? tld : domain,
+      );
+    }
+
+    const author = regexAuthor.exec(href);
+    if (author) {
+      return this.determineEnv(
+        env,
+        href,
+        true,
+        pathname,
+        author[4],
+        this.fixLocalLanguage(author[4], author[5]),
+      );
+    }
+
+    throw new Error(`${href} doesn't match any supported environment`);
   }
 
-  switch (env) {
-    case "live":
-      newUrl = makeLive(urlPart, market, localLanguage);
-      break;
-    case "perf":
-      newUrl = makePerfProd(true, urlPart, beta, market, localLanguage);
-      break;
-    case "prod":
-      newUrl = makePerfProd(false, urlPart, beta, market, localLanguage);
-      break;
-    case "editor.html":
-      newUrl = await makeAuthor(true, beta, urlPart, market, localLanguage);
-      break;
-    case "cf#":
-      newUrl = await makeAuthor(false, beta, urlPart, market, localLanguage);
-      break;
-    default:
-      throw new Error(`No such environment ${env}`);
+  private async determineEnv(
+    env: App.EnvTypes,
+    href: string,
+    isAuthor: boolean,
+    urlPart: string,
+    market?: string,
+    language?: string,
+  ) {
+    const beta = this.isBetaMarket(market);
+
+    if (isAuthor) {
+      if (env === "cf#" || env === "editor.html") {
+        const match = regexFastAuthor.exec(href);
+
+        if (!match) {
+          throw new Error("Regex not matched fast author");
+        }
+
+        const [, domain, authorPart, authorEnv, , content, html] = match;
+
+        return `${domain ?? ""}${
+          authorPart === "author" ? "" : "author"
+        }${authorEnv ?? ""}${env}/${content ?? ""}${html === "html" ? "" : ".html"}`;
+      }
+
+      urlPart = (await this.getPerfRealUrl(href)) ?? "";
+    }
+
+    switch (env) {
+      case "live":
+        return this.makeLive(urlPart, market, language);
+
+      case "perf":
+        return this.makePerfProd(true, urlPart, beta, market, language);
+
+      case "prod":
+        return this.makePerfProd(false, urlPart, beta, market, language);
+
+      case "editor.html":
+        return this.makeAuthor(true, beta, urlPart, market, language);
+
+      case "cf#":
+        return this.makeAuthor(false, beta, urlPart, market, language);
+
+      default:
+        throw new Error(`Unknown environment: ${env}`);
+    }
   }
 
-  return newUrl;
-}
-
-function makeLive(urlPart: string, market?: string, localLanguage?: string) {
-  let britain = "";
-  if (market === "uk") {
-    britain = "uk";
-    market = "co.";
-    localLanguage = "";
+  private isBetaMarket(market?: string) {
+    return this.betaMarkets.includes(market ?? "");
   }
 
-  if (localLanguage) {
-    localLanguage += ".";
+  private betaSuffix(beta: boolean) {
+    return beta ? "-beta" : "";
   }
 
-  return `https://www.${localLanguage ?? ""}${topLevelDomain}.${market}${britain}${urlPart}`;
-}
-
-function makePerfProd(
-  isPerf: boolean,
-  urlPart: string,
-  beta: boolean,
-  market?: string,
-  localLanguage?: string,
-) {
-  if (market === "uk" || market === "gb") {
-    market = "co";
-    localLanguage = "uk";
+  private hasHomeNew(market?: string) {
+    return this.homeNewMarkets.some((m) => market?.includes(m));
   }
 
-  const domainPerfProd = isPerf ? domainPerf : domainProd;
+  public fixMarket(market?: string) {
+    if (!market) return;
 
-  return `https://${domainPerfProd}${betaString(beta)}-${market}${localLanguage ?? ""}.${domain}.${topLevelDomain}.com${urlPart}`;
-}
+    const author = ["gb", "en", "gl"];
+    const perf = ["uk", "uk", "mothersite"];
 
-async function makeAuthor(
-  isTouch: boolean,
-  beta: boolean,
-  urlPart: string,
-  market?: string,
-  localLanguage?: string,
-) {
-  let wrongLink = `/content/guxeu${betaString(
-    beta,
-  )}/${market}/${fixLocalLanguage(market, localLanguage, true)}_${fixMarket(
-    market,
-  )}/${isMarketHasHomeNew(market) && !urlPart ? "home-new" : "home"}${urlPart}`;
+    const lower = market.toLowerCase();
 
-  const matchFixSiteWide = regexFixSiteWide.exec(wrongLink);
-  if (!matchFixSiteWide) {
-    throw new Error("Regex not matched site wide");
+    const idxAuthor = author.indexOf(lower);
+    if (idxAuthor >= 0) return perf[idxAuthor];
+
+    const idxPerf = perf.indexOf(lower);
+    if (idxPerf >= 0) return author[idxPerf];
+
+    return lower;
   }
 
-  const [, linkDomain, , linkContent, linkPart] = matchFixSiteWide;
+  public fixLocalLanguage(
+    market?: string,
+    language?: string,
+    toAuthor = false,
+  ) {
+    if (!market || market === language) {
+      return "";
+    }
 
-  if (linkContent === "/content") {
-    wrongLink = `${linkDomain}/site-wide-content${linkPart}`;
+    const map: Record<string, [string, string]> = {
+      uk: ["co", "en"],
+      ie: ["", "en"],
+      fr: ["", "fr"],
+      lu: ["", "fr"],
+      de: ["", "de"],
+      at: ["", "de"],
+      dk: ["", "da"],
+      cz: ["", "cs"],
+      gr: ["", "el"],
+      fi: ["", "fi"],
+      hu: ["", "hu"],
+      ro: ["", "ro"],
+      es: ["", "es"],
+      nl: ["", "nl"],
+      it: ["", "it"],
+      no: ["", "no"],
+      pt: ["", "pt"],
+      pl: ["", "pl"],
+    };
+
+    return map[market]?.[+toAuthor] ?? language;
   }
 
-  const {
-    map: { originalPath },
-  } = await ky
-    .get(`https://${fullAuthorPath}/${pathToResolver}${wrongLink}`, {
-      headers: {
-        Accept: "application/json",
-      },
-    })
-    .json<OriginalPathType>()
-    .catch(() => {
-      throw new Error("Please logIn to your AEM account");
+  private fixUrlPart(urlPart: string) {
+    const regex =
+      /\S+?(site-wide-content|home-new|home)((?:\S+)?(?=.html)|\S+)(?:\S+)?/gm;
+
+    const match = regex.exec(urlPart);
+
+    if (!match) {
+      throw new Error("Regex not matched url part");
+    }
+
+    const [, siteWide, part] = match;
+
+    return siteWide === "site-wide-content" ? `/content${part ?? ""}` : part;
+  }
+
+  private async getPerfRealUrl(url: string) {
+    const [tab] = await browser.tabs.query({
+      currentWindow: true,
+      url,
     });
 
-  return makeRealAuthorLink(originalPath, isTouch);
+    if (!tab?.id) {
+      throw new Error("Tab id is undefined");
+    }
+
+    const realUrl = await sendMessage("getRealUrl", undefined, tab.id);
+
+    if (!realUrl) {
+      throw new Error(
+        "Cannot get alias of the page. Reload the page or open Touch UI.",
+      );
+    }
+
+    return this.fixUrlPart(realUrl);
+  }
+
+  private makeLive(urlPart: string, market?: string, language?: string) {
+    let uk = "";
+
+    if (market === "uk") {
+      uk = "uk";
+      market = "co.";
+      language = "";
+    }
+
+    return `https://www.${language ? `${language}.` : ""}${topLevelDomain}.${market ?? ""}${uk}${urlPart}`;
+  }
+
+  private makePerfProd(
+    perf: boolean,
+    urlPart: string,
+    beta: boolean,
+    market?: string,
+    language?: string,
+  ) {
+    if (market === "uk" || market === "gb") {
+      market = "co";
+      language = "uk";
+    }
+
+    const subdomain = perf ? domainPerf : domainProd;
+
+    return `https://${subdomain}${this.betaSuffix(beta)}-${market ?? ""}${language ?? ""}.${domain}.${topLevelDomain}.com${urlPart}`;
+  }
+
+  private async makeAuthor(
+    touch: boolean,
+    beta: boolean,
+    urlPart: string,
+    market?: string,
+    language?: string,
+  ) {
+    let path =
+      `/content/guxeu${this.betaSuffix(beta)}/${market ?? ""}/` +
+      `${this.fixLocalLanguage(market, language, true) ?? ""}_${this.fixMarket(market) ?? ""}/` +
+      `${this.hasHomeNew(market) && !urlPart ? "home-new" : "home"}${urlPart}`;
+
+    const match = regexFixSiteWide.exec(path);
+
+    if (!match) {
+      throw new Error("Regex not matched site wide");
+    }
+
+    const [, domain, , content, part] = match;
+
+    if (content === "/content") {
+      path = `${domain ?? ""}/site-wide-content${part ?? ""}`;
+    }
+
+    const {
+      map: { originalPath },
+    } = await ky
+      .get(`https://${fullAuthorPath}/${pathToResolver}${path}`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      .json<OriginalPathType>()
+      .catch(() => {
+        throw new Error("Please log in to your AEM account");
+      });
+
+    return `https://${fullAuthorPath}/${touch ? "editor.html" : "cf#"}${originalPath}.html`;
+  }
 }
 
-function makeRealAuthorLink(wrongLink: string, isTouch: boolean): string {
-  return `https://${fullAuthorPath}/${
-    isTouch ? "editor.html" : "cf#"
-  }${wrongLink}.html`;
-}
-
-export async function convertLink(
-  env: EnvTypes,
-  { pathname, search, hash, href }: URL,
-) {
-  let urlPart = pathname + search + hash;
-  if (urlPart === "/") {
-    urlPart = "";
-  }
-
-  // Try live regex first
-  const matchLive = regexLive.exec(href);
-  if (matchLive) {
-    const [, localLanguageTemp, topLevelDomain, domain] = matchLive;
-    const market = domain || topLevelDomain;
-    const localLanguage = domain ? topLevelDomain : localLanguageTemp;
-
-    return determineEnv(env, href, false, urlPart, market, localLanguage);
-  }
-
-  // Try perf/prod regex
-  const matchPerfProd = regexPerfProd.exec(href);
-  if (matchPerfProd) {
-    const [, , topLevelDomain, domain] = matchPerfProd;
-
-    const isUk = domain === "uk";
-
-    const market = isUk ? domain : topLevelDomain;
-    const localLanguage = isUk ? topLevelDomain : domain;
-
-    return determineEnv(env, href, false, urlPart, market, localLanguage);
-  }
-
-  // Try author regex
-  const matchAuthor = regexAuthor.exec(href);
-  if (matchAuthor) {
-    const market = matchAuthor[4];
-    const localLanguage = fixLocalLanguage(market, matchAuthor[5]);
-
-    // fix resource resolver not working if link not ending with html
-    urlPart = pathname;
-
-    return determineEnv(env, href, true, urlPart, market, localLanguage);
-  }
-
-  // No regex matched
-  throw new Error(`${href} doesn't match any of the env`);
-}
+export const urlConverter = new UrlConverter();

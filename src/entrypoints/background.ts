@@ -1,5 +1,5 @@
 import livePerfUrl from "$assets/livePerf.scss?url";
-import { convertLink } from "$lib/convertLink";
+import { UrlConverter } from "$lib/convertLink";
 import { onMessage, sendMessage } from "$lib/messaging";
 import { initPosthog } from "$lib/posthog";
 import {
@@ -17,7 +17,7 @@ let posthog: PostHog | null = null;
 async function toEnvironment(
   activeTabs: Browser.tabs.Tab[],
   newTab: boolean,
-  env: EnvTypes,
+  env: App.EnvTypes,
   url?: string,
 ) {
   for (const activeTab of activeTabs) {
@@ -26,8 +26,11 @@ async function toEnvironment(
       throw new Error("url is undefined");
     }
 
-    const newUrl = await convertLink(env, new URL(tabUrl)).catch(
-      async (error: unknown) => {
+    const urlConverter = new UrlConverter();
+
+    const newUrl = await urlConverter
+      .convertLink(env, new URL(tabUrl))
+      .catch(async (error: unknown) => {
         if (error instanceof Error) {
           await sendMessage("showMessage", {
             color: "red",
@@ -36,15 +39,14 @@ async function toEnvironment(
 
           throw new Error(error.message);
         }
-      },
-    );
+      });
 
     if (!newTab && activeTab.id) {
-      browser.tabs.update(activeTab.id, {
+      await browser.tabs.update(activeTab.id, {
         url: newUrl,
       });
     } else {
-      browser.tabs.create({ index: activeTab.index + 1, url: newUrl });
+      await browser.tabs.create({ index: activeTab.index + 1, url: newUrl });
     }
   }
 }
@@ -172,7 +174,7 @@ async function handleOpenInTouchUI(
 
 async function handleToEnvironment(
   patternTab: Browser.tabs.Tab,
-  env: EnvTypes,
+  env: App.EnvTypes,
   linkUrl?: string,
 ) {
   await toEnvironment([patternTab], true, env, linkUrl);
@@ -199,7 +201,15 @@ async function checkTag(url?: string, tabId?: number) {
 
 export default defineBackground({
   type: "module",
-  main() {
+  async main() {
+    posthog ??= await initPosthog({
+      persistence: "localStorage",
+      capture_pageview: false,
+      autocapture: false,
+      disable_session_recording: true,
+      disable_surveys: true,
+    });
+
     onMessage(
       "toEnvironment",
       async ({ data: { tabs: msgTabs, env, newTab } }) => {
@@ -217,7 +227,7 @@ export default defineBackground({
     });
 
     onMessage("getCookie", async ({ sender }) => {
-      const senderTabUrl: string | undefined = sender.tab.url;
+      const senderTabUrl: string | undefined = sender.tab?.url;
       if (!senderTabUrl) {
         return;
       }
@@ -230,7 +240,7 @@ export default defineBackground({
     });
 
     onMessage("injectMothersiteCss", async ({ sender }) => {
-      const tabId: number | undefined = sender.tab.id;
+      const tabId: number | undefined = sender.tab?.id;
       if (!tabId) {
         return;
       }
@@ -263,15 +273,7 @@ export default defineBackground({
           throw new Error("tab in menus is undefined");
         }
 
-        posthog ??= await initPosthog({
-          persistence: "localStorage",
-          capture_pageview: false,
-          autocapture: false,
-          disable_session_recording: true,
-          disable_surveys: true,
-        });
-
-        posthog.capture(`menu_${snakeCase(noCase(menuItemId.toString()))}`);
+        posthog?.capture(`menu_${snakeCase(noCase(menuItemId.toString()))}`);
 
         switch (menuItemId) {
           case "openInDAM":

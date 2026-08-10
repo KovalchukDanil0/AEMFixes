@@ -1,6 +1,44 @@
 /// <reference types="svelte" />
 /// <reference types="vite/client" />
 
+namespace App {
+  import type {
+    EventName,
+    Properties,
+  } from "posthog-js/dist/module.no-external";
+
+  type ColorProps = "green" | "red";
+
+  interface ShowroomCode {
+    data: Record<
+      string,
+      {
+        code: string;
+        name: string;
+      }
+    >;
+  }
+
+  interface ReferencesConfig {
+    pages: {
+      path: string;
+    }[];
+  }
+
+  type MemeResponseType = Record<string, { path: string }>;
+
+  type EnvTypes = "live" | "perf" | "prod" | "editor.html" | "cf#" | "jira";
+
+  interface EventHandler<T> extends MouseEvent {
+    currentTarget: EventTarget & T;
+  }
+
+  export interface PostHogProps {
+    postHogEvent: EventName;
+    postHogConfig: Properties;
+  }
+}
+
 interface ImportMetaEnv {
   readonly VITE_LIVE_PERF_MATCH: string;
   readonly VITE_JIRA_MATCH: string;

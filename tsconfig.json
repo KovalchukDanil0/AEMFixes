@@ -2,9 +2,6 @@
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
     "useDefineForClassFields": true,
-    "verbatimModuleSyntax": true,
-    "noUncheckedIndexedAccess": true,
     "noImplicitAny": true,
-    "strict": true
-  }
+  },
 }
