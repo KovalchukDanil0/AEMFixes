@@ -34,7 +34,7 @@ const marketMap: Record<string, string> = {
 
 function createWFButton() {
   const buttonsContainer = document.querySelector<HTMLDivElement>(
-    "#stalker >* div.aui-toolbar2-primary",
+    "#stalker .aui-toolbar2-primary",
   );
 
   if (!buttonsContainer) {
